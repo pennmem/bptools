@@ -10,8 +10,11 @@ from bptools.test import datafile
 def test_create_pairs(filename):
     pairs = create_pairs(datafile(filename))
 
-    assert 'contact' in pairs.columns
     assert 'pair' in pairs.columns
+    assert 'label1' in pairs.columns
+    assert 'label2' in pairs.columns
+    assert 'contact1' in pairs.columns
+    assert 'contact2' in pairs.columns
 
     combos = np.array([sorted(pair.split('-')) for pair in pairs.pair])
     df = pd.DataFrame({
@@ -32,3 +35,8 @@ def test_create_pairs(filename):
     except AssertionError:
         print(df)
         raise
+
+    # Labels should match pairs
+    for n, row in pairs.iterrows():
+        assert row.label1 in row.pair
+        assert row.label2 in row.pair

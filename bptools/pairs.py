@@ -33,6 +33,7 @@ def create_pairs(jacksheet_filename, mux_channels=32):
     groups = jacksheet.electrode.unique()
 
     pairs = []
+    contacts = []
     mux = 0
 
     for group in groups:
@@ -48,15 +49,19 @@ def create_pairs(jacksheet_filename, mux_channels=32):
                 pair = _pair_str(el.iloc[i].label, el.iloc[0].label)
                 if pair not in pairs:
                     pairs.append(pair)
+                    contacts.append([el.index[i], el.index[0]])
                 continue
 
             # Last contact
             elif i == len(el) - 1:
                 b = el.iloc[-1].label
+                bi = len(el) - 1
                 if mux_crossed < 0:
                     a = el.iloc[0].label
+                    ai = 0
                 else:
                     a = el.iloc[mux_crossed].label
+                    ai = mux_crossed
 
                 if a != b:
                     pair = _pair_str(a, b)
@@ -64,14 +69,21 @@ def create_pairs(jacksheet_filename, mux_channels=32):
                     # Treat the special case of two contacts
                     if pair not in pairs:
                         pairs.append(pair)
+                        contacts.append([el.index[ai], el.index[bi]])
 
             # Adjacent contacts
             else:
                 pair = _pair_str(el.iloc[i].label, el.iloc[i + 1].label)
                 pairs.append(pair)
+                contacts.append([el.index[i], el.index[i + 1]])
 
+    labels = np.array([pair.split('-') for pair in pairs])
+    contacts = np.array(contacts)
     pdf = pd.DataFrame({
-        'contact': np.arange(len(pairs)) + 1,
-        'pair': pairs
+        'pair': pairs,
+        'label1': labels[:, 0],
+        'label2': labels[:, 1],
+        'contact1': contacts[:, 0],
+        'contact2': contacts[:, 1],
     })
     return pdf
