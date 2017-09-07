@@ -1,7 +1,8 @@
 import os.path as osp
+from argparse import ArgumentParser
 
-from .jacksheet import read_jacksheet
-from .pairs import create_pairs
+from bptools.jacksheet import read_jacksheet
+from bptools.pairs import create_pairs
 
 
 def _num_to_bank_label(num):
@@ -75,3 +76,28 @@ def make_odin_config(filename, name, subject, path=None):
             outfile.writelines(config)
     else:
         return "\n".join(config)
+
+
+def main():
+    """Command-line interface for generating Odin config files."""
+    parser = ArgumentParser(description="Odin config generator")
+    parser.add_argument("--jacksheet", "-j", type=str, help='path to jacksheet file')
+    parser.add_argument("--name", "-n", type=str, required=True, help='configuration name')
+    parser.add_argument("--subject", "-s", type=str, required=True, help='subject ID')
+    parser.add_argument("--output-path", "-o", type=str, help='path to write output to')
+    parser.add_argument("--rhino-root", "-r", type=str, default="/", help="rhino root path for jacksheet discovery")
+    args = parser.parse_args()
+
+    if args.jacksheet is None:
+        root = args.rhino_root if args.rhino_root.endswith("/") else args.rhino_root + "/"
+        jacksheet = osp.expanduser(root) + osp.join("data", "eeg", args.subject, "docs", "jacksheet.txt")
+    else:
+        jacksheet = args.jacksheet
+
+    res = make_odin_config(jacksheet, args.name, args.subject, args.output_path)
+    if res is not None:
+        print(res)
+
+
+if __name__ == "__main__":
+    main()
