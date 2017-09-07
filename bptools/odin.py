@@ -40,7 +40,7 @@ def make_odin_config(filename, name, subject, path=None):
 
     # Header
     config = [
-        "ODINConfigurationVersion:,# 1.2#",
+        "ODINConfigurationVersion:,#1.2#",
         "ConfigurationName:," + name,
         "SubjectID:," + subject,
         "Contacts:",
@@ -55,7 +55,7 @@ def make_odin_config(filename, name, subject, path=None):
         config.append(','.join(data))
 
     # Sense definitions
-    config.append("SenseChannelSubclasses")
+    config.append("SenseChannelSubclasses:")
     config.append("SenseChannels:")
     for _, row in pairs.iterrows():
         data = [row.label1, row.pair.replace('-', ''),
