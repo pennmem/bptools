@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -61,7 +62,10 @@ def create_pairs(jacksheet_filename, mux_channels=32):
             else:
                 pairs.append("{}-{}".format(el.iloc[i].label, el.iloc[i + 1].label))
 
-    pdf = pd.DataFrame(dict(pair=pairs))
+    pdf = pd.DataFrame({
+        'contact': np.arange(len(pairs)) + 1,
+        'pair': pairs
+    })
     return pdf
 
 
@@ -71,4 +75,4 @@ if __name__ == "__main__":
     pairs = create_pairs(filename.expanduser().absolute())
 
     for n, row in pairs.iterrows():
-        print(n + 1, row.pair)
+        print(row.contact, row.pair)
