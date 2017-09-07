@@ -3,6 +3,10 @@ import pandas as pd
 from .jacksheet import read_jacksheet
 
 
+def _pair_str(a, b):
+    return '-'.join(sorted([a, b]))
+
+
 def create_pairs(jacksheet_filename, mux_channels=32):
     """Defines bipolar pairs for the Odin ENS given a jacksheet.
 
@@ -35,13 +39,15 @@ def create_pairs(jacksheet_filename, mux_channels=32):
         mux_crossed = -1
 
         el = jacksheet[jacksheet.electrode == group]
-        for i in range(len(el) - 1):
+        for i in range(len(el)):
             mux += 1
 
             # MUX crossing
-            if mux % 32 == 0 and mux != 0 and i != 0:
-                mux_crossed = i
-                pairs.append("{}-{}".format(el.iloc[i].label, el.iloc[0].label))
+            if mux % mux_channels == 0 and mux != 0 and i != 0:
+                mux_crossed = i + 1
+                pair = _pair_str(el.iloc[i].label, el.iloc[0].label)
+                if pair not in pairs:
+                    pairs.append(pair)
                 continue
 
             # Last contact
@@ -53,24 +59,19 @@ def create_pairs(jacksheet_filename, mux_channels=32):
                     a = el.iloc[mux_crossed].label
 
                 if a != b:
-                    pairs.append("{}-{}".format(a, b))
+                    pair = _pair_str(a, b)
+
+                    # Treat the special case of two contacts
+                    if pair not in pairs:
+                        pairs.append(pair)
 
             # Adjacent contacts
-            # FIXME: handle MUX crossing
             else:
-                pairs.append("{}-{}".format(el.iloc[i].label, el.iloc[i + 1].label))
+                pair = _pair_str(el.iloc[i].label, el.iloc[i + 1].label)
+                pairs.append(pair)
 
     pdf = pd.DataFrame({
         'contact': np.arange(len(pairs)) + 1,
         'pair': pairs
     })
     return pdf
-
-
-if __name__ == "__main__":
-    from pathlib import Path
-    filename = Path("~/mnt/rhino/data/eeg/R1308T/docs/jacksheet.txt")
-    pairs = create_pairs(filename.expanduser().absolute())
-
-    for n, row in pairs.iterrows():
-        print(row.contact, row.pair)
