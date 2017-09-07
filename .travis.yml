@@ -27,8 +27,8 @@ install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy pandas
   - source activate test-environment
-#  - pip install -r requirements.txt
+  - pip install -r requirements.txt
 #  - python setup.py install
 script:
-  - python -m bptools.test
+  - python -m pytest
   - codecov
