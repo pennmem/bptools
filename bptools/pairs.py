@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from .jacksheet import read_jacksheet
 
 
 def create_pairs(jacksheet_filename, mux_channels=32):
@@ -24,10 +25,7 @@ def create_pairs(jacksheet_filename, mux_channels=32):
     pairs : pd.DataFrame
 
     """
-    df = pd.read_csv(jacksheet_filename, index_col=0, names=['label'], sep='\s+')
-    electrodes = df.label.str.extract(r'(^[a-zA-Z]+)', expand=True)\
-        .rename(columns={0: 'electrode'})
-    jacksheet = pd.concat([df, electrodes], axis=1)
+    jacksheet = read_jacksheet(jacksheet_filename)
     groups = jacksheet.electrode.unique()
 
     pairs = []
