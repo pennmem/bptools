@@ -73,7 +73,8 @@ def make_odin_config(filename, name, subject, path=None):
     if path is not None:
         outfile = osp.join(path, '{}_{}.csv'.format(subject, name))
         with open(outfile, 'w') as f:
-            outfile.writelines(config)
+            f.write('\n'.join(config))
+            f.write('\n')
     else:
         return "\n".join(config)
 
