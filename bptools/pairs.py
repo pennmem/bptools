@@ -36,7 +36,6 @@ def _mux_filter(c1, c2):
     if _mux(c1) == _mux(c2):
         return c1, c2
     else:
-        print(c1, _mux(c1), c2, _mux(c2))
         return None, None
 
 
@@ -73,10 +72,14 @@ def create_pairs(jacksheet_filename):
                 # Make adjacent pair
                 c1, c2 = _mux_filter(el.index[i], el.index[i + 1])
             except IndexError:
-                # Last electrode, pair first and last
                 c1, c2 = _mux_filter(el.index[0], el.index[i])
 
-            if c1 is not None:
+            for j in range(i):
+                if c1 is not None:
+                    break
+                c1, c2 = _mux_filter(el.index[j], el.index[i])
+
+            if c1 is not None and [c1, c2] not in contacts:
                 contacts.append([c1, c2])
 
     return _contacts_to_dataframe(jacksheet, contacts)
