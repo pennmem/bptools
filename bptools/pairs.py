@@ -4,7 +4,7 @@ from .jacksheet import read_jacksheet
 
 
 def _pair_str(a, b):
-    return '-'.join(sorted([a, b], key=lambda s: int(''.join([n for n in s if n.isdigit()]))))
+    return '-'.join([a, b])
 
 
 def create_pairs(jacksheet_filename, mux_channels=32):
