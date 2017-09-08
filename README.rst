@@ -38,3 +38,9 @@ on the subject ID.
 
 Stimulation channels must be defined manually via the Odin configuration tool
 GUI.
+
+.. warning::
+
+    In order to properly handle micro contacts on combined macro/micro
+    electrodes, labels in the jacksheet **must** be different for the macro and
+    micro contacts.
