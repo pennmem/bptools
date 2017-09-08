@@ -1,5 +1,9 @@
+import os.path as osp
+import json
+
 import numpy as np
 import pandas as pd
+
 from .jacksheet import read_jacksheet
 
 # Number of channels in one MUX
@@ -83,3 +87,43 @@ def create_pairs(jacksheet_filename):
                 contacts.append([c1, c2])
 
     return _contacts_to_dataframe(jacksheet, contacts)
+
+
+def pairs_to_json(pairs, subject, path):
+    """Convert a pairs :class:`pd.DataFrame` to a ``pairs.json`` file (with
+    coordinates omitted).
+
+    Parameters
+    ----------
+    pairs : pd.DataFrame
+    subject : str
+        Subject ID.
+    path : str
+        Path to write ``pairs.json`` to.
+
+    Notes
+    -----
+    Currently, several other fields are omitted, e.g., electrode type.
+
+    """
+    pd = {}
+    for _, row in pairs.iterrows():
+        pd[row.pair] = {
+            'atlases': {},
+            'channel_1': row.contact1,
+            'channel_2': row.contact2,
+            'code': row.pair,
+            'id': row.pair,
+            'is_explicit': False,
+            'is_stim_only': False,
+            'type_1': 'U',
+            'type_2': 'U'
+        }
+
+    with open(osp.join(path, 'pairs.json'), 'w') as f:
+        out = {
+            subject: {
+                'pairs': pd
+            }
+        }
+        f.write(json.dumps(out))

@@ -1,9 +1,12 @@
+import os.path as osp
+import json
 import pytest
+
 import numpy as np
 import pandas as pd
 
-from bptools.pairs import create_pairs
-from bptools.test import datafile
+from bptools.pairs import create_pairs, pairs_to_json
+from bptools.test import datafile, tempdir
 
 
 @pytest.mark.parametrize('filename', ['simple_jacksheet.txt', 'R1308T_jacksheet.txt'])
@@ -46,3 +49,20 @@ def test_no_mux_crossing():
             assert 'B' not in pair
         if 'B' in pair:
             assert 'A' not in pair
+
+
+def test_pairs_to_json():
+    pairs = create_pairs(datafile('R1308T_jacksheet.txt'))
+
+    with tempdir() as path:
+        pairs_to_json(pairs, 'R1308T', path)
+        pair_list = pairs.pair.tolist()
+        outfile = osp.join(path, 'pairs.json')
+        assert osp.exists(outfile)
+
+        with open(outfile, 'r') as f:
+            result = json.loads(f.read())
+            assert 'R1308T' in result.keys()
+            assert 'pairs' in result['R1308T'].keys()
+            for key in result['R1308T']['pairs']:
+                assert key in pair_list

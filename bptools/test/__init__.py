@@ -11,7 +11,7 @@ def datafile(name):
 @contextmanager
 def tempdir():
     """Create a temporary directory and remove its contents upon completion."""
-    d = tempfile.gettempdir()
+    d = tempfile.mkdtemp()
     yield d
     try:
         shutil.rmtree(d)
