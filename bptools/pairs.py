@@ -60,7 +60,7 @@ def create_pairs(jacksheet_filename):
 
         for i in range(len(el)):
             # MUX crossing
-            if len(contacts) % _ODIN_MUX_CHANNELS == 0:
+            if len(contacts) % _ODIN_MUX_CHANNELS == 0 and i != 0:
                 mux_crossed = i + 1
                 c1, c2 = el.index[0], el.index[i]
 
