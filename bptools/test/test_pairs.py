@@ -37,3 +37,12 @@ def test_create_pairs(filename):
     for n, row in pairs.iterrows():
         assert row.label1 in row.pair
         assert row.label2 in row.pair
+
+
+def test_no_mux_crossing():
+    pairs = create_pairs(datafile('mux_test_jacksheet.csv'))
+    for pair in pairs.pair:
+        if 'A' in pair:
+            assert 'B' not in pair
+        if 'B' in pair:
+            assert 'A' not in pair
