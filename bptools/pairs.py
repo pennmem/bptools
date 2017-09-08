@@ -2,12 +2,37 @@ import numpy as np
 import pandas as pd
 from .jacksheet import read_jacksheet
 
+# Number of channels in one MUX
+_ODIN_MUX_CHANNELS = 32
+
 
 def _pair_str(a, b):
     return '-'.join([a, b])
 
 
-def create_pairs(jacksheet_filename, mux_channels=32):
+def _contacts_to_dataframe(jacksheet, contacts):
+    """Inner workings of taking a list of contacts and generating a nice,
+    human-friendly DataFrame.
+
+    """
+    contacts = np.array(contacts)
+    labels = [
+        jacksheet.loc[contacts[:, n]].label.tolist()
+        for n in range(2)
+    ]
+    pairs = ['-'.join([labels[0][n], labels[1][n]]) for n in range(len(labels[0]))]
+    pdf = pd.DataFrame({
+        'pair': pairs,
+        'label1': labels[0],
+        'label2': labels[1],
+        'contact1': contacts[:, 0],
+        'contact2': contacts[:, 1],
+        'mux': [n // _ODIN_MUX_CHANNELS for n in range(len(contacts))],
+    })
+    return pdf
+
+
+def create_pairs(jacksheet_filename):
     """Defines bipolar pairs for the Odin ENS given a jacksheet.
 
     This uses a scheme to live within the constraints of ENS configuration,
@@ -19,11 +44,6 @@ def create_pairs(jacksheet_filename, mux_channels=32):
     jacksheet_filename : str
         Path to jacksheet to read.
 
-    Keyword Arguments
-    -----------------
-    mux_channels : int
-        Number of channels contained in a MUX (32 for the Odin ENS).
-
     Returns
     -------
     pairs : pd.DataFrame
@@ -32,58 +52,36 @@ def create_pairs(jacksheet_filename, mux_channels=32):
     jacksheet = read_jacksheet(jacksheet_filename)
     groups = jacksheet.electrode.unique()
 
-    pairs = []
     contacts = []
-    mux = 0
 
     for group in groups:
+        # We don't care about heart rate
+        if group in ['ECG', 'EKG']:
+            continue
+
         mux_crossed = -1
-
         el = jacksheet[jacksheet.electrode == group]
+
         for i in range(len(el)):
-            mux += 1
-
             # MUX crossing
-            if mux % mux_channels == 0 and mux != 0 and i != 0:
+            if len(contacts) % _ODIN_MUX_CHANNELS == 0:
                 mux_crossed = i + 1
-                pair = _pair_str(el.iloc[0].label, el.iloc[i].label)
-                if pair not in pairs:
-                    pairs.append(pair)
-                    contacts.append([el.index[0], el.index[i]])
-                continue
+                c1, c2 = el.index[0], el.index[i]
 
-            # Last contact
+            # Last contact on an electrode
             elif i == len(el) - 1:
-                b = el.iloc[-1].label
                 bi = len(el) - 1
                 if mux_crossed < 0:
-                    a = el.iloc[0].label
                     ai = 0
                 else:
-                    a = el.iloc[mux_crossed].label
                     ai = mux_crossed
-
-                if a != b:
-                    pair = _pair_str(a, b)
-
-                    # Treat the special case of two contacts
-                    if pair not in pairs:
-                        pairs.append(pair)
-                        contacts.append([el.index[ai], el.index[bi]])
+                c1, c2 = el.index[ai], el.index[bi]
 
             # Adjacent contacts
             else:
-                pair = _pair_str(el.iloc[i].label, el.iloc[i + 1].label)
-                pairs.append(pair)
-                contacts.append([el.index[i], el.index[i + 1]])
+                c1, c2 = el.index[i], el.index[i + 1]
 
-    labels = np.array([pair.split('-') for pair in pairs])
-    contacts = np.array(contacts)
-    pdf = pd.DataFrame({
-        'pair': pairs,
-        'label1': labels[:, 0],
-        'label2': labels[:, 1],
-        'contact1': contacts[:, 0],
-        'contact2': contacts[:, 1],
-    })
-    return pdf
+            if c1 != c2:
+                contacts.append([c1, c2])
+
+    return _contacts_to_dataframe(jacksheet, contacts)
