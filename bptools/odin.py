@@ -78,7 +78,7 @@ def make_odin_config(filename, name, subject, path=None):
         return "\n".join(config)
 
 
-def main():
+def main():  # pragma: nocover
     """Command-line interface for generating Odin config files."""
     parser = ArgumentParser(description="Odin config generator")
     parser.add_argument("--jacksheet", "-j", type=str, help='path to jacksheet file')
@@ -100,5 +100,5 @@ def main():
         print(res)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: nocover
     main()
