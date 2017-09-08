@@ -6,10 +6,6 @@ from .jacksheet import read_jacksheet
 _ODIN_MUX_CHANNELS = 32
 
 
-def _pair_str(a, b):
-    return '-'.join([a, b])
-
-
 def _contacts_to_dataframe(jacksheet, contacts):
     """Inner workings of taking a list of contacts and generating a nice,
     human-friendly DataFrame.
@@ -81,7 +77,7 @@ def create_pairs(jacksheet_filename):
             else:
                 c1, c2 = el.index[i], el.index[i + 1]
 
-            if c1 != c2:
+            if c1 != c2 and [c1, c2] not in contacts:
                 contacts.append([c1, c2])
 
     return _contacts_to_dataframe(jacksheet, contacts)

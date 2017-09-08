@@ -15,6 +15,7 @@ def test_create_pairs(filename):
     assert 'label2' in pairs.columns
     assert 'contact1' in pairs.columns
     assert 'contact2' in pairs.columns
+    assert 'mux' in pairs.columns
 
     combos = np.array([sorted(pair.split('-')) for pair in pairs.pair])
     df = pd.DataFrame({
@@ -30,11 +31,7 @@ def test_create_pairs(filename):
     df = pd.DataFrame({
         'pair': ['-'.join(combo) for combo in combos]
     })
-    try:
-        assert len(df.pair.unique()) == len(df)
-    except AssertionError:
-        print(df)
-        raise
+    assert len(df.pair.unique()) == len(df)
 
     # Labels should match pairs
     for n, row in pairs.iterrows():
