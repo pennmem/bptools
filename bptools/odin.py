@@ -64,7 +64,6 @@ def make_odin_config(filename, name, subject, path=None):
         config.append(','.join(data))
 
     # Stim definitions
-    # TODO
     config.append("StimulationChannelSubclasses:")
     config.append("StimulationChannels:")
     config.append("REF:,0,Common")
@@ -85,8 +84,9 @@ def main():
     parser.add_argument("--jacksheet", "-j", type=str, help='path to jacksheet file')
     parser.add_argument("--name", "-n", type=str, required=True, help='configuration name')
     parser.add_argument("--subject", "-s", type=str, required=True, help='subject ID')
-    parser.add_argument("--output-path", "-o", type=str, help='path to write output to')
-    parser.add_argument("--rhino-root", "-r", type=str, default="/", help="rhino root path for jacksheet discovery")
+    parser.add_argument("--output-path", "-o", type=str, help='directory to write output to')
+    parser.add_argument("--rhino-root", "-r", type=str, default="/",
+                        help='rhino root path for jacksheet discovery (default: "/")')
     args = parser.parse_args()
 
     if args.jacksheet is None:
