@@ -124,6 +124,7 @@ def pairs_to_json(pairs, subject, path):
         out = {
             subject: {
                 'pairs': pd
-            }
+            },
+            'code': subject,
         }
         f.write(json.dumps(out))
