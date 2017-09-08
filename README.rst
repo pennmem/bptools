@@ -4,6 +4,9 @@ bptools
 .. image:: https://travis-ci.org/pennmem/bptools.svg?branch=master
     :target: https://travis-ci.org/pennmem/bptools
 
+.. image:: https://codecov.io/gh/pennmem/bptools/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/pennmem/bptools
+
 EEG bipolar montage helpers.
 
 
