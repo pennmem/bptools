@@ -46,10 +46,10 @@ def create_pairs(jacksheet_filename, mux_channels=32):
             # MUX crossing
             if mux % mux_channels == 0 and mux != 0 and i != 0:
                 mux_crossed = i + 1
-                pair = _pair_str(el.iloc[i].label, el.iloc[0].label)
+                pair = _pair_str(el.iloc[0].label, el.iloc[i].label)
                 if pair not in pairs:
                     pairs.append(pair)
-                    contacts.append([el.index[i], el.index[0]])
+                    contacts.append([el.index[0], el.index[i]])
                 continue
 
             # Last contact
