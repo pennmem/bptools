@@ -6,6 +6,10 @@ from .jacksheet import read_jacksheet
 _ODIN_MUX_CHANNELS = 32
 
 
+def _mux(n):
+    return (n - 1) // _ODIN_MUX_CHANNELS
+
+
 def _contacts_to_dataframe(jacksheet, contacts):
     """Inner workings of taking a list of contacts and generating a nice,
     human-friendly DataFrame.
@@ -23,9 +27,17 @@ def _contacts_to_dataframe(jacksheet, contacts):
         'label2': labels[1],
         'contact1': contacts[:, 0],
         'contact2': contacts[:, 1],
-        'mux': [n // _ODIN_MUX_CHANNELS for n in range(len(contacts))],
+        'mux': [_mux(n) for n in range(len(contacts))],
     })
     return pdf
+
+
+def _mux_filter(c1, c2):
+    if _mux(c1) == _mux(c2):
+        return c1, c2
+    else:
+        print(c1, _mux(c1), c2, _mux(c2))
+        return None, None
 
 
 def create_pairs(jacksheet_filename):
@@ -55,29 +67,16 @@ def create_pairs(jacksheet_filename):
         if group in ['ECG', 'EKG']:
             continue
 
-        mux_crossed = -1
         el = jacksheet[jacksheet.electrode == group]
-
         for i in range(len(el)):
-            # MUX crossing
-            if len(contacts) % _ODIN_MUX_CHANNELS == 0 and i != 0:
-                mux_crossed = i + 1
-                c1, c2 = el.index[0], el.index[i]
+            try:
+                # Make adjacent pair
+                c1, c2 = _mux_filter(el.index[i], el.index[i + 1])
+            except IndexError:
+                # Last electrode, pair first and last
+                c1, c2 = _mux_filter(el.index[0], el.index[i])
 
-            # Last contact on an electrode
-            elif i == len(el) - 1:
-                bi = len(el) - 1
-                if mux_crossed < 0:
-                    ai = 0
-                else:
-                    ai = mux_crossed
-                c1, c2 = el.index[ai], el.index[bi]
-
-            # Adjacent contacts
-            else:
-                c1, c2 = el.index[i], el.index[i + 1]
-
-            if c1 != c2 and [c1, c2] not in contacts:
+            if c1 is not None:
                 contacts.append([c1, c2])
 
     return _contacts_to_dataframe(jacksheet, contacts)
