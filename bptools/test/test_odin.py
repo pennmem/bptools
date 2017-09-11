@@ -15,4 +15,3 @@ def test_make_odin_config(filename):
         import os
         print("contents: ", os.listdir(path))
         assert osp.exists(osp.join(path, 'R1308T_test.csv'))
-

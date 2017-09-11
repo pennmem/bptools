@@ -5,7 +5,7 @@ import pytest
 import numpy as np
 import pandas as pd
 
-from bptools.pairs import create_pairs, pairs_to_json
+from bptools.pairs import create_pairs, pairs_to_json, write_pairs
 from bptools.test import datafile, tempdir
 
 
@@ -66,3 +66,37 @@ def test_pairs_to_json():
             assert 'pairs' in result['R1308T'].keys()
             for key in result['R1308T']['pairs']:
                 assert key in pair_list
+
+
+def test_write_pairs():
+    pairs = create_pairs(datafile('R1308T_jacksheet.txt'))
+
+    # Unsupported file type
+    with tempdir() as path:
+        filename = osp.join(path, "test.xyz")
+        with pytest.raises(ValueError):
+            write_pairs(pairs, filename)
+
+    # CSV files
+    with tempdir() as path:
+        filename = osp.join(path, 'test.csv')
+        write_pairs(pairs, filename)
+
+        df = pd.read_csv(filename)
+        for column in pairs.columns:
+            assert all(df[column] == pairs[column])
+
+    # JSON files
+    with tempdir() as path:
+        filename = osp.join(path, 'pairs.json')
+
+        # No subject
+        with pytest.raises(ValueError):
+            write_pairs(pairs, filename)
+
+        write_pairs(pairs, filename, subject='R0000X')
+
+        with open(filename, 'r') as f:
+            data = json.loads(f.read())
+            assert 'R0000X' in data
+            # Not testing remainder since covered in test_pairs_to_json

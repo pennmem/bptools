@@ -128,3 +128,41 @@ def pairs_to_json(pairs, subject, path):
             'code': subject,
         }
         f.write(json.dumps(out))
+
+
+def write_pairs(pairs, filename, **kwargs):
+    """Write pairs to a file.
+
+    Parameters
+    ----------
+    pairs : pd.DataFrame
+    filename : str
+        File to write. File type is determined by the extension. Accepted file
+        extensions are: ``.csv``, ``.json``. If saving as JSON, pairs will be
+        saved in a minimal ``pairs.json`` format which excludes coordinates.
+
+    Keyword arguments
+    -----------------
+    kwargs : dict
+        Keyword arguments to pass to pandas ``to_xyz`` functions when writing
+        formats other than JSON. If writing ``pairs.json``, a ``subject``
+        keyword argument is also required.
+    subject : str
+        Subject ID.
+
+    Raises
+    ------
+    ValueError when subject kwarg is missing (for writing ``pairs.json``) or an
+    unsupported extension is used.
+
+    """
+    subject = kwargs.pop('subject', None)
+    if filename.endswith('.csv'):
+        pairs.to_csv(filename, **kwargs)
+    elif filename.endswith('.json'):
+        if subject is None:
+            raise ValueError("Subject ID is required for writing pairs.json")
+        path = osp.split(filename)[0]
+        pairs_to_json(pairs, subject, path)
+    else:
+        raise ValueError("Unsupported tile type")
