@@ -20,7 +20,7 @@ def _num_to_bank_label(num):
     return "{}-CH{:02d}".format(bank, num % 64)
 
 
-def make_odin_config(filename, name, subject, path=None):
+def make_odin_config(filename, name, subject, default_surface_area, path=None):
     """Create an Odin ENS electrode configuration CSV file.
 
     Parameters
@@ -31,10 +31,19 @@ def make_odin_config(filename, name, subject, path=None):
         Configuration file name.
     subject : str
         Subject ID.
+    default_surface_area : float
+        Default surface area for electrodes.
     path : str
         Directory to write file to. If None, return as a string.
 
+    Notes
+    -----
+    In the future, jacksheets should optionally include extra annotations such
+    as type of electrode (depth, grid, strip) and surface areas.
+
     """
+    assert isinstance(default_surface_area, float)
+
     js = read_jacksheet(filename)
     pairs = create_pairs(filename)
 
@@ -50,7 +59,7 @@ def make_odin_config(filename, name, subject, path=None):
     for n, row in js.iterrows():
         jbox_num = n
         chan = _num_to_bank_label(jbox_num)
-        data = [row.label, str(jbox_num), str(jbox_num), "0.001",
+        data = [row.label, str(jbox_num), str(jbox_num), str(default_surface_area),
                 "#Electrode {} jack box {}#".format(chan, jbox_num)]
         config.append(','.join(data))
 
@@ -84,6 +93,7 @@ def main():  # pragma: nocover
     parser.add_argument("--jacksheet", "-j", type=str, help='path to jacksheet file')
     parser.add_argument("--name", "-n", type=str, required=True, help='configuration name')
     parser.add_argument("--subject", "-s", type=str, required=True, help='subject ID')
+    parser.add_argument("--surface-area", "-a", default=0.001, help="default surface area in mm^2")
     parser.add_argument("--output-path", "-o", type=str, help='directory to write output to')
     parser.add_argument("--rhino-root", "-r", type=str, default="/",
                         help='rhino root path for jacksheet discovery (default: "/")')
@@ -95,7 +105,8 @@ def main():  # pragma: nocover
     else:
         jacksheet = args.jacksheet
 
-    res = make_odin_config(jacksheet, args.name, args.subject, args.output_path)
+    res = make_odin_config(jacksheet, args.name, args.subject,
+                           args.surface_area, args.output_path)
     if res is not None:
         print(res)
 
