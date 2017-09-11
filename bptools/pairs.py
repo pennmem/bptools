@@ -76,7 +76,8 @@ def create_pairs(jacksheet_filename):
                 # Make adjacent pair
                 c1, c2 = _mux_filter(el.index[i], el.index[i + 1])
             except IndexError:
-                c1, c2 = _mux_filter(el.index[0], el.index[i])
+                # Pair first and last
+                c1, c2 = _mux_filter(el.index[i], el.index[0])
 
             for j in range(i):
                 if c1 is not None:
