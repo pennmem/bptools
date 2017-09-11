@@ -15,9 +15,9 @@ Odin ENS electrode configuration
 
 Usage::
 
-    $ python -m bptools.odin -h
     usage: odin.py [-h] [--jacksheet JACKSHEET] --name NAME --subject SUBJECT
-                   [--output-path OUTPUT_PATH] [--rhino-root RHINO_ROOT]
+                   [--surface-area SURFACE_AREA] [--output-path OUTPUT_PATH]
+                   [--rhino-root RHINO_ROOT]
 
     Odin config generator
 
@@ -28,6 +28,8 @@ Usage::
       --name NAME, -n NAME  configuration name
       --subject SUBJECT, -s SUBJECT
                             subject ID
+      --surface-area SURFACE_AREA, -a SURFACE_AREA
+                            default surface area in mm^2
       --output-path OUTPUT_PATH, -o OUTPUT_PATH
                             directory to write output to
       --rhino-root RHINO_ROOT, -r RHINO_ROOT
