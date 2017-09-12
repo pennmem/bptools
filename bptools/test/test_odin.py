@@ -27,7 +27,7 @@ def read_sense_config(filename):
                 break
             else:
                 sense_channels.append(line)
-    csv = StringIO("".join(sense_channels))
+    csv = StringIO(u"".join(sense_channels))
     config = pd.read_csv(csv, names=['label', 'name', 'c1', 'c2', 'x', 'comment'])
     return config
 
