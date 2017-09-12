@@ -70,3 +70,13 @@ GUI.
     In order to properly handle micro contacts on combined macro/micro
     electrodes, labels in the jacksheet **must** be different for the macro and
     micro contacts.
+
+Known issues
+^^^^^^^^^^^^
+
+There is a bug in the Odin configuration tool which will silently accept the
+same primary contact in multiple sense channels. For example, it would indicate
+passing all checks if there were pairs defined as ``LA1-LA2`` and ``LA1-LA9``.
+This is handled automatically in the CSV generation script by flipping the order
+of contacts in the case of distal pairings. In other words, the pairs above will
+instead be defined as ``LA1-LA2`` and ``LA9-LA1``.
