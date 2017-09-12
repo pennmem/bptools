@@ -22,6 +22,9 @@ General workflow:
 5. Save the CSV config file.
 6. Save the binary config file.
 
+To run the script, either run from the same directory as this README, add said
+directory to your ``PYTHONPATH``, or run ``python setup.py install``.
+
 Script usage::
 
     usage: python -m bptools.odin [-h] [--jacksheet JACKSHEET] --subject SUBJECT
