@@ -27,12 +27,13 @@ directory to your ``PYTHONPATH``, or run ``python setup.py install``.
 
 Script usage::
 
-    usage: python -m bptools.odin [-h] [--jacksheet JACKSHEET] --subject SUBJECT
+    usage: python -m bptools.odin [-h] [--jacksheet JACKSHEET]
+                                  [--good-leads GOOD_LEADS]
                                   [--localization LOCALIZATION]
                                   [--montage MONTAGE] [--stim]
                                   [--surface-area SURFACE_AREA]
                                   [--output-path OUTPUT_PATH]
-                                  [--rhino-root RHINO_ROOT]
+                                  [--rhino-root RHINO_ROOT] --subject SUBJECT
 
     Odin config generator
 
@@ -40,8 +41,8 @@ Script usage::
       -h, --help            show this help message and exit
       --jacksheet JACKSHEET, -j JACKSHEET
                             path to jacksheet file
-      --subject SUBJECT, -s SUBJECT
-                            subject ID
+      --good-leads GOOD_LEADS, -g GOOD_LEADS
+                            path to good_leads.txt
       --localization LOCALIZATION, -l LOCALIZATION
                             localization number (default: 0)
       --montage MONTAGE, -m MONTAGE
@@ -53,6 +54,8 @@ Script usage::
                             directory to write output to
       --rhino-root RHINO_ROOT, -r RHINO_ROOT
                             rhino root path for jacksheet discovery (default: "/")
+      --subject SUBJECT, -s SUBJECT
+                            subject ID
 
     DON'T PANIC
 

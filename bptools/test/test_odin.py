@@ -1,11 +1,35 @@
 import os.path as osp
 from datetime import datetime
-import pytest
 from io import StringIO
 import pandas as pd
 
 from bptools.odin import make_odin_config, make_config_name
 from bptools.test import datafile, tempdir
+
+
+def read_sense_config(filename):
+    """Utility function to read sense configuration data from the generated
+    Odin electrode config CSV file.
+
+    FIXME: consider moving this into :mod:`bptools.odin`.
+
+    """
+    with open(filename, 'r') as f:
+        # Read until we get to sense channel definition
+        line = ''
+        while not line.startswith('SenseChannels:'):
+            line = f.readline()
+
+        sense_channels = []
+        while True:
+            line = f.readline()
+            if 'Stimulation' in line:
+                break
+            else:
+                sense_channels.append(line)
+    csv = StringIO("".join(sense_channels))
+    config = pd.read_csv(csv, names=['label', 'name', 'c1', 'c2', 'x', 'comment'])
+    return config
 
 
 def test_make_config_name():
@@ -29,8 +53,9 @@ def test_make_config_name():
                                                       localization, montage)
 
 
-@pytest.mark.parametrize('filename', ['R1308T_jacksheet.txt'])
-def test_make_odin_config(filename):
+def test_make_odin_config():
+    filename = 'R1308T_jacksheet.txt'
+    output_filename = 'R1308T_NAME.csv'
     jfile = datafile(filename)
 
     # Printing to stdout
@@ -39,26 +64,18 @@ def test_make_odin_config(filename):
     # Saving to a directory
     with tempdir() as path:
         make_odin_config(jfile, 'R1308T_NAME', 0.001, path)
-        outfile = osp.join(path, 'R1308T_NAME.csv')
+        outfile = osp.join(path, output_filename)
         assert osp.exists(outfile)
 
         # Verify that each primary sense channel is only listed once
-        with open(outfile, 'r') as f:
-            # Read until we get to sense channel definition
-            line = ''
-            while not line.startswith('SenseChannels:'):
-                line = f.readline()
-            print('done')
-
-            sense_channels = []
-            while True:
-                line = f.readline()
-                if 'Stimulation' in line:
-                    break
-                else:
-                    sense_channels.append(line)
-
-        csv = StringIO("".join(sense_channels))
-        config = pd.read_csv(csv, names=['label', 'name', 'c1', 'c2', 'x', 'comment'])
+        config = read_sense_config(outfile)
         assert len(config.c1) == len(config.c1.unique())
         assert all(config.c1 == config.c1.unique())
+
+    # Explicitly specifiying leads to include
+    good_leads = [n for n in range(1, 4)]
+    with tempdir() as path:
+        outfile = osp.join(path, output_filename)
+        make_odin_config(jfile, 'R1308T_NAME', 0.001, path, good_leads=good_leads)
+        config = read_sense_config(outfile)
+        assert len(config) == 2
