@@ -61,7 +61,7 @@ def make_odin_config(jacksheet_filename, config_name,
     for n, row in js.iterrows():
         jbox_num = n
         chan = _num_to_bank_label(jbox_num)
-        data = [row.label, str(jbox_num), str(jbox_num), str(default_surface_area),
+        data = [row.label, str(jbox_num), str(jbox_num), "{:.03f}".format(default_surface_area),
                 "#Electrode {} jack box {}#".format(chan, jbox_num)]
         config.append(','.join(data))
 

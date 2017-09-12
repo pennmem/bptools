@@ -79,10 +79,11 @@ def create_pairs(jacksheet_filename):
                 # Pair first and last
                 c1, c2 = _mux_filter(el.index[i], el.index[0])
 
+            # Pair distal if nothing else worked
             for j in range(i):
                 if c1 is not None:
                     break
-                c1, c2 = _mux_filter(el.index[j], el.index[i])
+                c1, c2 = _mux_filter(el.index[i], el.index[j])
 
             if c1 is not None and [c1, c2] not in contacts:
                 contacts.append([c1, c2])
