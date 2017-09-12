@@ -13,7 +13,9 @@ EEG bipolar montage helpers.
 Odin ENS electrode configuration
 --------------------------------
 
-Usage::
+Usage:
+
+Run as ``python -m bptools.odin``::
 
     usage: odin.py [-h] [--jacksheet JACKSHEET] --name NAME --subject SUBJECT
                    [--surface-area SURFACE_AREA] [--output-path OUTPUT_PATH]
