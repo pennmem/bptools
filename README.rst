@@ -13,7 +13,16 @@ EEG bipolar montage helpers.
 Odin ENS electrode configuration
 --------------------------------
 
-Usage::
+General workflow:
+
+1. Generate CSV config file with the script provided here.
+2. Edit the CSV config file to include the proper surface areas for each contact.
+3. Load the CSV config in the Odin configuration tool.
+4. Define stim channels if applicable.
+5. Save the CSV config file.
+6. Save the binary config file.
+
+Script usage::
 
     usage: python -m bptools.odin [-h] [--jacksheet JACKSHEET] --subject SUBJECT
                                   [--localization LOCALIZATION]
