@@ -6,7 +6,7 @@ with open('README.rst') as f:
 
 setup(
     name='btpools',
-    verison=__version__,
+    version=__version__,
     packages=find_packages(),
     package_data={
         '': ['*.txt', '*.csv'],
