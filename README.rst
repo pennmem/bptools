@@ -9,6 +9,8 @@ bptools
 
 EEG bipolar montage helpers.
 
+`Documentation <https://pennmem.github.io/bptools/html/index.html>`_
+
 
 Odin ENS electrode configuration
 --------------------------------
