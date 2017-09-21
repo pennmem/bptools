@@ -14,23 +14,22 @@ def _mux(n):
     return (n - 1) // _ODIN_MUX_CHANNELS
 
 
-def _contacts_to_dataframe(jacksheet, contacts):
+def _contacts_to_dataframe(jacksheet, contacts, monopolar=False):
     """Inner workings of taking a list of contacts and generating a nice,
     human-friendly DataFrame.
 
     """
     contacts = np.array(contacts)
-    labels = [
-        jacksheet.loc[contacts[:, n]].label.tolist()
-        for n in range(2)
-    ]
+    col1 = jacksheet.loc[contacts[:, 0]].label.tolist()
+    col2 = ['CR'] * len(col1) if all(contacts[:, 1] == 0) else jacksheet.loc[contacts[:, 1]].label.tolist()
+    labels = [col1, col2]
     pairs = ['-'.join([labels[0][n], labels[1][n]]) for n in range(len(labels[0]))]
     pdf = pd.DataFrame({
         'pair': pairs,
         'label1': labels[0],
-        'label2': labels[1],
+        'label2': labels[1] if not monopolar else 'CR',
         'contact1': contacts[:, 0],
-        'contact2': contacts[:, 1],
+        'contact2': contacts[:, 1] if not monopolar else 0,
         'mux': [_mux(n) for n in range(len(contacts))],
     })
     return pdf
@@ -88,6 +87,28 @@ def create_pairs(jacksheet_filename):
             if c1 is not None and [c1, c2] not in contacts:
                 contacts.append([c1, c2])
 
+    return _contacts_to_dataframe(jacksheet, contacts)
+
+
+def create_monopolar_pairs(jacksheet_filename, common_ref=0):
+    """Create 'pairs' that are referenced to a common reference.
+
+    Parameters
+    ----------
+    jacksheet_filename : str
+        Path to jacksheet to read.
+    common_ref : int
+        Contact number to use as common reference.
+
+    Returns
+    -------
+    pairs : pd.DataFrame
+
+    """
+    assert common_ref >= 0
+    assert isinstance(common_ref, int)
+    jacksheet = read_jacksheet(jacksheet_filename)
+    contacts = [[jacksheet.index[i], common_ref] for i in range(len(jacksheet))]
     return _contacts_to_dataframe(jacksheet, contacts)
 
 

@@ -30,7 +30,7 @@ def _read_good_leads(filename):
 
 
 def make_odin_config(jacksheet_filename, config_name, default_surface_area,
-                     path=None, good_leads=None):
+                     path=None, good_leads=None, scheme='bipolar'):
     """Create an Odin ENS electrode configuration CSV file.
 
     Parameters
@@ -46,6 +46,8 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
     good_leads : list or None
         Jackbox numbers to use when configuring sense channels. This is usually
         determined from the ``good_leads.txt`` file. When None, use all.
+    scheme : str
+        Referencing scheme to use (``bipolar`` or ``monopolar``).
 
     Notes
     -----
@@ -54,9 +56,14 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
 
     """
     assert isinstance(default_surface_area, float)
+    assert scheme in ['bipolar', 'monopolar'], "invalid referencing scheme"
 
     js = read_jacksheet(jacksheet_filename)
-    pairs = create_pairs(jacksheet_filename)
+
+    if scheme == 'bipolar':
+        pairs = create_pairs(jacksheet_filename)
+    elif scheme == 'monopolar':
+        pairs = None
 
     subject, name = config_name.split('_')
 
@@ -133,6 +140,9 @@ def main():  # pragma: nocover
     parser = ArgumentParser(prog='python -m bptools.odin',
                             description="Odin config generator",
                             epilog="DON'T PANIC")
+    parser.add_argument("--scheme", choices=["bipolar", "monopolar"],
+                        default="bipolar",
+                        help="configuration scheme to use (default: bipolar)")
     parser.add_argument("--jacksheet", "-j", type=str, help='path to jacksheet file')
     parser.add_argument("--good-leads", "-g", type=str, help="path to good_leads.txt")
     parser.add_argument("--localization", "-l", default=0, type=int,
@@ -142,7 +152,7 @@ def main():  # pragma: nocover
     parser.add_argument("--stim", "-S", action='store_true', default=False,
                         help='flag to enable stim (default: False)')
     parser.add_argument("--surface-area", "-a", default=0.001, type=float,
-                        help="default surface area in mm^2")
+                        help="default surface area in mm^2 (default: 0.001)")
     parser.add_argument("--output-path", "-o", type=str, help='directory to write output to')
     parser.add_argument("--rhino-root", "-r", type=str, default="/",
                         help='rhino root path for jacksheet discovery (default: "/")')
