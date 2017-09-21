@@ -3,9 +3,11 @@ from contextlib import contextmanager
 import tempfile
 import shutil
 
+HERE = osp.abspath(osp.dirname(__file__))
+
 
 def datafile(name):
-    return osp.join(osp.abspath(osp.dirname(__file__)), 'data', name)
+    return osp.join(HERE, 'data', name)
 
 
 @contextmanager

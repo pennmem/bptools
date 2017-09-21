@@ -4,8 +4,9 @@ from io import StringIO
 import pytest
 import pandas as pd
 
-from bptools.odin import make_odin_config, make_config_name
-from bptools.test import datafile, tempdir
+from bptools.odin.configgen import make_odin_config, make_config_name
+from bptools.odin import cli
+from bptools.test import datafile, tempdir, HERE
 
 
 def read_sense_config(filename):
@@ -85,3 +86,12 @@ def test_make_odin_config(scheme):
             assert len(config) == 2
         else:
             assert len(config) == 3
+
+
+def test_cli():
+    args = [
+        '--subject=R1308T',
+        '--stim',
+        '--rhino-root={}'.format(osp.join(HERE))
+    ]
+    cli.main(args=args)

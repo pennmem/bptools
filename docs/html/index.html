@@ -53,7 +53,7 @@
 <div class="section" id="electrode-config-generation">
 <h2>Electrode config generation<a class="headerlink" href="#electrode-config-generation" title="Permalink to this headline">¶</a></h2>
 <p>Electrode configuration CSV files can be generated for the Medtronic Odin ENS
-using the CLI tool provided in <a class="reference internal" href="#module-bptools.odin" title="bptools.odin"><code class="xref py py-mod docutils literal"><span class="pre">bptools.odin</span></code></a>:</p>
+using the CLI tool provided in <code class="xref py py-mod docutils literal"><span class="pre">bptools.odin</span></code>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">bptools</span><span class="o">.</span><span class="n">odin</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">scheme</span> <span class="p">{</span><span class="n">bipolar</span><span class="p">,</span><span class="n">monopolar</span><span class="p">}]</span>
                               <span class="p">[</span><span class="o">--</span><span class="n">jacksheet</span> <span class="n">JACKSHEET</span><span class="p">]</span>
                               <span class="p">[</span><span class="o">--</span><span class="n">good</span><span class="o">-</span><span class="n">leads</span> <span class="n">GOOD_LEADS</span><span class="p">]</span>
@@ -259,17 +259,11 @@ keyword argument is also required.</li>
 </dd></dl>
 
 </div>
-<div class="section" id="module-bptools.odin">
-<span id="odin-ens-configuration"></span><h3>Odin ENS configuration<a class="headerlink" href="#module-bptools.odin" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-bptools.odin.configgen">
+<span id="odin-ens-configuration"></span><h3>Odin ENS configuration<a class="headerlink" href="#module-bptools.odin.configgen" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="bptools.odin.main">
-<code class="descclassname">bptools.odin.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Command-line interface for generating Odin config files.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="bptools.odin.make_config_name">
-<code class="descclassname">bptools.odin.</code><code class="descname">make_config_name</code><span class="sig-paren">(</span><em>subject</em>, <em>localization</em>, <em>montage</em>, <em>stim</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin.html#make_config_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.make_config_name" title="Permalink to this definition">¶</a></dt>
+<dt id="bptools.odin.configgen.make_config_name">
+<code class="descclassname">bptools.odin.configgen.</code><code class="descname">make_config_name</code><span class="sig-paren">(</span><em>subject</em>, <em>localization</em>, <em>montage</em>, <em>stim</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/configgen.html#make_config_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.configgen.make_config_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the configuration filename using the standard naming convetion.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -288,8 +282,8 @@ keyword argument is also required.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="bptools.odin.make_odin_config">
-<code class="descclassname">bptools.odin.</code><code class="descname">make_odin_config</code><span class="sig-paren">(</span><em>jacksheet_filename</em>, <em>config_name</em>, <em>default_surface_area</em>, <em>path=None</em>, <em>good_leads=None</em>, <em>scheme=’bipolar’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin.html#make_odin_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.make_odin_config" title="Permalink to this definition">¶</a></dt>
+<dt id="bptools.odin.configgen.make_odin_config">
+<code class="descclassname">bptools.odin.configgen.</code><code class="descname">make_odin_config</code><span class="sig-paren">(</span><em>jacksheet_filename</em>, <em>config_name</em>, <em>default_surface_area</em>, <em>path=None</em>, <em>good_leads=None</em>, <em>scheme=’bipolar’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/configgen.html#make_odin_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.configgen.make_odin_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an Odin ENS electrode configuration CSV file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -333,7 +327,7 @@ as type of electrode (depth, grid, strip) and surface areas.</p>
 <li><a class="reference internal" href="#api-reference">API reference</a><ul>
 <li><a class="reference internal" href="#module-bptools.jacksheet">Jacksheet utilities</a></li>
 <li><a class="reference internal" href="#module-bptools.pairs">Pair creation tools</a></li>
-<li><a class="reference internal" href="#module-bptools.odin">Odin ENS configuration</a></li>
+<li><a class="reference internal" href="#module-bptools.odin.configgen">Odin ENS configuration</a></li>
 </ul>
 </li>
 </ul>

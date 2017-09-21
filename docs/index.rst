@@ -99,7 +99,7 @@ Pair creation tools
 Odin ENS configuration
 ^^^^^^^^^^^^^^^^^^^^^^
 
-.. automodule:: bptools.odin
+.. automodule:: bptools.odin.configgen
     :members:
 
 .. .. toctree::

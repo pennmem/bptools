@@ -1,0 +1,222 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bptools.odin.configgen &#8212; bptools 1.1.dev0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.1.dev0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">bptools 1.1.dev0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../odin.html" accesskey="U">bptools.odin</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for bptools.odin.configgen</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span> <span class="nn">bptools.jacksheet</span> <span class="k">import</span> <span class="n">read_jacksheet</span>
+<span class="kn">from</span> <span class="nn">bptools.pairs</span> <span class="k">import</span> <span class="n">create_pairs</span><span class="p">,</span> <span class="n">create_monopolar_pairs</span>
+
+
+<span class="k">def</span> <span class="nf">_num_to_bank_label</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a channel number to a more human-friendly ENS bank label (e.g.,</span>
+<span class="sd">    1 -&gt; A-CH01).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">banks</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;D&#39;</span>
+    <span class="p">}</span>
+    <span class="n">bank</span> <span class="o">=</span> <span class="n">banks</span><span class="p">[</span><span class="n">num</span> <span class="o">//</span> <span class="mi">64</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-CH</span><span class="si">{:02d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bank</span><span class="p">,</span> <span class="n">num</span> <span class="o">%</span> <span class="mi">64</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="make_odin_config"><a class="viewcode-back" href="../../../index.html#bptools.odin.configgen.make_odin_config">[docs]</a><span class="k">def</span> <span class="nf">make_odin_config</span><span class="p">(</span><span class="n">jacksheet_filename</span><span class="p">,</span> <span class="n">config_name</span><span class="p">,</span> <span class="n">default_surface_area</span><span class="p">,</span>
+                     <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">good_leads</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;bipolar&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create an Odin ENS electrode configuration CSV file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    jacksheet_filename : str</span>
+<span class="sd">        Input jacksheet filename.</span>
+<span class="sd">    config_name : str</span>
+<span class="sd">        Configuration file name.</span>
+<span class="sd">    default_surface_area : float</span>
+<span class="sd">        Default surface area for electrodes.</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Directory to write file to. If None, return as a string.</span>
+<span class="sd">    good_leads : list or None</span>
+<span class="sd">        Jackbox numbers to use when configuring sense channels. This is usually</span>
+<span class="sd">        determined from the ``good_leads.txt`` file. When None, use all.</span>
+<span class="sd">    scheme : str</span>
+<span class="sd">        Referencing scheme to use (``bipolar`` or ``monopolar``).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    In the future, jacksheets should optionally include extra annotations such</span>
+<span class="sd">    as type of electrode (depth, grid, strip) and surface areas.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_surface_area</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">scheme</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bipolar&#39;</span><span class="p">,</span> <span class="s1">&#39;monopolar&#39;</span><span class="p">],</span> <span class="s2">&quot;invalid referencing scheme&quot;</span>
+
+    <span class="n">js</span> <span class="o">=</span> <span class="n">read_jacksheet</span><span class="p">(</span><span class="n">jacksheet_filename</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;bipolar&#39;</span><span class="p">:</span>
+        <span class="n">pairs</span> <span class="o">=</span> <span class="n">create_pairs</span><span class="p">(</span><span class="n">jacksheet_filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;monopolar&#39;</span><span class="p">:</span>
+        <span class="n">pairs</span> <span class="o">=</span> <span class="n">create_monopolar_pairs</span><span class="p">(</span><span class="n">jacksheet_filename</span><span class="p">)</span>
+
+    <span class="n">subject</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">config_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Header</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;ODINConfigurationVersion:,#1.2#&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ConfigurationName:,&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;SubjectID:,&quot;</span> <span class="o">+</span> <span class="n">subject</span><span class="p">,</span>
+        <span class="s2">&quot;Contacts:&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+    <span class="c1"># Channel definitions</span>
+    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">js</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">jbox_num</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="n">chan</span> <span class="o">=</span> <span class="n">_num_to_bank_label</span><span class="p">(</span><span class="n">jbox_num</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">jbox_num</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">jbox_num</span><span class="p">),</span> <span class="s2">&quot;</span><span class="si">{:.03f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">default_surface_area</span><span class="p">),</span>
+                <span class="s2">&quot;#Electrode </span><span class="si">{}</span><span class="s2"> jack box </span><span class="si">{}</span><span class="s2">#&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chan</span><span class="p">,</span> <span class="n">jbox_num</span><span class="p">)]</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+    <span class="c1"># Sense definitions</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;SenseChannelSubclasses:&quot;</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;SenseChannels:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">pairs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">good_leads</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">contact1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">good_leads</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">contact2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">good_leads</span> <span class="ow">and</span> <span class="n">scheme</span> <span class="o">!=</span> <span class="s2">&quot;monopolar&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">label1</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">contact1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">contact2</span><span class="p">),</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span>
+                <span class="s2">&quot;#</span><span class="si">{}</span><span class="s2">#&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">pair</span><span class="p">)]</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+    <span class="c1"># Stim definitions</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;StimulationChannelSubclasses:&quot;</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;StimulationChannels:&quot;</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;REF:,0,Common&quot;</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;EOF&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">outfile</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">config_name</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="make_config_name"><a class="viewcode-back" href="../../../index.html#bptools.odin.configgen.make_config_name">[docs]</a><span class="k">def</span> <span class="nf">make_config_name</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">localization</span><span class="p">,</span> <span class="n">montage</span><span class="p">,</span> <span class="n">stim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create the configuration filename using the standard naming convetion.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    subject : str</span>
+<span class="sd">    localization : int</span>
+<span class="sd">    montage : int</span>
+<span class="sd">    stim : bool</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">name_tmpl</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{subject:s}</span><span class="s2">_</span><span class="si">{day:02d}{month:s}{year:04d}</span><span class="s2">L</span><span class="si">{localization:d}</span><span class="s2">M</span><span class="si">{montage:d}{stim:s}</span><span class="s2">&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">name_tmpl</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="p">{</span>
+        <span class="s1">&#39;subject&#39;</span><span class="p">:</span> <span class="n">subject</span><span class="p">,</span>
+        <span class="s1">&#39;day&#39;</span><span class="p">:</span> <span class="n">now</span><span class="o">.</span><span class="n">day</span><span class="p">,</span>
+        <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%b&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="n">now</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+        <span class="s1">&#39;localization&#39;</span><span class="p">:</span> <span class="n">localization</span><span class="p">,</span>
+        <span class="s1">&#39;montage&#39;</span><span class="p">:</span> <span class="n">montage</span><span class="p">,</span>
+        <span class="s1">&#39;stim&#39;</span><span class="p">:</span> <span class="s1">&#39;STIM&#39;</span> <span class="k">if</span> <span class="n">stim</span> <span class="k">else</span> <span class="s1">&#39;NOSTIM&#39;</span>
+    <span class="p">})</span>
+    <span class="k">return</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">bptools 1.1.dev0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../odin.html" >bptools.odin</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Penn Computational Memory Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>
