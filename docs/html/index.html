@@ -90,13 +90,37 @@ using the CLI tool provided in <a class="reference internal" href="#module-bptoo
 </div>
 <p>If no jacksheet is specified, the script will try to automatically find it based
 on the subject ID.</p>
-<p>Stimulation channels must be defined manually via the Odin configuration tool
-GUI.</p>
+<p>The general workflow is as follows:</p>
+<ol class="arabic simple">
+<li>Generate CSV config file with the script provided here.</li>
+<li>Edit the CSV config file to include the proper surface areas for each contact.</li>
+<li>Load the CSV config in the Odin configuration tool.</li>
+<li>Define stim channels if applicable.</li>
+<li>Save the CSV config file.</li>
+<li>Save the binary config file.</li>
+</ol>
+<p>To run the script, either run from the root directory of <code class="docutils literal"><span class="pre">bptools</span></code>, add said
+directory to your <code class="docutils literal"><span class="pre">PYTHONPATH</span></code>, or run <code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> so that it
+is always reachable from your environment.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Stimulation channels must be defined manually via the Odin configuration
+tool GUI.</p>
+</div>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">In order to properly handle micro contacts on combined macro/micro
 electrodes, labels in the jacksheet <strong>must</strong> be different for the macro and
-micro contacts.</p>
+micro contacts when using bipolar referencing.</p>
+</div>
+<div class="section" id="known-issues">
+<h3>Known issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h3>
+<p>There is a bug in the Odin configuration tool which will silently accept the
+same primary contact in multiple sense channels. For example, it would indicate
+passing all checks if there were pairs defined as <code class="docutils literal"><span class="pre">LA1-LA2</span></code> and <code class="docutils literal"><span class="pre">LA1-LA9</span></code>.
+This is handled automatically in the CSV generation script by flipping the order
+of contacts in the case of distal pairings. In other words, the pairs above will
+instead be defined as <code class="docutils literal"><span class="pre">LA1-LA2</span></code> and <code class="docutils literal"><span class="pre">LA9-LA1</span></code>.</p>
 </div>
 </div>
 <div class="section" id="api-reference">
@@ -302,7 +326,10 @@ as type of electrode (depth, grid, strip) and surface areas.</p>
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">bptools</a><ul>
-<li><a class="reference internal" href="#electrode-config-generation">Electrode config generation</a></li>
+<li><a class="reference internal" href="#electrode-config-generation">Electrode config generation</a><ul>
+<li><a class="reference internal" href="#known-issues">Known issues</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#api-reference">API reference</a><ul>
 <li><a class="reference internal" href="#module-bptools.jacksheet">Jacksheet utilities</a></li>
 <li><a class="reference internal" href="#module-bptools.pairs">Pair creation tools</a></li>
