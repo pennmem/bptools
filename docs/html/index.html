@@ -1,0 +1,354 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bptools &#8212; bptools 1.1.dev0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.dev0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">bptools 1.1.dev0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bptools">
+<h1>bptools<a class="headerlink" href="#bptools" title="Permalink to this headline">¶</a></h1>
+<p>EEG bipolar montage helpers.</p>
+<div class="section" id="electrode-config-generation">
+<h2>Electrode config generation<a class="headerlink" href="#electrode-config-generation" title="Permalink to this headline">¶</a></h2>
+<p>Electrode configuration CSV files can be generated for the Medtronic Odin ENS
+using the CLI tool provided in <a class="reference internal" href="#module-bptools.odin" title="bptools.odin"><code class="xref py py-mod docutils literal"><span class="pre">bptools.odin</span></code></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">bptools</span><span class="o">.</span><span class="n">odin</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">scheme</span> <span class="p">{</span><span class="n">bipolar</span><span class="p">,</span><span class="n">monopolar</span><span class="p">}]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">jacksheet</span> <span class="n">JACKSHEET</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">good</span><span class="o">-</span><span class="n">leads</span> <span class="n">GOOD_LEADS</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">localization</span> <span class="n">LOCALIZATION</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">montage</span> <span class="n">MONTAGE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">stim</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">surface</span><span class="o">-</span><span class="n">area</span> <span class="n">SURFACE_AREA</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="n">path</span> <span class="n">OUTPUT_PATH</span><span class="p">]</span>
+                              <span class="p">[</span><span class="o">--</span><span class="n">rhino</span><span class="o">-</span><span class="n">root</span> <span class="n">RHINO_ROOT</span><span class="p">]</span> <span class="o">--</span><span class="n">subject</span> <span class="n">SUBJECT</span>
+
+<span class="n">Odin</span> <span class="n">config</span> <span class="n">generator</span>
+
+<span class="n">optional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">--</span><span class="n">scheme</span> <span class="p">{</span><span class="n">bipolar</span><span class="p">,</span><span class="n">monopolar</span><span class="p">}</span>
+                        <span class="n">configuration</span> <span class="n">scheme</span> <span class="n">to</span> <span class="n">use</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">bipolar</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">jacksheet</span> <span class="n">JACKSHEET</span><span class="p">,</span> <span class="o">-</span><span class="n">j</span> <span class="n">JACKSHEET</span>
+                        <span class="n">path</span> <span class="n">to</span> <span class="n">jacksheet</span> <span class="n">file</span>
+  <span class="o">--</span><span class="n">good</span><span class="o">-</span><span class="n">leads</span> <span class="n">GOOD_LEADS</span><span class="p">,</span> <span class="o">-</span><span class="n">g</span> <span class="n">GOOD_LEADS</span>
+                        <span class="n">path</span> <span class="n">to</span> <span class="n">good_leads</span><span class="o">.</span><span class="n">txt</span>
+  <span class="o">--</span><span class="n">localization</span> <span class="n">LOCALIZATION</span><span class="p">,</span> <span class="o">-</span><span class="n">l</span> <span class="n">LOCALIZATION</span>
+                        <span class="n">localization</span> <span class="n">number</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">montage</span> <span class="n">MONTAGE</span><span class="p">,</span> <span class="o">-</span><span class="n">m</span> <span class="n">MONTAGE</span>
+                        <span class="n">montage</span> <span class="n">number</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">stim</span><span class="p">,</span> <span class="o">-</span><span class="n">S</span>            <span class="n">flag</span> <span class="n">to</span> <span class="n">enable</span> <span class="n">stim</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="kc">False</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">surface</span><span class="o">-</span><span class="n">area</span> <span class="n">SURFACE_AREA</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span> <span class="n">SURFACE_AREA</span>
+                        <span class="n">default</span> <span class="n">surface</span> <span class="n">area</span> <span class="ow">in</span> <span class="n">mm</span><span class="o">^</span><span class="mi">2</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="n">path</span> <span class="n">OUTPUT_PATH</span><span class="p">,</span> <span class="o">-</span><span class="n">o</span> <span class="n">OUTPUT_PATH</span>
+                        <span class="n">directory</span> <span class="n">to</span> <span class="n">write</span> <span class="n">output</span> <span class="n">to</span>
+  <span class="o">--</span><span class="n">rhino</span><span class="o">-</span><span class="n">root</span> <span class="n">RHINO_ROOT</span><span class="p">,</span> <span class="o">-</span><span class="n">r</span> <span class="n">RHINO_ROOT</span>
+                        <span class="n">rhino</span> <span class="n">root</span> <span class="n">path</span> <span class="k">for</span> <span class="n">jacksheet</span> <span class="n">discovery</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">subject</span> <span class="n">SUBJECT</span><span class="p">,</span> <span class="o">-</span><span class="n">s</span> <span class="n">SUBJECT</span>
+                        <span class="n">subject</span> <span class="n">ID</span>
+</pre></div>
+</div>
+<p>If no jacksheet is specified, the script will try to automatically find it based
+on the subject ID.</p>
+<p>Stimulation channels must be defined manually via the Odin configuration tool
+GUI.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">In order to properly handle micro contacts on combined macro/micro
+electrodes, labels in the jacksheet <strong>must</strong> be different for the macro and
+micro contacts.</p>
+</div>
+</div>
+<div class="section" id="api-reference">
+<h2>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-bptools.jacksheet">
+<span id="jacksheet-utilities"></span><h3>Jacksheet utilities<a class="headerlink" href="#module-bptools.jacksheet" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="bptools.jacksheet.read_jacksheet">
+<code class="descclassname">bptools.jacksheet.</code><code class="descname">read_jacksheet</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/jacksheet.html#read_jacksheet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.jacksheet.read_jacksheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function to read a jacksheet.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Columns in the returned <code class="xref py py-class docutils literal"><span class="pre">pd.DataFrame</span></code>:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">label</span></code>: contact labels</li>
+<li><code class="docutils literal"><span class="pre">electrode</span></code>: electrode the contact resides on (same as <code class="docutils literal"><span class="pre">label</span></code>
+without the number)</li>
+</ul>
+<p>The index is the jackbox number.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-bptools.pairs">
+<span id="pair-creation-tools"></span><h3>Pair creation tools<a class="headerlink" href="#module-bptools.pairs" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="bptools.pairs.create_monopolar_pairs">
+<code class="descclassname">bptools.pairs.</code><code class="descname">create_monopolar_pairs</code><span class="sig-paren">(</span><em>jacksheet_filename</em>, <em>common_ref=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/pairs.html#create_monopolar_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.pairs.create_monopolar_pairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create ‘pairs’ that are referenced to a common reference.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>jacksheet_filename</strong> (<em>str</em>) – Path to jacksheet to read.</li>
+<li><strong>common_ref</strong> (<em>int</em>) – Contact number to use as common reference.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>pairs</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bptools.pairs.create_pairs">
+<code class="descclassname">bptools.pairs.</code><code class="descname">create_pairs</code><span class="sig-paren">(</span><em>jacksheet_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/pairs.html#create_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.pairs.create_pairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines bipolar pairs for the Odin ENS given a jacksheet.</p>
+<p>This uses a scheme to live within the constraints of ENS configuration,
+namely that pairs cannot cross a MUX. All neighboring pairs are used, and
+the first and last contacts are also paired.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jacksheet_filename</strong> (<em>str</em>) – Path to jacksheet to read.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>pairs</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bptools.pairs.pairs_to_json">
+<code class="descclassname">bptools.pairs.</code><code class="descname">pairs_to_json</code><span class="sig-paren">(</span><em>pairs</em>, <em>subject</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/pairs.html#pairs_to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.pairs.pairs_to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a pairs <code class="xref py py-class docutils literal"><span class="pre">pd.DataFrame</span></code> to a <code class="docutils literal"><span class="pre">pairs.json</span></code> file (with
+coordinates omitted).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pairs</strong> (<em>pd.DataFrame</em>) – </li>
+<li><strong>subject</strong> (<em>str</em>) – Subject ID.</li>
+<li><strong>path</strong> (<em>str</em>) – Path to write <code class="docutils literal"><span class="pre">pairs.json</span></code> to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Currently, several other fields are omitted, e.g., electrode type.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bptools.pairs.write_pairs">
+<code class="descclassname">bptools.pairs.</code><code class="descname">write_pairs</code><span class="sig-paren">(</span><em>pairs</em>, <em>filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/pairs.html#write_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.pairs.write_pairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write pairs to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pairs</strong> (<em>pd.DataFrame</em>) – </li>
+<li><strong>filename</strong> (<em>str</em>) – File to write. File type is determined by the extension. Accepted file
+extensions are: <code class="docutils literal"><span class="pre">.csv</span></code>, <code class="docutils literal"><span class="pre">.json</span></code>. If saving as JSON, pairs will be
+saved in a minimal <code class="docutils literal"><span class="pre">pairs.json</span></code> format which excludes coordinates.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Keyword Arguments:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><ul class="first simple">
+<li><strong>kwargs</strong> (<em>dict</em>) – Keyword arguments to pass to pandas <code class="docutils literal"><span class="pre">to_xyz</span></code> functions when writing
+formats other than JSON. If writing <code class="docutils literal"><span class="pre">pairs.json</span></code>, a <code class="docutils literal"><span class="pre">subject</span></code>
+keyword argument is also required.</li>
+<li><strong>subject</strong> (<em>str</em>) – Subject ID.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li>ValueError when subject kwarg is missing (for writing <code class="docutils literal"><span class="pre">pairs.json</span></code>) or an</li>
+<li>unsupported extension is used.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-bptools.odin">
+<span id="odin-ens-configuration"></span><h3>Odin ENS configuration<a class="headerlink" href="#module-bptools.odin" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="bptools.odin.main">
+<code class="descclassname">bptools.odin.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Command-line interface for generating Odin config files.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bptools.odin.make_config_name">
+<code class="descclassname">bptools.odin.</code><code class="descname">make_config_name</code><span class="sig-paren">(</span><em>subject</em>, <em>localization</em>, <em>montage</em>, <em>stim</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin.html#make_config_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.make_config_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the configuration filename using the standard naming convetion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>subject</strong> (<em>str</em>) – </li>
+<li><strong>localization</strong> (<em>int</em>) – </li>
+<li><strong>montage</strong> (<em>int</em>) – </li>
+<li><strong>stim</strong> (<em>bool</em>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bptools.odin.make_odin_config">
+<code class="descclassname">bptools.odin.</code><code class="descname">make_odin_config</code><span class="sig-paren">(</span><em>jacksheet_filename</em>, <em>config_name</em>, <em>default_surface_area</em>, <em>path=None</em>, <em>good_leads=None</em>, <em>scheme=’bipolar’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin.html#make_odin_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.make_odin_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an Odin ENS electrode configuration CSV file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>jacksheet_filename</strong> (<em>str</em>) – Input jacksheet filename.</li>
+<li><strong>config_name</strong> (<em>str</em>) – Configuration file name.</li>
+<li><strong>default_surface_area</strong> (<em>float</em>) – Default surface area for electrodes.</li>
+<li><strong>path</strong> (<em>str</em>) – Directory to write file to. If None, return as a string.</li>
+<li><strong>good_leads</strong> (<em>list</em><em> or </em><em>None</em>) – Jackbox numbers to use when configuring sense channels. This is usually
+determined from the <code class="docutils literal"><span class="pre">good_leads.txt</span></code> file. When None, use all.</li>
+<li><strong>scheme</strong> (<em>str</em>) – Referencing scheme to use (<code class="docutils literal"><span class="pre">bipolar</span></code> or <code class="docutils literal"><span class="pre">monopolar</span></code>).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>In the future, jacksheets should optionally include extra annotations such
+as type of electrode (depth, grid, strip) and surface areas.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">bptools</a><ul>
+<li><a class="reference internal" href="#electrode-config-generation">Electrode config generation</a></li>
+<li><a class="reference internal" href="#api-reference">API reference</a><ul>
+<li><a class="reference internal" href="#module-bptools.jacksheet">Jacksheet utilities</a></li>
+<li><a class="reference internal" href="#module-bptools.pairs">Pair creation tools</a></li>
+<li><a class="reference internal" href="#module-bptools.odin">Odin ENS configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">bptools 1.1.dev0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Penn Computational Memory Lab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>
