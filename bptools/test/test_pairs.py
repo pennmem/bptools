@@ -5,7 +5,7 @@ import pytest
 import numpy as np
 import pandas as pd
 
-from bptools.pairs import create_pairs, pairs_to_json, write_pairs
+from bptools.pairs import create_pairs, create_monopolar_pairs, pairs_to_json, write_pairs
 from bptools.test import datafile, tempdir
 
 
@@ -40,6 +40,21 @@ def test_create_pairs(filename):
     for n, row in pairs.iterrows():
         assert row.label1 in row.pair
         assert row.label2 in row.pair
+
+
+def test_muxes():
+    """Test that muxes are labeled properly."""
+    pairs = create_monopolar_pairs(datafile("simple_jacksheet.txt"))
+    assert all(pairs.mux[:32] == 0)
+    assert all(pairs.mux[32:] == 1)
+
+
+def test_create_monopolar_pairs():
+    pairs = create_monopolar_pairs(datafile('simple_jacksheet.txt'))
+    assert all(pairs.contact2 == 0)
+    names = pairs.pair
+    for name in names:
+        assert name.split('-')[1] == 'CR'
 
 
 def test_no_mux_crossing():
@@ -100,3 +115,13 @@ def test_write_pairs():
             data = json.loads(f.read())
             assert 'R0000X' in data
             # Not testing remainder since covered in test_pairs_to_json
+
+
+if __name__ == "__main__":
+    from bptools.jacksheet import read_jacksheet
+    from bptools.pairs import create_monopolar_pairs
+
+    js = read_jacksheet(datafile('simple_jacksheet.txt'))
+    print(create_monopolar_pairs(datafile('simple_jacksheet.txt')))
+    print(create_pairs(datafile('simple_jacksheet.txt')))
+    # print(create_pairs(datafile('R1306E_jacksheet.txt')))
