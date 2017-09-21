@@ -25,5 +25,3 @@ Odin ENS configuration
 .. .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-
