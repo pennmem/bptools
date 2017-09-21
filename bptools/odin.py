@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from datetime import datetime
 
 from bptools.jacksheet import read_jacksheet
-from bptools.pairs import create_pairs
+from bptools.pairs import create_pairs, create_monopolar_pairs
 
 
 def _num_to_bank_label(num):
@@ -63,7 +63,7 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
     if scheme == 'bipolar':
         pairs = create_pairs(jacksheet_filename)
     elif scheme == 'monopolar':
-        pairs = None
+        pairs = create_monopolar_pairs(jacksheet_filename)
 
     subject, name = config_name.split('_')
 
@@ -88,7 +88,9 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
     config.append("SenseChannels:")
     for _, row in pairs.iterrows():
         if good_leads is not None:
-            if row.contact1 not in good_leads or row.contact2 not in good_leads:
+            if row.contact1 not in good_leads:
+                continue
+            if row.contact2 not in good_leads and scheme != "monopolar":
                 continue
         data = [row.label1, row.pair.replace('-', ''),
                 str(row.contact1), str(row.contact2), 'x',
@@ -178,7 +180,7 @@ def main():  # pragma: nocover
 
     name = make_config_name(args.subject, args.localization, args.montage, args.stim)
     res = make_odin_config(jacksheet, name, args.surface_area, args.output_path,
-                           good_leads=good_leads)
+                           good_leads=good_leads, scheme=args.scheme)
     if res is not None:
         print(res)
     else:

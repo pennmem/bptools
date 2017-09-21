@@ -1,6 +1,7 @@
 import os.path as osp
 from datetime import datetime
 from io import StringIO
+import pytest
 import pandas as pd
 
 from bptools.odin import make_odin_config, make_config_name
@@ -53,7 +54,8 @@ def test_make_config_name():
                                                       localization, montage)
 
 
-def test_make_odin_config():
+@pytest.mark.parametrize('scheme', ['bipolar', 'monopolar'])
+def test_make_odin_config(scheme):
     filename = 'R1308T_jacksheet.txt'
     output_filename = 'R1308T_NAME.csv'
     jfile = datafile(filename)
@@ -63,7 +65,7 @@ def test_make_odin_config():
 
     # Saving to a directory
     with tempdir() as path:
-        make_odin_config(jfile, 'R1308T_NAME', 0.001, path)
+        make_odin_config(jfile, 'R1308T_NAME', 0.001, path, scheme=scheme)
         outfile = osp.join(path, output_filename)
         assert osp.exists(outfile)
 
@@ -76,6 +78,10 @@ def test_make_odin_config():
     good_leads = [n for n in range(1, 4)]
     with tempdir() as path:
         outfile = osp.join(path, output_filename)
-        make_odin_config(jfile, 'R1308T_NAME', 0.001, path, good_leads=good_leads)
+        make_odin_config(jfile, 'R1308T_NAME', 0.001, path, good_leads=good_leads,
+                         scheme=scheme)
         config = read_sense_config(outfile)
-        assert len(config) == 2
+        if scheme == 'bipolar':
+            assert len(config) == 2
+        else:
+            assert len(config) == 3
