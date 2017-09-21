@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 from .jacksheet import read_jacksheet
-from .pairs import create_pairs
+from .pairs import create_pairs, create_monopolar_pairs
 
 __version__ = "1.0.0"
 
