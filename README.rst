@@ -13,5 +13,5 @@ bptools
 
 EEG bipolar montage helpers.
 
-See the `<documentation https://pennmem.github.io/bptools/html/index.html>`_ for
+See the `documentation <https://pennmem.github.io/bptools/html/index.html>`_ for
 full usage information.
