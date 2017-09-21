@@ -90,7 +90,7 @@ class ElectrodeConfig(object):
             # Read contacts
             with buffer() as buf:
                 for line in iterlines():
-                    buf.write(','.join(line) + '\n')
+                    buf.write(','.join(line) + u'\n')
             self.contacts = pd.read_csv(buf, names=[
                 'label', 'port', 'port2', 'area', 'description'
             ]).drop('port2', axis=1)
@@ -98,7 +98,7 @@ class ElectrodeConfig(object):
             # Read sense channels
             with buffer() as buf:
                 for line in iterlines():
-                    buf.write(','.join(line) + '\n')
+                    buf.write(','.join(line) + u'\n')
             self.sense_channels = pd.read_csv(buf, names=[
                 'name', 'name2', 'contact', 'ref', 'x', 'description'
             ]).drop(['name2', 'x'], axis=1)
@@ -108,7 +108,7 @@ class ElectrodeConfig(object):
                 while True:
                     try:
                         line = ','.join([getline()[1] for _ in range(3)])
-                        buf.write(line + '\n')
+                        buf.write(line + u'\n')
                     except IndexError:
                         break
             self.stim_channels = pd.read_csv(buf, names=[
