@@ -30,7 +30,7 @@ def _contacts_to_dataframe(jacksheet, contacts, monopolar=False):
         'label2': labels[1] if not monopolar else 'CR',
         'contact1': contacts[:, 0],
         'contact2': contacts[:, 1] if not monopolar else 0,
-        'mux': [_mux(n) for n in range(len(contacts))],
+        'mux': [_mux(n) for n in range(1, len(contacts) + 1)],
     })
     return pdf
 

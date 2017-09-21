@@ -42,9 +42,19 @@ def test_create_pairs(filename):
         assert row.label2 in row.pair
 
 
+def test_muxes():
+    """Test that muxes are labeled properly."""
+    pairs = create_monopolar_pairs(datafile("simple_jacksheet.txt"))
+    assert all(pairs.mux[:32] == 0)
+    assert all(pairs.mux[32:] == 1)
+
+
 def test_create_monopolar_pairs():
     pairs = create_monopolar_pairs(datafile('simple_jacksheet.txt'))
-    print('\n', pairs.head())
+    assert all(pairs.contact2 == 0)
+    names = pairs.pair
+    for name in names:
+        assert name.split('-')[1] == 'CR'
 
 
 def test_no_mux_crossing():
@@ -113,4 +123,5 @@ if __name__ == "__main__":
 
     js = read_jacksheet(datafile('simple_jacksheet.txt'))
     print(create_monopolar_pairs(datafile('simple_jacksheet.txt')))
-    print(create_pairs(datafile('R1306E_jacksheet.txt')))
+    print(create_pairs(datafile('simple_jacksheet.txt')))
+    # print(create_pairs(datafile('R1306E_jacksheet.txt')))
