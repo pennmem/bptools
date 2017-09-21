@@ -4,10 +4,6 @@ from contextlib import contextmanager
 import pandas as pd
 
 
-class ParsingError(Exception):
-    pass
-
-
 class ElectrodeConfig(object):
     """Representation of OdinLib electrode configuration files.
 
