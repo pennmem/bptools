@@ -7,9 +7,11 @@ bptools
 .. image:: https://codecov.io/gh/pennmem/bptools/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/pennmem/bptools
 
-EEG bipolar montage helpers.
+.. image:: https://img.shields.io/badge/docs-here-brightgreen.svg
+  :target: https://pennmem.github.io/bptools/html/index.html
+  :alt: docs
 
-`Documentation <https://pennmem.github.io/bptools/html/index.html>`_
+EEG bipolar montage helpers.
 
 
 Odin ENS electrode configuration
