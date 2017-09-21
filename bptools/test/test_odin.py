@@ -1,10 +1,12 @@
 import os.path as osp
 from datetime import datetime
 from io import StringIO
+
 import pytest
 import pandas as pd
 
 from bptools.odin.configgen import make_odin_config, make_config_name
+from bptools.odin.config import ElectrodeConfig
 from bptools.odin import cli
 from bptools.test import datafile, tempdir, HERE
 
@@ -95,3 +97,27 @@ def test_cli():
         '--rhino-root={}'.format(osp.join(HERE))
     ]
     cli.main(args=args)
+
+
+class TestElectrodeConfig:
+    @pytest.mark.parametrize('extension', ['.csv', '.bin'])
+    def test_read_config_file(self, extension):
+        ec = ElectrodeConfig()
+        filename = 'R1308T_14JUN2017L0M0STIM' + extension
+        ec.read_config_file(datafile(filename))
+
+        assert ec.subject == 'R1308T'
+        assert ec.version == '1.2'
+        assert ec.name == '14JUN2017L0M0STIM'
+
+        assert len(ec.contacts) == 126
+        assert len(ec.sense_channels) == 126
+        assert len(ec.stim_channels) == 3
+
+        ec2 = ElectrodeConfig(datafile(filename))
+        assert ec.subject == ec2.subject
+        assert ec.version == ec2.version
+        assert ec.name == ec2.name
+        assert all(ec.contacts == ec2.contacts)
+        assert all(ec.sense_channels == ec2.sense_channels)
+        assert all(ec.stim_channels == ec2.stim_channels)
