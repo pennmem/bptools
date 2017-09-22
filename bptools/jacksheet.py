@@ -1,12 +1,14 @@
 import pandas as pd
 
 
-def read_jacksheet(filename):
+def read_jacksheet(filename, ignore_ecg=True):
     """Utility function to read a jacksheet.
 
     Parameters
     ----------
     filename : str
+    ignore_ecg : bool
+        Omit heart rate channels labeled as ECG/EKG.
 
     Returns
     -------
@@ -26,4 +28,9 @@ def read_jacksheet(filename):
     df = pd.read_csv(filename, index_col=0, names=['label'], sep='\s+')
     electrodes = df.label.str.extract(r'(\d*[a-zA-Z]+)', expand=True) \
         .rename(columns={0: 'electrode'})
-    return pd.concat([df, electrodes], axis=1)
+    js = pd.concat([df, electrodes], axis=1)
+
+    if ignore_ecg:
+        return js[~js.label.str.startswith('ECG') & ~js.label.str.startswith('EKG')]
+    else:
+        return js

@@ -66,10 +66,6 @@ def create_pairs(jacksheet_filename):
     contacts = []
 
     for group in groups:
-        # We don't care about heart rate
-        if group in ['ECG', 'EKG']:
-            continue
-
         el = jacksheet[jacksheet.electrode == group]
         for i in range(len(el)):
             try:
