@@ -57,6 +57,7 @@ def create_pairs(jacksheet_filename):
     Returns
     -------
     pairs : pd.DataFrame
+        Columns: pair, label1, label2, contact1, contact2, mux
 
     """
     jacksheet = read_jacksheet(jacksheet_filename)
@@ -103,6 +104,7 @@ def create_monopolar_pairs(jacksheet_filename, common_ref=0):
     Returns
     -------
     pairs : pd.DataFrame
+        See the documentation for :func:`create_pairs` for details.
 
     """
     assert common_ref >= 0

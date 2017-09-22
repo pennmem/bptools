@@ -100,10 +100,16 @@ def test_cli():
 
 
 class TestElectrodeConfig:
-    @pytest.mark.parametrize('extension', ['.csv', '.bin'])
+    @pytest.mark.parametrize('extension', ['.csv', '.bin', '.txt'])
     def test_read_config_file(self, extension):
         ec = ElectrodeConfig()
         filename = 'R1308T_14JUN2017L0M0STIM' + extension
+
+        if extension == '.txt':
+            with pytest.raises(RuntimeError):
+                ec.read_config_file(datafile(filename))
+            return
+
         ec.read_config_file(datafile(filename))
 
         assert ec.subject == 'R1308T'
@@ -121,3 +127,19 @@ class TestElectrodeConfig:
         assert all(ec.contacts == ec2.contacts)
         assert all(ec.sense_channels == ec2.sense_channels)
         assert all(ec.stim_channels == ec2.stim_channels)
+
+    @pytest.mark.parametrize('scheme', ['bipolar', 'monopolar', 'invalid'])
+    def test_from_jacksheet(self, scheme):
+        jfile = datafile('simple_jacksheet.txt')
+        subject = "subject"
+
+        if scheme == 'invalid':
+            with pytest.raises(AssertionError):
+                ElectrodeConfig.from_jacksheet(jfile, subject, scheme)
+            return
+
+        ec = ElectrodeConfig.from_jacksheet(jfile, subject, scheme)
+        assert ec.subject == subject
+        assert ec.num_contacts == 35
+        assert ec.num_sense_channels == 35 if scheme == 'monopolar' else 34
+        assert ec.num_stim_channels == 0

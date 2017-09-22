@@ -1,7 +1,44 @@
 import os.path as osp
 from io import StringIO
 from contextlib import contextmanager
+try:
+    from typing import List
+except ImportError:  # pragma: no cover
+    pass
 import pandas as pd
+
+from bptools.util import FromSeriesMixin
+from bptools.jacksheet import read_jacksheet
+from bptools.pairs import create_pairs, create_monopolar_pairs
+
+
+class Contact(FromSeriesMixin):
+    """Data about a configured contact."""
+    def __init__(self, label, port, area, description):
+        self.label = label
+        self.port = port
+        self.area = area
+        self.description = description
+
+
+class SenseChannel(FromSeriesMixin):
+    """Data for a configured sense channel. This consists of two contacts: the
+    primary contact and the reference contact.
+
+    """
+    def __init__(self, name, contact, ref, description):
+        self.name = name
+        self.contact = contact
+        self.ref = ref
+        self.description = description
+
+
+class StimChannel(FromSeriesMixin):
+    """Data for a configured stimulation channel."""
+    def __init__(self, name, anode, cathode):
+        self.name = name
+        self.anode = anode
+        self.cathode = cathode
 
 
 class ElectrodeConfig(object):
@@ -19,15 +56,24 @@ class ElectrodeConfig(object):
     subject : str
         Subject ID
 
+    Attributes
+    ----------
+    contacts : list of :class:`Contact`
+        Contact labels and numbers.
+    sense_channels : list of :class:`SenseChannel`
+        Configured sense channels.
+    stim_channels : list of :class:`StimChannel`
+        Configured stimulation channels.
+
     """
     def __init__(self, filename=None, version="1.2", name="", subject=""):
         self.version = version
         self.name = name
         self.subject = subject
 
-        self.contacts = None  # type: pd.DataFrame
-        self.sense_channels = None  # type: pd.DataFrame
-        self.stim_channels = None  # type: pd.DataFrame
+        self.contacts = []  # type: List[Contact]
+        self.sense_channels = []  # type: List[SenseChannel]
+        self.stim_channels = []  # type: List[StimChannel]
 
         # Paths to config files
         self._csv_file = None  # type: str
@@ -36,10 +82,78 @@ class ElectrodeConfig(object):
         if filename is not None:
             self.read_config_file(filename)
 
+    def __str__(self):
+        return "<ElectrodeConfig(num contacts={}, num sense channels={}, num stim channels={}>".format(
+            len(self.contacts), len(self.sense_channels), len(self.stim_channels)
+        )
+
+    @property
+    def num_contacts(self):
+        """Return the number of configured contacts."""
+        return len(self.contacts)
+
     @property
     def num_sense_channels(self):
         """Return the number of configured sense channels."""
         return len(self.sense_channels)
+
+    @property
+    def num_stim_channels(self):
+        """Return the number of configured stim channels."""
+        return len(self.stim_channels)
+
+    @classmethod
+    def from_jacksheet(cls, filename, subject="", scheme='bipolar', area=0.5):
+        """Create a new :class:`ElectrodeConfig` instance from a jacksheet.
+
+        Parameters
+        ----------
+        filename : str
+            Path to jacksheet file.
+        subject : str
+            Subject ID
+        scheme : str
+            Referencing scheme to use (``bipolar`` or ``monopolar``).
+        area : float
+            Default surface area to use in mm^2.
+
+        Returns
+        -------
+        config : ElectrodeConfig
+
+        """
+        js = read_jacksheet(filename)
+        config = ElectrodeConfig()
+        config.subject = subject
+
+        config.contacts = [
+            Contact.from_series(s)
+            for _, s in pd.DataFrame({
+                'label': js.label,
+                'port': js.electrode,
+                'area': [area] * len(js),
+                'description': ['Jackbox number {}'.format(n) for n in js.index]
+            }).iterrows()
+        ]
+
+        if scheme == 'bipolar':
+            pairs = create_pairs(filename)
+        elif scheme == 'monopolar':
+            pairs = create_monopolar_pairs(filename)
+        else:
+            raise AssertionError("Unrecognized referencing scheme")
+
+        config.sense_channels = [
+            SenseChannel.from_series(s)
+            for _, s in pd.DataFrame({
+                'name': pairs.pair,
+                'contact': pairs.contact1,
+                'ref': pairs.contact2,
+                'description': pairs.pair
+            }).iterrows()
+        ]
+
+        return config
 
     def read_config_file(self, filename):
         """Populate the instance from an Odin electrode configuration file.
@@ -112,12 +226,11 @@ class ElectrodeConfig(object):
                     except IndexError:
                         break
             self.stim_channels = pd.read_csv(buf, names=[
-                'label', 'anode', 'cathode'
+                'name', 'anode', 'cathode'
             ])
 
 
-if __name__ == "__main__":
-    config = ElectrodeConfig('bptools/test/data/R1308T_14JUN2017L0M0STIM.bin')
-    print(config.contacts)
-    print(config.sense_channels)
-    print(config.stim_channels)
+if __name__ == "__main__":  # pragma: no cover
+    jfile = 'bptools/test/data/simple_jacksheet.txt'
+    config = ElectrodeConfig.from_jacksheet(jfile)
+    print(config)
