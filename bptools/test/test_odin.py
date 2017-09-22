@@ -124,9 +124,28 @@ class TestElectrodeConfig:
         assert ec.subject == ec2.subject
         assert ec.version == ec2.version
         assert ec.name == ec2.name
-        assert all(ec.contacts == ec2.contacts)
-        assert all(ec.sense_channels == ec2.sense_channels)
-        assert all(ec.stim_channels == ec2.stim_channels)
+        assert all([ec.contacts[i] == ec2.contacts[i] for i in range(len(ec.contacts))])
+        assert all([ec.sense_channels[i] == ec2.sense_channels[i] for i in range(len(ec.sense_channels))])
+        assert all([ec.stim_channels[i] == ec2.stim_channels[i] for i in range(len(ec.stim_channels))])
+
+    def test_creation_methods(self):
+        ec = ElectrodeConfig(filename=datafile('R1306E_22SEP2017L0M0NOSTIM.csv'))
+        ec2 = ElectrodeConfig.from_jacksheet(datafile('R1306E_jacksheet.txt'), scheme='monopolar')
+
+        assert len(ec.contacts) == len(ec2.contacts)
+        assert len(ec.sense_channels) == len(ec2.sense_channels)
+
+        # n.b., stim channels shouldn't be defined for ec2
+        assert len(ec2.stim_channels) == 0
+
+        for i, _ in enumerate(ec.contacts):
+            assert ec.contacts[i].label == ec2.contacts[i].label
+            assert ec.contacts[i].port == ec2.contacts[i].port
+
+        for i, _ in enumerate(ec.sense_channels):
+            assert ec.sense_channels[i].name == ec2.sense_channels[i].name
+            assert ec.sense_channels[i].contact == ec2.sense_channels[i].contact
+            assert ec.sense_channels[i].ref == ec2.sense_channels[i].ref
 
     @pytest.mark.parametrize('scheme', ['bipolar', 'monopolar', 'invalid'])
     def test_from_jacksheet(self, scheme):
@@ -139,6 +158,7 @@ class TestElectrodeConfig:
             return
 
         ec = ElectrodeConfig.from_jacksheet(jfile, subject, scheme)
+        assert isinstance(ec.contacts[0].port, int)
         assert ec.subject == subject
         assert ec.num_contacts == 35
         assert ec.num_sense_channels == 35 if scheme == 'monopolar' else 34

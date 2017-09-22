@@ -12,8 +12,24 @@ from bptools.jacksheet import read_jacksheet
 from bptools.pairs import create_pairs, create_monopolar_pairs
 
 
-class Contact(FromSeriesMixin):
+class _SlotsMixin(object):
+    def __eq__(self, other):
+        return all([
+            getattr(self, slot) == getattr(other, slot)
+            for slot in self.__class__.__slots__
+        ])
+
+    def __str__(self):
+        repr = []
+        for slot in self.__class__.__slots__:
+            repr.append("{}={}".format(slot, getattr(self, slot)))
+        return "<{} {}>".format(self.__class__.__name__, ', '.join(repr))
+
+
+class Contact(FromSeriesMixin, _SlotsMixin):
     """Data about a configured contact."""
+    __slots__ = ('label', 'port', 'area', 'description')
+
     def __init__(self, label, port, area, description):
         self.label = label
         self.port = port
@@ -21,11 +37,13 @@ class Contact(FromSeriesMixin):
         self.description = description
 
 
-class SenseChannel(FromSeriesMixin):
+class SenseChannel(FromSeriesMixin, _SlotsMixin):
     """Data for a configured sense channel. This consists of two contacts: the
     primary contact and the reference contact.
 
     """
+    __slots__ = ('name', 'contact', 'ref', 'description')
+
     def __init__(self, name, contact, ref, description):
         self.name = name
         self.contact = contact
@@ -33,8 +51,10 @@ class SenseChannel(FromSeriesMixin):
         self.description = description
 
 
-class StimChannel(FromSeriesMixin):
+class StimChannel(FromSeriesMixin, _SlotsMixin):
     """Data for a configured stimulation channel."""
+    __slots__ = ('name', 'anode', 'cathode')
+
     def __init__(self, name, anode, cathode):
         self.name = name
         self.anode = anode
@@ -130,7 +150,7 @@ class ElectrodeConfig(object):
             Contact.from_series(s)
             for _, s in pd.DataFrame({
                 'label': js.label,
-                'port': js.electrode,
+                'port': js.index,
                 'area': [area] * len(js),
                 'description': ['Jackbox number {}'.format(n) for n in js.index]
             }).iterrows()
@@ -205,17 +225,23 @@ class ElectrodeConfig(object):
             with buffer() as buf:
                 for line in iterlines():
                     buf.write(','.join(line) + u'\n')
-            self.contacts = pd.read_csv(buf, names=[
-                'label', 'port', 'port2', 'area', 'description'
-            ]).drop('port2', axis=1)
+            self.contacts = [
+                Contact.from_series(s)
+                for _, s in pd.read_csv(buf, names=[
+                    'label', 'port', 'port2', 'area', 'description'
+                ]).drop('port2', axis=1).iterrows()
+            ]
 
             # Read sense channels
             with buffer() as buf:
                 for line in iterlines():
                     buf.write(','.join(line) + u'\n')
-            self.sense_channels = pd.read_csv(buf, names=[
-                'name', 'name2', 'contact', 'ref', 'x', 'description'
-            ]).drop(['name2', 'x'], axis=1)
+            self.sense_channels = [
+                SenseChannel.from_series(s)
+                for _, s in pd.read_csv(buf, names=[
+                    'name', 'name2', 'contact', 'ref', 'x', 'description'
+                ]).drop(['name2', 'x'], axis=1).iterrows()
+            ]
 
             # Read stim channels
             with buffer() as buf:
@@ -225,12 +251,15 @@ class ElectrodeConfig(object):
                         buf.write(line + u'\n')
                     except IndexError:
                         break
-            self.stim_channels = pd.read_csv(buf, names=[
-                'name', 'anode', 'cathode'
-            ])
+            self.stim_channels = [
+                StimChannel.from_series(s)
+                for _, s in pd.read_csv(buf, names=[
+                    'name', 'anode', 'cathode'
+                ]).iterrows()
+            ]
 
 
 if __name__ == "__main__":  # pragma: no cover
-    jfile = 'bptools/test/data/simple_jacksheet.txt'
-    config = ElectrodeConfig.from_jacksheet(jfile)
-    print(config)
+    c1 = Contact('a', 1, 1, '')
+    c2 = Contact('a', 1, 1, '')
+    print(c1 == c2)
