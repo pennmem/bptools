@@ -129,17 +129,23 @@ instead be defined as <code class="docutils literal"><span class="pre">LA1-LA2</
 <span id="jacksheet-utilities"></span><h3>Jacksheet utilities<a class="headerlink" href="#module-bptools.jacksheet" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="bptools.jacksheet.read_jacksheet">
-<code class="descclassname">bptools.jacksheet.</code><code class="descname">read_jacksheet</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/jacksheet.html#read_jacksheet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.jacksheet.read_jacksheet" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">bptools.jacksheet.</code><code class="descname">read_jacksheet</code><span class="sig-paren">(</span><em>filename</em>, <em>ignore_ecg=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/jacksheet.html#read_jacksheet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.jacksheet.read_jacksheet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility function to read a jacksheet.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>str</em>) – </li>
+<li><strong>ignore_ecg</strong> (<em>bool</em>) – Omit heart rate channels labeled as ECG/EKG.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.DataFrame</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -170,7 +176,7 @@ without the number)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>pairs</strong></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>pairs</strong> – See the documentation for <a class="reference internal" href="#bptools.pairs.create_pairs" title="bptools.pairs.create_pairs"><code class="xref py py-func docutils literal"><span class="pre">create_pairs()</span></code></a> for details.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.DataFrame</p>
@@ -193,7 +199,7 @@ the first and last contacts are also paired.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jacksheet_filename</strong> (<em>str</em>) – Path to jacksheet to read.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>pairs</strong></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>pairs</strong> – Columns: pair, label1, label2, contact1, contact2, mux</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
 </tr>
@@ -259,11 +265,127 @@ keyword argument is also required.</li>
 </dd></dl>
 
 </div>
-<div class="section" id="module-bptools.odin.configgen">
-<span id="odin-ens-configuration"></span><h3>Odin ENS configuration<a class="headerlink" href="#module-bptools.odin.configgen" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-bptools.odin.config">
+<span id="odin-ens-configuration"></span><h3>Odin ENS configuration<a class="headerlink" href="#module-bptools.odin.config" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="bptools.odin.config.Contact">
+<em class="property">class </em><code class="descclassname">bptools.odin.config.</code><code class="descname">Contact</code><span class="sig-paren">(</span><em>label</em>, <em>port</em>, <em>area</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#Contact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.Contact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data about a configured contact.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bptools.odin.config.ElectrodeConfig">
+<em class="property">class </em><code class="descclassname">bptools.odin.config.</code><code class="descname">ElectrodeConfig</code><span class="sig-paren">(</span><em>filename=None</em>, <em>version=‘1.2’</em>, <em>name=”</em>, <em>subject=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representation of OdinLib electrode configuration files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<em>str</em>) – Path to Odin binary or CSV configuration file. Both must be present in
+the same directory.</li>
+<li><strong>version</strong> (<em>str</em>) – Odin config version number</li>
+<li><strong>name</strong> (<em>str</em>) – Name given to config file (alphanumeric only)</li>
+<li><strong>subject</strong> (<em>str</em>) – Subject ID</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="bptools.odin.config.ElectrodeConfig.contacts">
+<code class="descname">contacts</code><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.contacts" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of <a class="reference internal" href="#bptools.odin.config.Contact" title="bptools.odin.config.Contact"><code class="xref py py-class docutils literal"><span class="pre">Contact</span></code></a> – Contact labels and numbers.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.odin.config.ElectrodeConfig.sense_channels">
+<code class="descname">sense_channels</code><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.sense_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of <a class="reference internal" href="#bptools.odin.config.SenseChannel" title="bptools.odin.config.SenseChannel"><code class="xref py py-class docutils literal"><span class="pre">SenseChannel</span></code></a> – Configured sense channels.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.odin.config.ElectrodeConfig.stim_channels">
+<code class="descname">stim_channels</code><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.stim_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of <a class="reference internal" href="#bptools.odin.config.StimChannel" title="bptools.odin.config.StimChannel"><code class="xref py py-class docutils literal"><span class="pre">StimChannel</span></code></a> – Configured stimulation channels.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bptools.odin.config.ElectrodeConfig.from_jacksheet">
+<em class="property">classmethod </em><code class="descname">from_jacksheet</code><span class="sig-paren">(</span><em>filename</em>, <em>subject=”</em>, <em>scheme=’bipolar’</em>, <em>area=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig.from_jacksheet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.from_jacksheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new <a class="reference internal" href="#bptools.odin.config.ElectrodeConfig" title="bptools.odin.config.ElectrodeConfig"><code class="xref py py-class docutils literal"><span class="pre">ElectrodeConfig</span></code></a> instance from a jacksheet.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>str</em>) – Path to jacksheet file.</li>
+<li><strong>subject</strong> (<em>str</em>) – Subject ID</li>
+<li><strong>scheme</strong> (<em>str</em>) – Referencing scheme to use (<code class="docutils literal"><span class="pre">bipolar</span></code> or <code class="docutils literal"><span class="pre">monopolar</span></code>).</li>
+<li><strong>area</strong> (<em>float</em>) – Default surface area to use in mm^2.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>config</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#bptools.odin.config.ElectrodeConfig" title="bptools.odin.config.ElectrodeConfig">ElectrodeConfig</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.odin.config.ElectrodeConfig.num_contacts">
+<code class="descname">num_contacts</code><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.num_contacts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of configured contacts.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.odin.config.ElectrodeConfig.num_sense_channels">
+<code class="descname">num_sense_channels</code><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.num_sense_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of configured sense channels.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.odin.config.ElectrodeConfig.num_stim_channels">
+<code class="descname">num_stim_channels</code><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.num_stim_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of configured stim channels.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bptools.odin.config.ElectrodeConfig.read_config_file">
+<code class="descname">read_config_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig.read_config_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.read_config_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate the instance from an Odin electrode configuration file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – Path to Odin binary or CSV config file.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bptools.odin.config.SenseChannel">
+<em class="property">class </em><code class="descclassname">bptools.odin.config.</code><code class="descname">SenseChannel</code><span class="sig-paren">(</span><em>name</em>, <em>contact</em>, <em>ref</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#SenseChannel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.SenseChannel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data for a configured sense channel. This consists of two contacts: the
+primary contact and the reference contact.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bptools.odin.config.StimChannel">
+<em class="property">class </em><code class="descclassname">bptools.odin.config.</code><code class="descname">StimChannel</code><span class="sig-paren">(</span><em>name</em>, <em>anode</em>, <em>cathode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#StimChannel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.StimChannel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data for a configured stimulation channel.</p>
+</dd></dl>
+
 <dl class="function">
-<dt id="bptools.odin.configgen.make_config_name">
-<code class="descclassname">bptools.odin.configgen.</code><code class="descname">make_config_name</code><span class="sig-paren">(</span><em>subject</em>, <em>localization</em>, <em>montage</em>, <em>stim</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/configgen.html#make_config_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.configgen.make_config_name" title="Permalink to this definition">¶</a></dt>
+<dt id="bptools.odin.config.make_config_name">
+<code class="descclassname">bptools.odin.config.</code><code class="descname">make_config_name</code><span class="sig-paren">(</span><em>subject</em>, <em>localization</em>, <em>montage</em>, <em>stim</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#make_config_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.make_config_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the configuration filename using the standard naming convetion.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -282,8 +404,8 @@ keyword argument is also required.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="bptools.odin.configgen.make_odin_config">
-<code class="descclassname">bptools.odin.configgen.</code><code class="descname">make_odin_config</code><span class="sig-paren">(</span><em>jacksheet_filename</em>, <em>config_name</em>, <em>default_surface_area</em>, <em>path=None</em>, <em>good_leads=None</em>, <em>scheme=’bipolar’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/configgen.html#make_odin_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.configgen.make_odin_config" title="Permalink to this definition">¶</a></dt>
+<dt id="bptools.odin.config.make_odin_config">
+<code class="descclassname">bptools.odin.config.</code><code class="descname">make_odin_config</code><span class="sig-paren">(</span><em>jacksheet_filename</em>, <em>config_name</em>, <em>default_surface_area</em>, <em>path=None</em>, <em>good_leads=None</em>, <em>scheme=’bipolar’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#make_odin_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.make_odin_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an Odin ENS electrode configuration CSV file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -327,7 +449,7 @@ as type of electrode (depth, grid, strip) and surface areas.</p>
 <li><a class="reference internal" href="#api-reference">API reference</a><ul>
 <li><a class="reference internal" href="#module-bptools.jacksheet">Jacksheet utilities</a></li>
 <li><a class="reference internal" href="#module-bptools.pairs">Pair creation tools</a></li>
-<li><a class="reference internal" href="#module-bptools.odin.configgen">Odin ENS configuration</a></li>
+<li><a class="reference internal" href="#module-bptools.odin.config">Odin ENS configuration</a></li>
 </ul>
 </li>
 </ul>
