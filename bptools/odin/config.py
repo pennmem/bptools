@@ -166,7 +166,7 @@ class ElectrodeConfig(object):
         config.sense_channels = [
             SenseChannel.from_series(s)
             for _, s in pd.DataFrame({
-                'name': pairs.pair,
+                'name': pairs.label1 + "CR" if scheme == 'monopolar' else pairs.label1 + pairs.label2,
                 'contact': pairs.contact1,
                 'ref': pairs.contact2,
                 'description': pairs.pair
@@ -239,8 +239,8 @@ class ElectrodeConfig(object):
             self.sense_channels = [
                 SenseChannel.from_series(s)
                 for _, s in pd.read_csv(buf, names=[
-                    'name', 'name2', 'contact', 'ref', 'x', 'description'
-                ]).drop(['name2', 'x'], axis=1).iterrows()
+                    'primary_name', 'name', 'contact', 'ref', 'x', 'description'
+                ]).drop(['primary_name', 'x'], axis=1).iterrows()
             ]
 
             # Read stim channels

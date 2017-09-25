@@ -52,9 +52,8 @@ def test_muxes():
 def test_create_monopolar_pairs():
     pairs = create_monopolar_pairs(datafile('simple_jacksheet.txt'))
     assert all(pairs.contact2 == 0)
-    names = pairs.pair
-    for name in names:
-        assert name.split('-')[1] == 'CR'
+    print(pairs)
+    assert all(pairs.pair[i] == "{}-CR".format(pairs.label1[i]) for i in range(len(pairs)))
 
 
 def test_no_mux_crossing():

@@ -1,0 +1,250 @@
+ODINConfigurationVersion:,#1.2#
+ConfigurationName:,22SEP2017L0M0NOSTIM
+SubjectID:,R1306E
+Contacts:
+2Rd1,1,1,0.001,#Electrode A-CH01 jack box 1#
+2Rd2,2,2,0.001,#Electrode A-CH02 jack box 2#
+2Rd3,3,3,0.001,#Electrode A-CH03 jack box 3#
+2Rd4,4,4,0.001,#Electrode A-CH04 jack box 4#
+2Rd5,5,5,0.001,#Electrode A-CH05 jack box 5#
+2Rd6,6,6,0.001,#Electrode A-CH06 jack box 6#
+2Rd7,7,7,0.001,#Electrode A-CH07 jack box 7#
+2Rd8,8,8,0.001,#Electrode A-CH08 jack box 8#
+2Rd9,9,9,0.001,#Electrode A-CH09 jack box 9#
+2Rd10,10,10,0.001,#Electrode A-CH10 jack box 10#
+4Rd1,11,11,0.001,#Electrode A-CH11 jack box 11#
+4Rd2,12,12,0.001,#Electrode A-CH12 jack box 12#
+4Rd3,13,13,0.001,#Electrode A-CH13 jack box 13#
+4Rd4,14,14,0.001,#Electrode A-CH14 jack box 14#
+4Rd5,15,15,0.001,#Electrode A-CH15 jack box 15#
+4Rd6,16,16,0.001,#Electrode A-CH16 jack box 16#
+4Rd7,17,17,0.001,#Electrode A-CH17 jack box 17#
+4Rd8,18,18,0.001,#Electrode A-CH18 jack box 18#
+4Rd9,19,19,0.001,#Electrode A-CH19 jack box 19#
+4Rd10,20,20,0.001,#Electrode A-CH20 jack box 20#
+6Rd1,21,21,0.001,#Electrode A-CH21 jack box 21#
+6Rd2,22,22,0.001,#Electrode A-CH22 jack box 22#
+6Rd3,23,23,0.001,#Electrode A-CH23 jack box 23#
+6Rd4,24,24,0.001,#Electrode A-CH24 jack box 24#
+6Rd5,25,25,0.001,#Electrode A-CH25 jack box 25#
+6Rd6,26,26,0.001,#Electrode A-CH26 jack box 26#
+6Rd7,27,27,0.001,#Electrode A-CH27 jack box 27#
+6Rd8,28,28,0.001,#Electrode A-CH28 jack box 28#
+6Rd9,29,29,0.001,#Electrode A-CH29 jack box 29#
+6Rd10,30,30,0.001,#Electrode A-CH30 jack box 30#
+10Rd1,31,31,0.001,#Electrode A-CH31 jack box 31#
+10Rd2,32,32,0.001,#Electrode A-CH32 jack box 32#
+10Rd3,33,33,0.001,#Electrode A-CH33 jack box 33#
+10Rd4,34,34,0.001,#Electrode A-CH34 jack box 34#
+10Rd5,35,35,0.001,#Electrode A-CH35 jack box 35#
+10Rd6,36,36,0.001,#Electrode A-CH36 jack box 36#
+10Rd7,37,37,0.001,#Electrode A-CH37 jack box 37#
+10Rd8,38,38,0.001,#Electrode A-CH38 jack box 38#
+10Rd9,39,39,0.001,#Electrode A-CH39 jack box 39#
+10Rd10,40,40,0.001,#Electrode A-CH40 jack box 40#
+12Rd1,41,41,0.001,#Electrode A-CH41 jack box 41#
+12Rd2,42,42,0.001,#Electrode A-CH42 jack box 42#
+12Rd3,43,43,0.001,#Electrode A-CH43 jack box 43#
+12Rd4,44,44,0.001,#Electrode A-CH44 jack box 44#
+12Rd5,45,45,0.001,#Electrode A-CH45 jack box 45#
+12Rd6,46,46,0.001,#Electrode A-CH46 jack box 46#
+12Rd7,47,47,0.001,#Electrode A-CH47 jack box 47#
+12Rd8,48,48,0.001,#Electrode A-CH48 jack box 48#
+12Rd9,49,49,0.001,#Electrode A-CH49 jack box 49#
+12Rd10,50,50,0.001,#Electrode A-CH50 jack box 50#
+14Rd1,51,51,0.001,#Electrode A-CH51 jack box 51#
+14Rd2,52,52,0.001,#Electrode A-CH52 jack box 52#
+14Rd3,53,53,0.001,#Electrode A-CH53 jack box 53#
+14Rd4,54,54,0.001,#Electrode A-CH54 jack box 54#
+14Rd5,55,55,0.001,#Electrode A-CH55 jack box 55#
+14Rd6,56,56,0.001,#Electrode A-CH56 jack box 56#
+14Rd7,57,57,0.001,#Electrode A-CH57 jack box 57#
+14Rd8,58,58,0.001,#Electrode A-CH58 jack box 58#
+14Rd9,59,59,0.001,#Electrode A-CH59 jack box 59#
+14Rd10,60,60,0.001,#Electrode A-CH60 jack box 60#
+1Ld1,61,61,0.001,#Electrode A-CH61 jack box 61#
+1Ld2,62,62,0.001,#Electrode A-CH62 jack box 62#
+1Ld3,63,63,0.001,#Electrode A-CH63 jack box 63#
+1Ld4,64,64,0.001,#Electrode B-CH00 jack box 64#
+1Ld5,65,65,0.001,#Electrode B-CH01 jack box 65#
+1Ld6,66,66,0.001,#Electrode B-CH02 jack box 66#
+1Ld7,67,67,0.001,#Electrode B-CH03 jack box 67#
+1Ld8,68,68,0.001,#Electrode B-CH04 jack box 68#
+1Ld9,69,69,0.001,#Electrode B-CH05 jack box 69#
+1Ld10,70,70,0.001,#Electrode B-CH06 jack box 70#
+3Ld1,71,71,0.001,#Electrode B-CH07 jack box 71#
+3Ld2,72,72,0.001,#Electrode B-CH08 jack box 72#
+3Ld3,73,73,0.001,#Electrode B-CH09 jack box 73#
+3Ld4,74,74,0.001,#Electrode B-CH10 jack box 74#
+3Ld5,75,75,0.001,#Electrode B-CH11 jack box 75#
+3Ld6,76,76,0.001,#Electrode B-CH12 jack box 76#
+3Ld7,77,77,0.001,#Electrode B-CH13 jack box 77#
+3Ld8,78,78,0.001,#Electrode B-CH14 jack box 78#
+3Ld9,79,79,0.001,#Electrode B-CH15 jack box 79#
+3Ld10,80,80,0.001,#Electrode B-CH16 jack box 80#
+5Ld1,81,81,0.001,#Electrode B-CH17 jack box 81#
+5Ld2,82,82,0.001,#Electrode B-CH18 jack box 82#
+5Ld3,83,83,0.001,#Electrode B-CH19 jack box 83#
+5Ld4,84,84,0.001,#Electrode B-CH20 jack box 84#
+5Ld5,85,85,0.001,#Electrode B-CH21 jack box 85#
+5Ld6,86,86,0.001,#Electrode B-CH22 jack box 86#
+5Ld7,87,87,0.001,#Electrode B-CH23 jack box 87#
+5Ld8,88,88,0.001,#Electrode B-CH24 jack box 88#
+5Ld9,89,89,0.001,#Electrode B-CH25 jack box 89#
+5Ld10,90,90,0.001,#Electrode B-CH26 jack box 90#
+7Ld1,91,91,0.001,#Electrode B-CH27 jack box 91#
+7Ld2,92,92,0.001,#Electrode B-CH28 jack box 92#
+7Ld3,93,93,0.001,#Electrode B-CH29 jack box 93#
+7Ld4,94,94,0.001,#Electrode B-CH30 jack box 94#
+7Ld5,95,95,0.001,#Electrode B-CH31 jack box 95#
+7Ld6,96,96,0.001,#Electrode B-CH32 jack box 96#
+7Ld7,97,97,0.001,#Electrode B-CH33 jack box 97#
+7Ld8,98,98,0.001,#Electrode B-CH34 jack box 98#
+7Ld9,99,99,0.001,#Electrode B-CH35 jack box 99#
+7Ld10,100,100,0.001,#Electrode B-CH36 jack box 100#
+9Ld1,101,101,0.001,#Electrode B-CH37 jack box 101#
+9Ld2,102,102,0.001,#Electrode B-CH38 jack box 102#
+9Ld3,103,103,0.001,#Electrode B-CH39 jack box 103#
+9Ld4,104,104,0.001,#Electrode B-CH40 jack box 104#
+9Ld5,105,105,0.001,#Electrode B-CH41 jack box 105#
+9Ld6,106,106,0.001,#Electrode B-CH42 jack box 106#
+9Ld7,107,107,0.001,#Electrode B-CH43 jack box 107#
+9Ld8,108,108,0.001,#Electrode B-CH44 jack box 108#
+9Ld9,109,109,0.001,#Electrode B-CH45 jack box 109#
+9Ld10,110,110,0.001,#Electrode B-CH46 jack box 110#
+11Ld1,111,111,0.001,#Electrode B-CH47 jack box 111#
+11Ld2,112,112,0.001,#Electrode B-CH48 jack box 112#
+11Ld3,113,113,0.001,#Electrode B-CH49 jack box 113#
+11Ld4,114,114,0.001,#Electrode B-CH50 jack box 114#
+11Ld5,115,115,0.001,#Electrode B-CH51 jack box 115#
+11Ld6,116,116,0.001,#Electrode B-CH52 jack box 116#
+11Ld7,117,117,0.001,#Electrode B-CH53 jack box 117#
+11Ld8,118,118,0.001,#Electrode B-CH54 jack box 118#
+11Ld9,119,119,0.001,#Electrode B-CH55 jack box 119#
+11Ld10,120,120,0.001,#Electrode B-CH56 jack box 120#
+SenseChannelSubclasses:
+SenseChannels:
+2Rd1,2Rd1CR,1,0,x,#2Rd1-CR#
+2Rd2,2Rd2CR,2,0,x,#2Rd2-CR#
+2Rd3,2Rd3CR,3,0,x,#2Rd3-CR#
+2Rd4,2Rd4CR,4,0,x,#2Rd4-CR#
+2Rd5,2Rd5CR,5,0,x,#2Rd5-CR#
+2Rd6,2Rd6CR,6,0,x,#2Rd6-CR#
+2Rd7,2Rd7CR,7,0,x,#2Rd7-CR#
+2Rd8,2Rd8CR,8,0,x,#2Rd8-CR#
+2Rd9,2Rd9CR,9,0,x,#2Rd9-CR#
+2Rd10,2Rd10CR,10,0,x,#2Rd10-CR#
+4Rd1,4Rd1CR,11,0,x,#4Rd1-CR#
+4Rd2,4Rd2CR,12,0,x,#4Rd2-CR#
+4Rd3,4Rd3CR,13,0,x,#4Rd3-CR#
+4Rd4,4Rd4CR,14,0,x,#4Rd4-CR#
+4Rd5,4Rd5CR,15,0,x,#4Rd5-CR#
+4Rd6,4Rd6CR,16,0,x,#4Rd6-CR#
+4Rd7,4Rd7CR,17,0,x,#4Rd7-CR#
+4Rd8,4Rd8CR,18,0,x,#4Rd8-CR#
+4Rd9,4Rd9CR,19,0,x,#4Rd9-CR#
+4Rd10,4Rd10CR,20,0,x,#4Rd10-CR#
+6Rd1,6Rd1CR,21,0,x,#6Rd1-CR#
+6Rd2,6Rd2CR,22,0,x,#6Rd2-CR#
+6Rd3,6Rd3CR,23,0,x,#6Rd3-CR#
+6Rd4,6Rd4CR,24,0,x,#6Rd4-CR#
+6Rd5,6Rd5CR,25,0,x,#6Rd5-CR#
+6Rd6,6Rd6CR,26,0,x,#6Rd6-CR#
+6Rd7,6Rd7CR,27,0,x,#6Rd7-CR#
+6Rd8,6Rd8CR,28,0,x,#6Rd8-CR#
+6Rd9,6Rd9CR,29,0,x,#6Rd9-CR#
+6Rd10,6Rd10CR,30,0,x,#6Rd10-CR#
+10Rd1,10Rd1CR,31,0,x,#10Rd1-CR#
+10Rd2,10Rd2CR,32,0,x,#10Rd2-CR#
+10Rd3,10Rd3CR,33,0,x,#10Rd3-CR#
+10Rd4,10Rd4CR,34,0,x,#10Rd4-CR#
+10Rd5,10Rd5CR,35,0,x,#10Rd5-CR#
+10Rd6,10Rd6CR,36,0,x,#10Rd6-CR#
+10Rd7,10Rd7CR,37,0,x,#10Rd7-CR#
+10Rd8,10Rd8CR,38,0,x,#10Rd8-CR#
+10Rd9,10Rd9CR,39,0,x,#10Rd9-CR#
+10Rd10,10Rd10CR,40,0,x,#10Rd10-CR#
+12Rd1,12Rd1CR,41,0,x,#12Rd1-CR#
+12Rd2,12Rd2CR,42,0,x,#12Rd2-CR#
+12Rd3,12Rd3CR,43,0,x,#12Rd3-CR#
+12Rd4,12Rd4CR,44,0,x,#12Rd4-CR#
+12Rd5,12Rd5CR,45,0,x,#12Rd5-CR#
+12Rd6,12Rd6CR,46,0,x,#12Rd6-CR#
+12Rd7,12Rd7CR,47,0,x,#12Rd7-CR#
+12Rd8,12Rd8CR,48,0,x,#12Rd8-CR#
+12Rd9,12Rd9CR,49,0,x,#12Rd9-CR#
+12Rd10,12Rd10CR,50,0,x,#12Rd10-CR#
+14Rd1,14Rd1CR,51,0,x,#14Rd1-CR#
+14Rd2,14Rd2CR,52,0,x,#14Rd2-CR#
+14Rd3,14Rd3CR,53,0,x,#14Rd3-CR#
+14Rd4,14Rd4CR,54,0,x,#14Rd4-CR#
+14Rd5,14Rd5CR,55,0,x,#14Rd5-CR#
+14Rd6,14Rd6CR,56,0,x,#14Rd6-CR#
+14Rd7,14Rd7CR,57,0,x,#14Rd7-CR#
+14Rd8,14Rd8CR,58,0,x,#14Rd8-CR#
+14Rd9,14Rd9CR,59,0,x,#14Rd9-CR#
+14Rd10,14Rd10CR,60,0,x,#14Rd10-CR#
+1Ld1,1Ld1CR,61,0,x,#1Ld1-CR#
+1Ld2,1Ld2CR,62,0,x,#1Ld2-CR#
+1Ld3,1Ld3CR,63,0,x,#1Ld3-CR#
+1Ld4,1Ld4CR,64,0,x,#1Ld4-CR#
+1Ld5,1Ld5CR,65,0,x,#1Ld5-CR#
+1Ld6,1Ld6CR,66,0,x,#1Ld6-CR#
+1Ld7,1Ld7CR,67,0,x,#1Ld7-CR#
+1Ld8,1Ld8CR,68,0,x,#1Ld8-CR#
+1Ld9,1Ld9CR,69,0,x,#1Ld9-CR#
+1Ld10,1Ld10CR,70,0,x,#1Ld10-CR#
+3Ld1,3Ld1CR,71,0,x,#3Ld1-CR#
+3Ld2,3Ld2CR,72,0,x,#3Ld2-CR#
+3Ld3,3Ld3CR,73,0,x,#3Ld3-CR#
+3Ld4,3Ld4CR,74,0,x,#3Ld4-CR#
+3Ld5,3Ld5CR,75,0,x,#3Ld5-CR#
+3Ld6,3Ld6CR,76,0,x,#3Ld6-CR#
+3Ld7,3Ld7CR,77,0,x,#3Ld7-CR#
+3Ld8,3Ld8CR,78,0,x,#3Ld8-CR#
+3Ld9,3Ld9CR,79,0,x,#3Ld9-CR#
+3Ld10,3Ld10CR,80,0,x,#3Ld10-CR#
+5Ld1,5Ld1CR,81,0,x,#5Ld1-CR#
+5Ld2,5Ld2CR,82,0,x,#5Ld2-CR#
+5Ld3,5Ld3CR,83,0,x,#5Ld3-CR#
+5Ld4,5Ld4CR,84,0,x,#5Ld4-CR#
+5Ld5,5Ld5CR,85,0,x,#5Ld5-CR#
+5Ld6,5Ld6CR,86,0,x,#5Ld6-CR#
+5Ld7,5Ld7CR,87,0,x,#5Ld7-CR#
+5Ld8,5Ld8CR,88,0,x,#5Ld8-CR#
+5Ld9,5Ld9CR,89,0,x,#5Ld9-CR#
+5Ld10,5Ld10CR,90,0,x,#5Ld10-CR#
+7Ld1,7Ld1CR,91,0,x,#7Ld1-CR#
+7Ld2,7Ld2CR,92,0,x,#7Ld2-CR#
+7Ld3,7Ld3CR,93,0,x,#7Ld3-CR#
+7Ld4,7Ld4CR,94,0,x,#7Ld4-CR#
+7Ld5,7Ld5CR,95,0,x,#7Ld5-CR#
+7Ld6,7Ld6CR,96,0,x,#7Ld6-CR#
+7Ld7,7Ld7CR,97,0,x,#7Ld7-CR#
+7Ld8,7Ld8CR,98,0,x,#7Ld8-CR#
+7Ld9,7Ld9CR,99,0,x,#7Ld9-CR#
+7Ld10,7Ld10CR,100,0,x,#7Ld10-CR#
+9Ld1,9Ld1CR,101,0,x,#9Ld1-CR#
+9Ld2,9Ld2CR,102,0,x,#9Ld2-CR#
+9Ld3,9Ld3CR,103,0,x,#9Ld3-CR#
+9Ld4,9Ld4CR,104,0,x,#9Ld4-CR#
+9Ld5,9Ld5CR,105,0,x,#9Ld5-CR#
+9Ld6,9Ld6CR,106,0,x,#9Ld6-CR#
+9Ld7,9Ld7CR,107,0,x,#9Ld7-CR#
+9Ld8,9Ld8CR,108,0,x,#9Ld8-CR#
+9Ld9,9Ld9CR,109,0,x,#9Ld9-CR#
+9Ld10,9Ld10CR,110,0,x,#9Ld10-CR#
+11Ld1,11Ld1CR,111,0,x,#11Ld1-CR#
+11Ld2,11Ld2CR,112,0,x,#11Ld2-CR#
+11Ld3,11Ld3CR,113,0,x,#11Ld3-CR#
+11Ld4,11Ld4CR,114,0,x,#11Ld4-CR#
+11Ld5,11Ld5CR,115,0,x,#11Ld5-CR#
+11Ld6,11Ld6CR,116,0,x,#11Ld6-CR#
+11Ld7,11Ld7CR,117,0,x,#11Ld7-CR#
+11Ld8,11Ld8CR,118,0,x,#11Ld8-CR#
+11Ld9,11Ld9CR,119,0,x,#11Ld9-CR#
+11Ld10,11Ld10CR,120,0,x,#11Ld10-CR#
+StimulationChannelSubclasses:
+StimulationChannels:
+REF:,0,Common
+EOF

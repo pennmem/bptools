@@ -64,7 +64,7 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
         "ConfigurationName:," + name,
         "SubjectID:," + subject,
         "Contacts:",
-        ]
+    ]
 
     # Channel definitions
     for n, row in js.iterrows():
