@@ -11,6 +11,6 @@ class FromSeriesMixin(object):
         """
         kwargs = {
             attr: value
-            for attr, value in s.items()
+            for attr, value in s.iteritems()
         }
         return cls(**kwargs)
