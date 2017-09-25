@@ -5,8 +5,7 @@ from io import StringIO
 import pytest
 import pandas as pd
 
-from bptools.odin.configgen import make_odin_config, make_config_name
-from bptools.odin.config import ElectrodeConfig
+from bptools.odin.config import ElectrodeConfig, make_odin_config, make_config_name
 from bptools.odin import cli
 from bptools.test import datafile, tempdir, HERE
 

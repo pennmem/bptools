@@ -3,7 +3,7 @@ from __future__ import print_function
 from argparse import ArgumentParser
 import os.path as osp
 
-from .configgen import make_config_name, make_odin_config
+from .config import make_config_name, make_odin_config
 
 
 def _read_good_leads(filename):
