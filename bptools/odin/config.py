@@ -409,6 +409,35 @@ class ElectrodeConfig(object):
                 ]).iterrows()
             ]
 
+    def to_csv(self, outfile=None):
+        """Export as an Odin CSV electrode configuration file.
+
+        Parameters
+        ----------
+        outfile : str
+            Name of the output file.
+
+        Returns
+        -------
+        ``str`` if outfile is ``None`` else ``None`` and writes to ``outfile``.
+
+        Notes
+        -----
+        For now, this only works if the configuration was generated from an
+        existing CSV file.
+
+        """
+        assert self._csv_file is not None, "TODO: implement more general to_csv"
+
+        with open(self._csv_file, 'r') as f:
+            config = f.read()
+
+        if outfile is None:
+            return config
+        else:
+            with open(outfile, 'w') as f:
+                f.write(config)
+
     def contacts_as_recarray(self):
         """Return the monopolar contacts as a recarry.
 

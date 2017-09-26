@@ -175,12 +175,26 @@ class TestElectrodeConfig:
         assert ec.num_sense_channels == 35 if scheme == 'monopolar' else 34
         assert ec.num_stim_channels == 0
 
+    def test_to_csv(self, tmpdir):
+        basename = "R1308T_14JUN2017L0M0STIM.csv"
+        filename = datafile(basename)
+        ec = ElectrodeConfig(filename)
+        stringy = ec.to_csv()
+
+        with open(filename, 'r') as original:
+            assert stringy == original.read()
+
+        outfile = tmpdir.join(basename)
+        ec.to_csv(outfile=outfile)
+
+        with open(filename, 'r') as original:
+            with open(outfile, 'r') as new:
+                assert new.read() == original.read()
+
     def test_contacts_as_recarray(self):
         ec = ElectrodeConfig.from_jacksheet(datafile("simple_jacksheet.txt"))
         arr = ec.contacts_as_recarray()
         for i, num in enumerate(range(1, 36)):
             assert arr.jack_box_num[i] == num
         assert len(arr.contact_name) == 35
-        for area in arr.surface_area:
-            assert area == 0.5
         assert len(arr.description) == 35
