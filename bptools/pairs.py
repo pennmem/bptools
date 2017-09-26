@@ -1,10 +1,13 @@
 import os.path as osp
 import json
+from collections import namedtuple
 
 import numpy as np
 import pandas as pd
 
 from .jacksheet import read_jacksheet
+
+Pair = namedtuple('Pair', ['ch0_label', 'ch1_label', 'pair_label'])
 
 # Number of channels in one MUX
 _ODIN_MUX_CHANNELS = 32
@@ -187,3 +190,92 @@ def write_pairs(pairs, filename, **kwargs):
         pairs_to_json(pairs, subject, path)
     else:
         raise ValueError("Unsupported tile type")
+
+
+def read_montage_json(montage_path, assume_monopolar=True):
+    """Reads pairs.json.  Assumes "consecutive wiring". i.e. when we have e.g.
+    130 contacts they are plugged one after another. so based on channel label
+    we can determine positional index of that channel For example channel
+    labeled 001 will have positional index 0 and channel indexed 122 will have
+    positional index 121
+
+    :param str montage_path: path to pairs.json
+    :param bool assume_monopolar: specifies whether correspongind electrod
+    :rtype: ndarray
+    :return: montage recarray with the following columns:
+        (contact_name, ch0_label, ch1_label, ch1_idx, ch1_idx)
+
+    """
+    with open(montage_path, 'r') as f:
+        montage_jn = json.loads(f.read())
+
+    pairs_jn = montage_jn[montage_jn.keys()[0]]['pairs']
+
+    ch0_label = []
+    ch1_label = []
+    ch0_idx = []
+    ch1_idx = []
+    pair_label = []
+
+    channel_set = set()
+    bp_list = []
+    for pair_name, pair_val in pairs_jn.items():
+        channel_set.add(int(pair_val['channel_1']))
+        channel_set.add(int(pair_val['channel_2']))
+
+        bp_list.append(
+            Pair(
+                ch0_label=int(pair_val['channel_1']),
+                ch1_label=int(pair_val['channel_2']),
+                pair_label=pair_name
+            )
+        )
+
+    channel_array = np.sort(np.array(list(channel_set), dtype=np.int))
+    channel_idx_dict = dict(zip(channel_array,np.arange(channel_array.shape[0])))
+
+    if assume_monopolar:
+        # we assume that all contacts are present in the electrode configuration
+        # file and if the highest contact number is 130 then all 1-130 contacts
+        # are listed in the electrode config file we also assume that port
+        # numbers are sorted ie 1,2,5,6 is allowed but 5,6,1,2 is not
+        for bp in bp_list:
+
+            ch0_idx.append(channel_idx_dict[bp.ch0_label])
+            ch1_idx.append(channel_idx_dict[bp.ch1_label])
+            ch0_label.append(str(bp.ch0_label).zfill(3))
+            ch1_label.append(str(bp.ch1_label).zfill(3))
+            pair_label.append(bp.pair_label)
+    else:
+        # this branch of 'if' statement is valid in one special case: you have
+        # fully bipolar electrode config and you generated pairs.json based on
+        # it. now you want to compute classifier based on the monopolar
+        # recordings - this case is very limited and in practice applies only to
+        # debugging scenarios Main assumption is that ch0_idx =
+        # int(bp.ch0_label)-1 because in the absence of electrode config file we
+        # cannot determine from pairs.json how many contacts were skipped
+        for bp in bp_list:
+
+            ch0_idx.append(int(bp.ch0_label)-1)
+            ch1_idx.append(int(bp.ch1_label)-1)
+            ch0_label.append(str(bp.ch0_label).zfill(3))
+            ch1_label.append(str(bp.ch1_label).zfill(3))
+            pair_label.append(bp.pair_label)
+
+    montage_dtype = np.dtype([
+        ('ch0_idx', '<i8'), ('ch1_idx', '<i8'), ('ch0_label', '|S256'),
+        ('ch1_label', '|S256'), ('contact_name', '|S256')
+    ])
+
+    e_array = np.recarray((len(ch0_idx),),dtype=montage_dtype)
+
+    for counter, (ch0_idx_, ch1_idx_, ch0_label_, ch1_label_, contact_name_) in enumerate(zip(ch0_idx, ch1_idx, ch0_label, ch1_label, pair_label)):
+        e_array[counter]['ch0_idx'] = ch0_idx_
+        e_array[counter]['ch1_idx'] = ch1_idx_
+        e_array[counter]['ch0_label'] = ch0_label_
+        e_array[counter]['ch1_label'] = ch1_label_
+        e_array[counter]['contact_name'] = contact_name_
+
+    # sorting by ch0_idx and ch1_idx
+    e_array = np.sort(e_array, order=['ch0_idx', 'ch1_idx'])
+    return e_array
