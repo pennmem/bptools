@@ -184,7 +184,7 @@ class TestElectrodeConfig:
         with open(filename, 'r') as original:
             assert stringy == original.read()
 
-        outfile = tmpdir.join(basename)
+        outfile = str(tmpdir.join(basename))
         ec.to_csv(outfile=outfile)
 
         with open(filename, 'r') as original:
