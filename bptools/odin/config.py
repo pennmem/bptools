@@ -27,8 +27,10 @@ def _num_to_bank_label(num):
         2: 'C',
         3: 'D'
     }
-    bank = banks[num // 64]
-    return "{}-CH{:02d}".format(bank, num % 64)
+    bank = banks[(num - 1) // 64]
+    # number = num % 64 if bank == 'A' else (num + 1) % 64
+    number = num % 64 or 64
+    return "{}-CH{:02d}".format(bank, number)
 
 
 def make_config_name(subject, localization, montage, stim):
