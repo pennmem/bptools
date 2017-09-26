@@ -101,6 +101,10 @@ def test_cli():
 
 
 class TestSlotsMixin:
+    def test_str(self):
+        contact = Contact("x", 0, 1, "description")
+        assert str(contact) == "<Contact label=x, port=0, area=1, description=description>"
+
     def test_keys(self):
         contact = Contact("x", 0, 1, "description")
         assert contact.keys() == ['label', 'port', 'area', 'description']

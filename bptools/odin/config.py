@@ -226,7 +226,6 @@ class ElectrodeConfig(object):
 
     * jack_box_num - int
     * contact_name - str
-    * surface_area - float
     * description - str
 
     """
@@ -251,7 +250,7 @@ class ElectrodeConfig(object):
         # Ramulator.
         self._recarray_dtype = np.dtype([
             ('jack_box_num', '<i8'), ('contact_name', '|S256'),
-            ('surface_area', '<f8'), ('description', '|S256')
+            ('description', '|S256')
         ])
 
     def __str__(self):
@@ -421,8 +420,24 @@ class ElectrodeConfig(object):
         for i, contact in enumerate(self.contacts):
             arr[i]['jack_box_num'] = int(contact.port)
             arr[i]['contact_name'] = str(contact.label)
-            arr[i]['surface_area'] = float(contact.area)
+            # Not using surface area anymore because not used by Ramulator
+            # arr[i]['surface_area'] = float(contact.area)
             arr[i]['description'] = str(contact.description)
+
+        return arr
+
+    def sense_channels_as_recarray(self):
+        """Return the sense channels as a recarray.
+
+        This method exists for Ramulator compatibility.
+
+        """
+        arr = np.recarray((len(self.sense_channels),), dtype=self._recarray_dtype)
+
+        for i, chan in enumerate(self.sense_channels):
+            arr[i]['jack_box_num'] = int(chan.contact)
+            arr[i]['contact_name'] = str(chan.name)
+            arr[i]['description'] = str(chan.name)
 
         return arr
 
