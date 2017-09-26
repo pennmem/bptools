@@ -5,7 +5,7 @@ with open('README.rst') as f:
     readme = f.read()
 
 setup(
-    name='btpools',
+    name='bptools',
     version=__version__,
     packages=find_packages(),
     package_data={
