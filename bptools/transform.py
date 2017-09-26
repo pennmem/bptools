@@ -1,6 +1,6 @@
-import numpy as np
 import warnings
 from os.path import abspath, splitext, isfile
+import numpy as np
 
 from bptools.odin import ElectrodeConfig
 from bptools.pairs import read_montage_json
@@ -8,74 +8,28 @@ from bptools.pairs import read_montage_json
 
 class SeriesTransformation(object):
     def __init__(self):
-
-        #
-        # matrix that recovers monopolar channnel readings from bipolar recording
+        # matrix that recovers monopolar channnel readings from bipolar
+        # recording
         self.bipolar_to_monopolar_matrix = None
 
-        #
         # monopolar to bipolar matrix
         self.monopolar_to_bipolar_matrix = None
 
-        #
         # instance of ElectrodeConfig
         self.elec_conf = None
 
-        #
-        # montage data as specified in the montage file or in the electrode config file
-        # self.full_montage_data = None
-
         self.montage_data = None
 
-        #
         # montage data that describes which bp's to exclude
         self.excluded_montage_data = None
 
-        #
-        # full_montage_data-excluded_montage_date - usually used to compute classifiers
+        # full_montage_data-excluded_montage_date - usually used to compute
+        # classifiers
         self.net_montage_data = None
 
         self.montage_initialized = False
 
         self.bp_except_excluded_mask = None
-
-    def montage_2_pairs_json(self, montage_data):
-        """
-        Generates json element for montage
-        :param montage_data: recarray containing montage specification
-        :return: json element describing montage
-        """
-
-        def row_to_json(montage_data_row):
-            rjn = JSONNode()
-            rjn['atlases'] = JSONNode()
-            # rjn['channel_1'] = montage_data_row['ch0_idx']
-            # rjn['channel_2'] = montage_data_row['ch1_idx']
-            rjn['channel_1'] = int(montage_data_row['ch0_label'])
-            rjn['channel_2'] = int(montage_data_row['ch1_label'])
-
-            rjn['code'] = montage_data_row['contact_name']
-            rjn['id'] = montage_data_row['contact_name']
-            rjn['is_explicit'] = False
-            rjn['is_stim_only'] = False
-            rjn['type_1'] = 'U'
-            rjn['type_2'] = 'U'
-            return rjn
-
-        pairs_jn = JSONNode()
-        pairs_jn["R1111X"] = JSONNode()
-        pairs_jn["R1111X"]['code'] = "R1111X"
-        pairs_jn["R1111X"]['id'] = "R1111X"
-        pairs_jn["R1111X"]['pairs'] = JSONNode()
-        pairs_container = pairs_jn["R1111X"]['pairs']
-
-        for montage_data_row in montage_data:
-            pairs_container[montage_data_row['contact_name']] = row_to_json(montage_data_row)
-            # print pairs_jn
-            # print pairs_jn.output()
-            # print
-
-        return pairs_jn
 
     @property
     def bipolar_pairs_recarray(self):
@@ -137,8 +91,8 @@ class SeriesTransformation(object):
                 raise RuntimeError("Improper initialization of the montage ")
 
         raise RuntimeError(
-            "Montage missing and could not determine implied_bipolar_pairs - likely mixed_mode with missing montage")
-
+            "Montage missing and could not determine implied_bipolar_pairs - "
+            "likely mixed_mode with missing montage")
 
     @property
     def net_num_bp(self):
@@ -225,7 +179,6 @@ class SeriesTransformation(object):
                     'some of the excluded pairs: {} '
                     'are not present in the montage'.format(str(self.excluded_montage_data.contact_name)),
                     RuntimeWarning)
-            print all_excluded_present
 
             self.bp_except_excluded_mask = ~ np.in1d(self.montage_data.contact_name, self.excluded_montage_data.contact_name)
 
@@ -236,11 +189,12 @@ class SeriesTransformation(object):
         # TODO careful here
         self.montage_initialized = True
 
-
     def bipolar_possible(self):
         """
-        Determines whether SeriesTransformation can produce bipolar pairs time series from  ens_time_series
-        :return: {bool}
+        Determines whether SeriesTransformation can produce bipolar pairs time
+        series from  ens_time_series
+
+        :rtype: bool
         """
         try:
             a = self.num_all_bp
@@ -257,9 +211,9 @@ class SeriesTransformation(object):
         return self.bipolar_to_monopolar_matrix is not None
 
     def _bipolar_pairs_signal_mixed_mode_impl(self, ens_signal_array, exclude_bipolar_pairs=False):
-        """
-        bipolar_pairs_signal implementation when monopolar_recording recovery is possible AND
-        montage has been initialized
+        """bipolar_pairs_signal implementation when monopolar_recording recovery
+        is possible AND montage has been initialized
+
         :param ens_signal_array: 2D array (or nm.matrix) with the following dimensions (num_channels, sample_len)
         :param exclude_bipolar_pairs: {bool} specifies whether bipolar time series should be based on full set of
         bipolar pairs (as speciofied in the self. montage_data) or whether
@@ -295,11 +249,16 @@ class SeriesTransformation(object):
         Tries to reconstruct monopolar recordings from the ens_recordings and then use bipolar_pairs.json to
         construct bipolar time series. If the bipolar-to-monopolar is impossible then we are
         in the fully bipolar-sensing mode and then we simply return ens_signal_array
-        :param ens_signal_array: 2D array (or nm.matrix) with the following dimensions (num_channels, sample_len)
-        :param exclude_bipolar_pairs: {bool} specifies whether bipolar time series should be based on full set of
-        bipolar pairs (as speciofied in the self. montage_data) or whether
-        we should exclude bipolar pairs (specified in self.excluded_montage_data)
+
+        :param ens_signal_array: 2D array (or nm.matrix) with the following
+            dimensions (num_channels, sample_len)
+        :param exclude_bipolar_pairs: {bool} specifies whether bipolar time
+            series should be based on full set of bipolar pairs (as speciofied
+            in the self. montage_data) or whether
+            we should exclude bipolar pairs (specified in
+            self.excluded_montage_data)
         :return: {ndarray} bipolar time series
+
         """
 
         if self.monopolar_possible() and not self.montage_initialized:
