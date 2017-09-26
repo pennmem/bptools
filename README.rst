@@ -7,7 +7,7 @@ bptools
 .. image:: https://codecov.io/gh/pennmem/bptools/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/pennmem/bptools
 
-.. image:: https://img.shields.io/badge/docs-here-brightgreen.svg
+.. image:: https://img.shields.io/badge/docs-here-blue.svg
   :target: https://pennmem.github.io/bptools/html/index.html
   :alt: docs
 
