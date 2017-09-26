@@ -31,6 +31,45 @@ class SeriesTransformation(object):
 
         self.bp_except_excluded_mask = None
 
+    @classmethod
+    def create(cls, electrode_config_file, montage_file=None, excluded_montage_file=None):
+        """
+        reads electrode config .csv file and stores ElectrodeConfig instance as member variable
+        It also initializes transformation matrices (if possible) and configures bp_pairs-related variables
+        that will be used in the ens_data_array -> monopolar or ens_data_array -> bipolar
+
+        :param electrode_config_file: {str} path to electrode configuration file
+        :return: None
+        """
+
+        st_obj = cls()
+        electrode_config_file = abspath(electrode_config_file)
+        electrode_config_file_core, ext = splitext(electrode_config_file)
+        electrode_config_file_csv = electrode_config_file_core + '.csv'
+
+        elec_conf = ElectrodeConfig(electrode_config_file_csv)
+        # TODO check if we always have to include C/R in the electrode list
+        st_obj.elec_conf = elec_conf
+
+        # first we determine whether bipolar to monopolar transformation is possible
+
+        # initializing  bipolar_2_monopolar_matrix - if possible
+        st_obj.bipolar_to_monopolar_matrix = st_obj.monopolar_trans_matrix_via_inverse()
+
+        # next we process montage
+        st_obj.__initialize_montage(montage_file=montage_file, excluded_montage_file=excluded_montage_file)
+
+        if st_obj.bipolar_to_monopolar_matrix is None:
+            # we are in the full-bipolar mode and will extract implied bipolar pairs
+            # setting up bipolar_pairs_signal implementation
+            st_obj.bipolar_pairs_signal = st_obj._bipolar_pairs_signal_full_bp_mode_impl
+        else:
+            if st_obj.montage_initialized:
+                st_obj.bipolar_pairs_signal = st_obj._bipolar_pairs_signal_mixed_mode_impl
+
+        return st_obj
+
+
     @property
     def bipolar_pairs_recarray(self):
         """
@@ -110,44 +149,6 @@ class SeriesTransformation(object):
 
         raise RuntimeError(
             "Montage missing and could not determine implied_bipolar_pairs - likely mixed_mode with missing montage")
-
-    @classmethod
-    def create(cls, electrode_config_file, montage_file=None, excluded_montage_file=None):
-        """
-        reads elecgtrode config .csv file and stores ElectrodeConfig instance as member variable
-        It also initializes transformation matrices (if possible) and configures bp_pairs-related variables
-        that will be used in the ens_data_array -> monopolar or ens_data_array -> bipolar
-
-        :param electrode_config_file: {str} path to electrode configuration file
-        :return: None
-        """
-
-        st_obj = cls()
-        electrode_config_file = abspath(electrode_config_file)
-        electrode_config_file_core, ext = splitext(electrode_config_file)
-        electrode_config_file_csv = electrode_config_file_core + '.csv'
-
-        elec_conf = ElectrodeConfig(electrode_config_file_csv)
-        # TODO check if we always have to include C/R in the electrode list
-        st_obj.elec_conf = elec_conf
-
-        # first we determine whether bipolar to monopolar transformation is possible
-
-        # initializing  bipolar_2_monopolar_matrix - if possible
-        st_obj.bipolar_to_monopolar_matrix = st_obj.monopolar_trans_matrix_via_inverse()
-
-        # next we process montage
-        st_obj.__initialize_montage(montage_file=montage_file, excluded_montage_file=excluded_montage_file)
-
-        if st_obj.bipolar_to_monopolar_matrix is None:
-            # we are in the full-bipolar mode and will extract implied bipolar pairs
-            # setting up bipolar_pairs_signal implementation
-            st_obj.bipolar_pairs_signal = st_obj._bipolar_pairs_signal_full_bp_mode_impl
-        else:
-            if st_obj.montage_initialized:
-                st_obj.bipolar_pairs_signal = st_obj._bipolar_pairs_signal_mixed_mode_impl
-
-        return st_obj
 
     def __initialize_montage(self, montage_file=None, excluded_montage_file=None):
         """
