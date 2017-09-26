@@ -8,6 +8,7 @@ try:
 except ImportError:  # pragma: no cover
     pass
 
+import numpy as np
 import pandas as pd
 
 from bptools.util import FromSeriesMixin
@@ -215,6 +216,15 @@ class ElectrodeConfig(object):
     stim_channels : list of :class:`StimChannel`
         Configured stimulation channels.
 
+    Notes
+    -----
+    All ``x_as_recarray`` methods return a recarray with the following columns:
+
+    * jack_box_num - int
+    * contact_name - str
+    * surface_area - float
+    * description - str
+
     """
     def __init__(self, filename=None, version="1.2", name="", subject=""):
         self.version = version
@@ -231,6 +241,14 @@ class ElectrodeConfig(object):
 
         if filename is not None:
             self.read_config_file(filename)
+
+        # dtype for when exporting as a recarray
+        # Naming conventions here differ for backwards compatibility with
+        # Ramulator.
+        self._recarray_dtype = np.dtype([
+            ('jack_box_num', '<i8'), ('contact_name', '|S256'),
+            ('surface_area', '<f8'), ('description', '|S256')
+        ])
 
     def __str__(self):
         return "<ElectrodeConfig(num contacts={}, num sense channels={}, num stim channels={}>".format(
@@ -387,6 +405,22 @@ class ElectrodeConfig(object):
                     'name', 'anode', 'cathode'
                 ]).iterrows()
             ]
+
+    def contacts_as_recarray(self):
+        """Return the monopolar contacts as a recarry.
+
+        This method exists for Ramulator compatibility.
+
+        """
+        arr = np.recarray((len(self.contacts),), dtype=self._recarray_dtype)
+
+        for i, contact in enumerate(self.contacts):
+            arr[i]['jack_box_num'] = int(contact.port)
+            arr[i]['contact_name'] = str(contact.label)
+            arr[i]['surface_area'] = float(contact.area)
+            arr[i]['description'] = str(contact.description)
+
+        return arr
 
 
 if __name__ == "__main__":  # pragma: no cover
