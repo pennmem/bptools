@@ -5,7 +5,9 @@ from io import StringIO
 import pytest
 import pandas as pd
 
-from bptools.odin.config import ElectrodeConfig, make_odin_config, make_config_name
+from bptools.odin.config import (
+    ElectrodeConfig, make_odin_config, make_config_name, Contact
+)
 from bptools.odin import cli
 from bptools.test import datafile, tempdir, HERE
 
@@ -98,6 +100,12 @@ def test_cli():
     cli.main(args=args)
 
 
+class TestSlotsMixin:
+    def test_keys(self):
+        contact = Contact("x", 0, 1, "description")
+        assert contact.keys() == ['label', 'port', 'area', 'description']
+
+
 class TestElectrodeConfig:
     @pytest.mark.parametrize('extension', ['.csv', '.bin', '.txt'])
     def test_read_config_file(self, extension):
@@ -162,3 +170,13 @@ class TestElectrodeConfig:
         assert ec.num_contacts == 35
         assert ec.num_sense_channels == 35 if scheme == 'monopolar' else 34
         assert ec.num_stim_channels == 0
+
+    def test_contacts_as_recarray(self):
+        ec = ElectrodeConfig.from_jacksheet(datafile("simple_jacksheet.txt"))
+        arr = ec.contacts_as_recarray()
+        for i, num in enumerate(range(1, 36)):
+            assert arr.jack_box_num[i] == num
+        assert len(arr.contact_name) == 35
+        for area in arr.surface_area:
+            assert area == 0.5
+        assert len(arr.description) == 35

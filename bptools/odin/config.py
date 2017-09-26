@@ -156,6 +156,10 @@ class _SlotsMixin(object):
             repr.append("{}={}".format(slot, getattr(self, slot)))
         return "<{} {}>".format(self.__class__.__name__, ', '.join(repr))
 
+    def keys(self):
+        """Return all the slot names."""
+        return [slot for slot in self.__class__.__slots__]
+
 
 class Contact(FromSeriesMixin, _SlotsMixin):
     """Data about a configured contact."""
