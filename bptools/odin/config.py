@@ -162,10 +162,10 @@ class Contact(FromSeriesMixin, _SlotsMixin):
     __slots__ = ('label', 'port', 'area', 'description')
 
     def __init__(self, label, port, area, description):
-        self.label = label
-        self.port = port
-        self.area = area
-        self.description = description
+        self.label = label  # type: str
+        self.port = port  # type: int
+        self.area = area  # type: float
+        self.description = description  # type: str
 
 
 class SenseChannel(FromSeriesMixin, _SlotsMixin):
@@ -176,10 +176,10 @@ class SenseChannel(FromSeriesMixin, _SlotsMixin):
     __slots__ = ('name', 'contact', 'ref', 'description')
 
     def __init__(self, name, contact, ref, description):
-        self.name = name
-        self.contact = contact
-        self.ref = ref
-        self.description = description
+        self.name = name  # type: str
+        self.contact = contact  # type: int
+        self.ref = ref  # type: int
+        self.description = description  # type: str
 
 
 class StimChannel(FromSeriesMixin, _SlotsMixin):
@@ -187,9 +187,9 @@ class StimChannel(FromSeriesMixin, _SlotsMixin):
     __slots__ = ('name', 'anode', 'cathode')
 
     def __init__(self, name, anode, cathode):
-        self.name = name
-        self.anode = anode
-        self.cathode = cathode
+        self.name = name  # type: str
+        self.anode = anode  # type: int
+        self.cathode = cathode  # type: int
 
 
 class ElectrodeConfig(object):
@@ -227,9 +227,9 @@ class ElectrodeConfig(object):
 
     """
     def __init__(self, filename=None, version="1.2", name="", subject=""):
-        self.version = version
-        self.name = name
-        self.subject = subject
+        self.version = version  # type: str
+        self.name = name  # type: str
+        self.subject = subject  # type: str
 
         self.contacts = []  # type: List[Contact]
         self.sense_channels = []  # type: List[SenseChannel]
