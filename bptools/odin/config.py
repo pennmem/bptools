@@ -355,7 +355,7 @@ class ElectrodeConfig(object):
             def iterlines():
                 while True:
                     row = getline()
-                    if len(row) == 1:
+                    if "Subclasses:" in ','.join(row):
                         getline()
                         raise StopIteration
                     yield row

@@ -47,7 +47,7 @@ class SeriesTransformation(object):
         electrode_config_file_core, ext = splitext(electrode_config_file)
         electrode_config_file_csv = electrode_config_file_core + '.csv'
 
-        elec_conf = ElectrodeConfig(electrode_config_file_csv)
+        elec_conf = ElectrodeConfig(electrode_config_file)
         # TODO check if we always have to include C/R in the electrode list
         st_obj.elec_conf = elec_conf
 
