@@ -11,7 +11,7 @@ except ImportError:  # pragma: no cover
 import numpy as np
 import pandas as pd
 
-from bptools.util import FromSeriesMixin
+from bptools.util import FromSeriesMixin, standardize_label
 from bptools.jacksheet import read_jacksheet
 from bptools.pairs import create_pairs, create_monopolar_pairs
 
@@ -328,7 +328,7 @@ class ElectrodeConfig(object):
 
         return config
 
-    def read_config_file(self, filename):
+    def read_config_file(self, filename, standardize_labels=True):
         """Populate the instance from an Odin electrode configuration file.
 
         Parameters
@@ -410,6 +410,15 @@ class ElectrodeConfig(object):
                     'name', 'anode', 'cathode'
                 ]).iterrows()
             ]
+
+            # Optionally standardize labels for contacts, sense channels, and stim channels
+            if standardize_labels:
+                for contact in self.contacts:
+                    contact.label = standardize_label(contact.label)
+                for sense_channel in self.sense_channels:
+                    sense_channel.name = standardize_label(sense_channel.name)
+                for stim_channel in self.stim_channels:
+                    stim_channel.name = standardize_label(stim_channel.name)
 
     def to_csv(self, outfile=None):
         """Export as an Odin CSV electrode configuration file.
