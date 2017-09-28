@@ -14,3 +14,48 @@ class FromSeriesMixin(object):
             for attr, value in s.iteritems()
         }
         return cls(**kwargs)
+
+
+def standardize_label(label):
+    """ Utility function to standardize a contact label
+
+    Given either a monopolar or bipolar contact label returns the label in a standardized format:
+        1. All uppercase characters
+        2. No whitespace
+        3. No leading zeros for lead numbers
+
+    Parameters
+    ----------
+    label: str
+        The contact label to be standardized
+
+    Returns
+    -------
+    final_label: str
+        The standardized contact label
+
+    Notes
+    -----
+    Makes it easier to compare labels across differneet sources when they are stored consistently
+
+    """
+    # Remove whitepsace characters
+    label = ''.join(label.split())
+
+    # Use recursion for bipolars
+    if label.find("-") != -1:
+        tokens = label.split("-")
+        left = standardize_label(tokens[0])
+        right = standardize_label(tokens[1])
+        return "-".join([left, right])
+
+    final_label = label
+
+    # Some contacts have a leading 0 (LAD01), so remove it
+    if label[-2] == "0":
+        final_label = label[:-2] + label[-1]
+
+    # All characters should be uppercase 
+    final_label = final_label.upper()
+
+    return final_label
