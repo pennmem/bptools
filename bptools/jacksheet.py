@@ -1,7 +1,8 @@
 import pandas as pd
+from bptools.util import standardize_label
 
 
-def read_jacksheet(filename, ignore_ecg=True):
+def read_jacksheet(filename, ignore_ecg=True, standardize_labels=True):
     """Utility function to read a jacksheet.
 
     Parameters
@@ -9,6 +10,8 @@ def read_jacksheet(filename, ignore_ecg=True):
     filename : str
     ignore_ecg : bool
         Omit heart rate channels labeled as ECG/EKG.
+    standarize_labels: bool
+        Standarize contact labels when reading in the jacksheet
 
     Returns
     -------
@@ -30,7 +33,10 @@ def read_jacksheet(filename, ignore_ecg=True):
         .rename(columns={0: 'electrode'})
     js = pd.concat([df, electrodes], axis=1)
 
+    if standardize_labels:
+        js['label'] = js['label'].apply(standardize_label)
+
     if ignore_ecg:
-        return js[~js.label.str.startswith('ECG') & ~js.label.str.startswith('EKG')]
-    else:
-        return js
+        js =  js[~js.label.str.startswith('ECG') & ~js.label.str.startswith('EKG')]
+    
+    return js
