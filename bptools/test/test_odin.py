@@ -3,6 +3,7 @@ from datetime import datetime
 from io import StringIO
 
 import pytest
+from numpy.testing import assert_equal
 import pandas as pd
 
 from bptools.odin.config import (
@@ -126,6 +127,9 @@ class TestElectrodeConfig:
         assert ec.subject == 'R1308T'
         assert ec.version == '1.2'
         assert ec.name == '14JUN2017L0M0STIM'
+
+        assert all([ch.name == ch.label for ch in ec.sense_channels])
+        assert all([ch.name == ch.label for ch in ec.stim_channels])
 
         assert len(ec.contacts) == 126
         assert len(ec.sense_channels) == 126

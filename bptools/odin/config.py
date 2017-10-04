@@ -187,6 +187,10 @@ class SenseChannel(FromSeriesMixin, _SlotsMixin):
         self.ref = ref  # type: int
         self.description = description  # type: str
 
+    @property
+    def label(self):
+        return self.name
+
 
 class StimChannel(FromSeriesMixin, _SlotsMixin):
     """Data for a configured stimulation channel."""
@@ -196,6 +200,10 @@ class StimChannel(FromSeriesMixin, _SlotsMixin):
         self.name = name  # type: str
         self.anode = anode  # type: int
         self.cathode = cathode  # type: int
+
+    @property
+    def label(self):
+        return self.name
 
 
 class ElectrodeConfig(object):
