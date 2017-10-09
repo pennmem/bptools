@@ -36,9 +36,13 @@ def standardize_label(label):
 
     Notes
     -----
-    Makes it easier to compare labels across differneet sources when they are stored consistently
+    Makes it easier to compare labels across different sources when they are stored consistently
 
     """
+    # Update type of label to be string. Occasionally, pandas will infer a long
+    # type for contacts starting with numbers
+    label = str(label)
+
     # Remove whitepsace characters
     label = ''.join(label.split())
 
