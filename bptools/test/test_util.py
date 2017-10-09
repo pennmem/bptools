@@ -20,6 +20,9 @@ def test_from_series_mixin():
 @pytest.mark.parametrize("input,expected_output",[
     ("LAD1", "LAD1"),
     ("LAD1-LAD2", "LAD1-LAD2"),
+    ("2RD1", "2RD1"),
+    ("1LD1CR", "1LD1CR"),
+    ("23LAD1", "23LAD1"),
     ("RHD10-RHD11", "RHD10-RHD11"),
     ("LAD 1", "LAD1"),
     ("LAD \t 1", "LAD1"),

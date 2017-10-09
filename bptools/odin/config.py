@@ -336,7 +336,7 @@ class ElectrodeConfig(object):
 
         return config
 
-    def read_config_file(self, filename, standardize_labels=False):
+    def read_config_file(self, filename, standardize_labels=True):
         """Populate the instance from an Odin electrode configuration file.
 
         Parameters
