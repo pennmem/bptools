@@ -25,8 +25,8 @@ def get_odin_config_path(subject, experiment, root='/'):
         Path to binary config file
 
     """
-    subj_dir = Path(expanduser(root)) / 'data' / 'eeg' / subject / 'behavioral'
-    exp_dir = subj_dir / experiment
+    subj_dir = Path(expanduser(root)).joinpath('data', 'eeg', subject, 'behavioral')
+    exp_dir = subj_dir.joinpath(experiment)
     bin = list(exp_dir.rglob('*.bin'))[0]
     return str(bin)
 
