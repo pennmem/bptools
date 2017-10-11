@@ -10,6 +10,7 @@ from bptools.odin.config import (
     ElectrodeConfig, make_odin_config, make_config_name, Contact
 )
 from bptools.odin import cli
+from bptools.odin.confgrep import get_odin_config_path
 from bptools.test import datafile, tempdir, HERE
 
 
@@ -143,7 +144,7 @@ class TestElectrodeConfig:
         assert all([ec.sense_channels[i] == ec2.sense_channels[i] for i in range(len(ec.sense_channels))])
         assert all([ec.stim_channels[i] == ec2.stim_channels[i] for i in range(len(ec.stim_channels))])
 
-    @pytest.mark.parametrize('odin,jacksheet,scheme',[ 
+    @pytest.mark.parametrize('odin,jacksheet,scheme',[
         ('R1306E_22SEP2017L0M0NOSTIM.csv', 'R1306E_jacksheet.txt', 'monopolar'),]
     )
     def test_creation_methods(self, odin, jacksheet, scheme):
@@ -205,3 +206,8 @@ class TestElectrodeConfig:
             assert arr.jack_box_num[i] == num
         assert len(arr.contact_name) == 35
         assert len(arr.description) == 35
+
+
+def test_get_odin_config_path():
+    path = get_odin_config_path('R1308T', 'FR1', root=HERE)
+    assert path.endswith(osp.join('R1308T', 'behavioral', 'FR1', 'test.bin'))

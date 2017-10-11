@@ -25,6 +25,9 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy pandas h5py
   - source activate test-environment
   - pip install -r requirements.txt
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      pip install pathlib
+    fi
   - python setup.py install
 script:
   - python -m pytest
