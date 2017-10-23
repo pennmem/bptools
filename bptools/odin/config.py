@@ -390,7 +390,7 @@ class ElectrodeConfig(object):
                 Contact.from_series(s)
                 for _, s in pd.read_csv(buf, names=[
                     'label', 'port', 'port2', 'area', 'description'
-                ]).drop('port2', axis=1).iterrows()
+                ], index_col=False).drop('port2', axis=1).iterrows()
             ]
 
             # Read sense channels
