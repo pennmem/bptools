@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>bptools.pairs &#8212; bptools 1.1.dev0 documentation</title>
+    <title>bptools.pairs &#8212; bptools 1.1.2 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '1.1.dev0',
+        VERSION:     '1.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">bptools 1.1.dev0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">bptools 1.1.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -51,11 +51,14 @@
   <h1>Source code for bptools.pairs</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">from</span> <span class="nn">.jacksheet</span> <span class="k">import</span> <span class="n">read_jacksheet</span>
+
+<span class="n">Pair</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Pair&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ch0_label&#39;</span><span class="p">,</span> <span class="s1">&#39;ch1_label&#39;</span><span class="p">,</span> <span class="s1">&#39;pair_label&#39;</span><span class="p">])</span>
 
 <span class="c1"># Number of channels in one MUX</span>
 <span class="n">_ODIN_MUX_CHANNELS</span> <span class="o">=</span> <span class="mi">32</span>
@@ -238,6 +241,95 @@
         <span class="n">pairs_to_json</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported tile type&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_montage_json"><a class="viewcode-back" href="../../index.html#bptools.pairs.read_montage_json">[docs]</a><span class="k">def</span> <span class="nf">read_montage_json</span><span class="p">(</span><span class="n">montage_path</span><span class="p">,</span> <span class="n">assume_monopolar</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reads pairs.json.  Assumes &quot;consecutive wiring&quot;. i.e. when we have e.g.</span>
+<span class="sd">    130 contacts they are plugged one after another. so based on channel label</span>
+<span class="sd">    we can determine positional index of that channel For example channel</span>
+<span class="sd">    labeled 001 will have positional index 0 and channel indexed 122 will have</span>
+<span class="sd">    positional index 121</span>
+
+<span class="sd">    :param str montage_path: path to pairs.json</span>
+<span class="sd">    :param bool assume_monopolar: specifies whether correspongind electrod</span>
+<span class="sd">    :rtype: ndarray</span>
+<span class="sd">    :return: montage recarray with the following columns:</span>
+<span class="sd">        (contact_name, ch0_label, ch1_label, ch1_idx, ch1_idx)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">montage_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">montage_jn</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="n">pairs_jn</span> <span class="o">=</span> <span class="n">montage_jn</span><span class="p">[</span><span class="n">montage_jn</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;pairs&#39;</span><span class="p">]</span>
+
+    <span class="n">ch0_label</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ch1_label</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ch0_idx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ch1_idx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pair_label</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">channel_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">bp_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">pair_name</span><span class="p">,</span> <span class="n">pair_val</span> <span class="ow">in</span> <span class="n">pairs_jn</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">channel_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pair_val</span><span class="p">[</span><span class="s1">&#39;channel_1&#39;</span><span class="p">]))</span>
+        <span class="n">channel_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pair_val</span><span class="p">[</span><span class="s1">&#39;channel_2&#39;</span><span class="p">]))</span>
+
+        <span class="n">bp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">Pair</span><span class="p">(</span>
+                <span class="n">ch0_label</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">pair_val</span><span class="p">[</span><span class="s1">&#39;channel_1&#39;</span><span class="p">]),</span>
+                <span class="n">ch1_label</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">pair_val</span><span class="p">[</span><span class="s1">&#39;channel_2&#39;</span><span class="p">]),</span>
+                <span class="n">pair_label</span><span class="o">=</span><span class="n">pair_name</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">channel_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">channel_set</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+    <span class="n">channel_idx_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">channel_array</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">channel_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+
+    <span class="k">if</span> <span class="n">assume_monopolar</span><span class="p">:</span>
+        <span class="c1"># we assume that all contacts are present in the electrode configuration</span>
+        <span class="c1"># file and if the highest contact number is 130 then all 1-130 contacts</span>
+        <span class="c1"># are listed in the electrode config file we also assume that port</span>
+        <span class="c1"># numbers are sorted ie 1,2,5,6 is allowed but 5,6,1,2 is not</span>
+        <span class="k">for</span> <span class="n">bp</span> <span class="ow">in</span> <span class="n">bp_list</span><span class="p">:</span>
+
+            <span class="n">ch0_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">channel_idx_dict</span><span class="p">[</span><span class="n">bp</span><span class="o">.</span><span class="n">ch0_label</span><span class="p">])</span>
+            <span class="n">ch1_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">channel_idx_dict</span><span class="p">[</span><span class="n">bp</span><span class="o">.</span><span class="n">ch1_label</span><span class="p">])</span>
+            <span class="n">ch0_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">ch0_label</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="n">ch1_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">ch1_label</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="n">pair_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">pair_label</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># this branch of &#39;if&#39; statement is valid in one special case: you have</span>
+        <span class="c1"># fully bipolar electrode config and you generated pairs.json based on</span>
+        <span class="c1"># it. now you want to compute classifier based on the monopolar</span>
+        <span class="c1"># recordings - this case is very limited and in practice applies only to</span>
+        <span class="c1"># debugging scenarios Main assumption is that ch0_idx =</span>
+        <span class="c1"># int(bp.ch0_label)-1 because in the absence of electrode config file we</span>
+        <span class="c1"># cannot determine from pairs.json how many contacts were skipped</span>
+        <span class="k">for</span> <span class="n">bp</span> <span class="ow">in</span> <span class="n">bp_list</span><span class="p">:</span>
+
+            <span class="n">ch0_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">ch0_label</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">ch1_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">ch1_label</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">ch0_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">ch0_label</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="n">ch1_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">ch1_label</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="n">pair_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">pair_label</span><span class="p">)</span>
+
+    <span class="n">montage_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([</span>
+        <span class="p">(</span><span class="s1">&#39;ch0_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;i8&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;ch1_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;i8&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;ch0_label&#39;</span><span class="p">,</span> <span class="s1">&#39;|S256&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;ch1_label&#39;</span><span class="p">,</span> <span class="s1">&#39;|S256&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;contact_name&#39;</span><span class="p">,</span> <span class="s1">&#39;|S256&#39;</span><span class="p">)</span>
+    <span class="p">])</span>
+
+    <span class="n">e_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">recarray</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">ch0_idx</span><span class="p">),),</span><span class="n">dtype</span><span class="o">=</span><span class="n">montage_dtype</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">counter</span><span class="p">,</span> <span class="p">(</span><span class="n">ch0_idx_</span><span class="p">,</span> <span class="n">ch1_idx_</span><span class="p">,</span> <span class="n">ch0_label_</span><span class="p">,</span> <span class="n">ch1_label_</span><span class="p">,</span> <span class="n">contact_name_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ch0_idx</span><span class="p">,</span> <span class="n">ch1_idx</span><span class="p">,</span> <span class="n">ch0_label</span><span class="p">,</span> <span class="n">ch1_label</span><span class="p">,</span> <span class="n">pair_label</span><span class="p">)):</span>
+        <span class="n">e_array</span><span class="p">[</span><span class="n">counter</span><span class="p">][</span><span class="s1">&#39;ch0_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ch0_idx_</span>
+        <span class="n">e_array</span><span class="p">[</span><span class="n">counter</span><span class="p">][</span><span class="s1">&#39;ch1_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ch1_idx_</span>
+        <span class="n">e_array</span><span class="p">[</span><span class="n">counter</span><span class="p">][</span><span class="s1">&#39;ch0_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ch0_label_</span>
+        <span class="n">e_array</span><span class="p">[</span><span class="n">counter</span><span class="p">][</span><span class="s1">&#39;ch1_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ch1_label_</span>
+        <span class="n">e_array</span><span class="p">[</span><span class="n">counter</span><span class="p">][</span><span class="s1">&#39;contact_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">contact_name_</span>
+
+    <span class="c1"># sorting by ch0_idx and ch1_idx</span>
+    <span class="n">e_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">e_array</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ch0_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;ch1_idx&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">e_array</span></div>
 </pre></div>
 
           </div>
@@ -268,7 +360,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">bptools 1.1.dev0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">bptools 1.1.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

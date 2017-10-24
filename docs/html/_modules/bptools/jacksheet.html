@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>bptools.jacksheet &#8212; bptools 1.1.dev0 documentation</title>
+    <title>bptools.jacksheet &#8212; bptools 1.1.2 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '1.1.dev0',
+        VERSION:     '1.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">bptools 1.1.dev0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">bptools 1.1.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -50,9 +50,10 @@
             
   <h1>Source code for bptools.jacksheet</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bptools.util</span> <span class="k">import</span> <span class="n">standardize_label</span>
 
 
-<div class="viewcode-block" id="read_jacksheet"><a class="viewcode-back" href="../../index.html#bptools.jacksheet.read_jacksheet">[docs]</a><span class="k">def</span> <span class="nf">read_jacksheet</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ignore_ecg</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="read_jacksheet"><a class="viewcode-back" href="../../index.html#bptools.jacksheet.read_jacksheet">[docs]</a><span class="k">def</span> <span class="nf">read_jacksheet</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ignore_ecg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">standardize_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility function to read a jacksheet.</span>
 
 <span class="sd">    Parameters</span>
@@ -60,6 +61,8 @@
 <span class="sd">    filename : str</span>
 <span class="sd">    ignore_ecg : bool</span>
 <span class="sd">        Omit heart rate channels labeled as ECG/EKG.</span>
+<span class="sd">    standarize_labels: bool</span>
+<span class="sd">        Standarize contact labels when reading in the jacksheet</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -81,10 +84,13 @@
         <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;electrode&#39;</span><span class="p">})</span>
     <span class="n">js</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">electrodes</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">standardize_labels</span><span class="p">:</span>
+        <span class="n">js</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">js</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">standardize_label</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">ignore_ecg</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">js</span><span class="p">[</span><span class="o">~</span><span class="n">js</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ECG&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">js</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;EKG&#39;</span><span class="p">)]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">js</span></div>
+        <span class="n">js</span> <span class="o">=</span>  <span class="n">js</span><span class="p">[</span><span class="o">~</span><span class="n">js</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ECG&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">js</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;EKG&#39;</span><span class="p">)]</span>
+    
+    <span class="k">return</span> <span class="n">js</span></div>
 </pre></div>
 
           </div>
@@ -115,7 +121,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">bptools 1.1.dev0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">bptools 1.1.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
