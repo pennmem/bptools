@@ -273,29 +273,31 @@ class SeriesTransformation(object):
         Applies bipolar-to-monopolar transformation to recover monopolar readings (if possible)
 
         Here is an example:
-        you get EEG signal - make sure that each row is a time series representing single channel recording (
-        i.e. your eeg array (EEG_ARRAY) should look like
+        you get EEG signal - make sure that each row is a time series representing single channel recording
+        i.e. your eeg array (EEG_ARRAY) should look like::
 
 
-            time---------------->
-        0  | 12, 23, 45,56 67, 78, 78 78
-        1  | 34 45 56 67 78 23 45 56 56
-        2  | 23 45 56 23 45 667 67 34 23
-        ...
-        100 |
-        ^
-        |
-        channels
+                time---------------->
+            0  | 12, 23, 45,56 67, 78, 78 78
+            1  | 34 45 56 67 78 23 45 56 56
+            2  | 23 45 56 23 45 667 67 34 23
+            ...
+            100 |
+            ^
+            |
+            channels
 
-        The transformation then is
-        EEG_ARRAYTRANSFORMED = transformation_matrix * EEG_ARRAY
+        The transformation then is::
+
+            EEG_ARRAYTRANSFORMED = transformation_matrix * EEG_ARRAY
 
         If such transformation is not possible it means we are in the fully bipolar mode and then we return signal_array
         because there is not transformation to be made
 
         :param ens_signal_array: 2D array (or nm.matrix) with the following dimensions (num_channels, sample_len)
         :return:numpy array shape=(num_channels, sample_len) of monopolar readings
-        or signal_array if bipolar_2_monopolar transformation is impossible
+            or signal_array if bipolar_2_monopolar transformation is impossible
+
         """
 
         if self.bipolar_to_monopolar_matrix is None:
@@ -323,25 +325,27 @@ class SeriesTransformation(object):
         Applies bipolar to monopolar transformation to recover monopolar readings
 
         Here is an example:
-        you get EEG signal - make sure that each row is a time series representing single channel recording (
-        i.e. your eeg array (EEG_ARRAY) should look like
+        you get EEG signal - make sure that each row is a time series representing single channel recording
+        i.e. your eeg array (EEG_ARRAY) should look like::
 
 
-            time---------------->
-        0  | 12, 23, 45,56 67, 78, 78 78
-        1  | 34 45 56 67 78 23 45 56 56
-        2  | 23 45 56 23 45 667 67 34 23
-        ...
-        100 |
-        ^
-        |
-        channels
+                time---------------->
+            0  | 12, 23, 45,56 67, 78, 78 78
+            1  | 34 45 56 67 78 23 45 56 56
+            2  | 23 45 56 23 45 667 67 34 23
+            ...
+            100 |
+            ^
+            |
+            channels
 
-        The transformation then is
-        EEG_ARRAYTRANSFORMED = transformation_matrix * EEG_ARRAY
+        The transformation then is::
+
+            EEG_ARRAYTRANSFORMED = transformation_matrix * EEG_ARRAY
 
         :param ens_signal_array: 2D array (or nm.matrix) with the following dimensions (num_channels, sample_len)
         :return:numpy array shape=(num_channels, sample_len) of monopolar readings
+
         """
 
         if self.bipolar_to_monopolar_matrix is None:
@@ -429,9 +433,11 @@ class SeriesTransformation(object):
     def get_monopolar_to_bipolar_matrix(self):
         """Constructs monopolar to bipolar transformation matrix
         The algorithm is as follows:
+
         1. We declare 256x256 zero matrix (because we can expect at most 256 sense channels in the ENS
-        2. We iterate over sense channels (sorted by jackbox number) and put 1 in the [jack_box_num, jack_box_num] position
-        and -1 in the [jack_box, ref_jack_box_num]
+        2. We iterate over sense channels (sorted by jackbox number) and put 1 in the [jack_box_num, jack_box_num]
+           position and -1 in the [jack_box, ref_jack_box_num]
+
         :param elec_conf: {instance of ElectrodeConfig}
         :return: {ndarray} monopolar to bipolar matrix as ndarray
 
@@ -470,22 +476,23 @@ class SeriesTransformation(object):
 
         and in the experiment we measure E1, E2E1, E3E1, E4E1
 
-        For this we get the following system of eqns
-        E1 = E1
-        E2 - E1 = E2E1
-        E3 - E1 = E3E1
-        E4 - E1 = E4E1
+        For this we get the following system of eqns::
 
-        or in matrix form
+            E1 = E1
+            E2 - E1 = E2E1
+            E3 - E1 = E3E1
+            E4 - E1 = E4E1
 
-        | 1  0  0  0 |  |E1|   | E1   |
-        | -1 1  0  0 |  |E2|   | E2E1 |
-        | -1 0  1  0 |* |E3| = | E3E1 |
-        | -1 0  0  1 |  |E4|   | E3E1 |
+        or in matrix form::
 
-        or
+            | 1  0  0  0 |  |E1|   | E1   |
+            | -1 1  0  0 |  |E2|   | E2E1 |
+            | -1 0  1  0 |* |E3| = | E3E1 |
+            | -1 0  0  1 |  |E4|   | E3E1 |
 
-        A*E_monopolar = E_bipolar
+        or::
+
+            A*E_monopolar = E_bipolar
 
         Therefore to find monopolar recordings ew invert matrix A
 

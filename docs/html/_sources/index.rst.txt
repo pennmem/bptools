@@ -102,6 +102,12 @@ Odin ENS configuration
 .. automodule:: bptools.odin.config
     :members:
 
+Bipolar transformation utilities
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: bptools.transform.SeriesTransformation
+    :members:
+
 .. .. toctree::
    :maxdepth: 2
    :caption: Contents:

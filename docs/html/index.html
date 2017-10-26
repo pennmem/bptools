@@ -525,6 +525,312 @@ as type of electrode (depth, grid, strip) and surface areas.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="bipolar-transformation-utilities">
+<h3>Bipolar transformation utilities<a class="headerlink" href="#bipolar-transformation-utilities" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="bptools.transform.SeriesTransformation">
+<em class="property">class </em><code class="descclassname">bptools.transform.</code><code class="descname">SeriesTransformation</code><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="bptools.transform.SeriesTransformation.bipolar_2_monopolar_transformation">
+<code class="descname">bipolar_2_monopolar_transformation</code><span class="sig-paren">(</span><em>ens_signal_array</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation.bipolar_2_monopolar_transformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation.bipolar_2_monopolar_transformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies bipolar to monopolar transformation to recover monopolar readings</p>
+<p>Here is an example:
+you get EEG signal - make sure that each row is a time series representing single channel recording
+i.e. your eeg array (EEG_ARRAY) should look like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>    <span class="n">time</span><span class="o">----------------&gt;</span>
+<span class="mi">0</span>  <span class="o">|</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span><span class="mi">56</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">78</span><span class="p">,</span> <span class="mi">78</span> <span class="mi">78</span>
+<span class="mi">1</span>  <span class="o">|</span> <span class="mi">34</span> <span class="mi">45</span> <span class="mi">56</span> <span class="mi">67</span> <span class="mi">78</span> <span class="mi">23</span> <span class="mi">45</span> <span class="mi">56</span> <span class="mi">56</span>
+<span class="mi">2</span>  <span class="o">|</span> <span class="mi">23</span> <span class="mi">45</span> <span class="mi">56</span> <span class="mi">23</span> <span class="mi">45</span> <span class="mi">667</span> <span class="mi">67</span> <span class="mi">34</span> <span class="mi">23</span>
+<span class="o">...</span>
+<span class="mi">100</span> <span class="o">|</span>
+<span class="o">^</span>
+<span class="o">|</span>
+<span class="n">channels</span>
+</pre></div>
+</div>
+<p>The transformation then is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">EEG_ARRAYTRANSFORMED</span> <span class="o">=</span> <span class="n">transformation_matrix</span> <span class="o">*</span> <span class="n">EEG_ARRAY</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ens_signal_array</strong> – 2D array (or nm.matrix) with the following dimensions (num_channels, sample_len)</td>
+</tr>
+</tbody>
+</table>
+<p>:return:numpy array shape=(num_channels, sample_len) of monopolar readings</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.transform.SeriesTransformation.bipolar_pairs_recarray">
+<code class="descname">bipolar_pairs_recarray</code><a class="headerlink" href="#bptools.transform.SeriesTransformation.bipolar_pairs_recarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns montage recarray
+:return: {ndarray} montage recarray with the following columns:
+(contact_name, ch0_label, ch1_label, ch1_idx, ch1_idx)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bptools.transform.SeriesTransformation.bipolar_pairs_signal">
+<code class="descname">bipolar_pairs_signal</code><span class="sig-paren">(</span><em>ens_signal_array</em>, <em>exclude_bipolar_pairs=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation.bipolar_pairs_signal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation.bipolar_pairs_signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tries to reconstruct monopolar recordings from the ens_recordings and then use bipolar_pairs.json to
+construct bipolar time series. If the bipolar-to-monopolar is impossible then we are
+in the fully bipolar-sensing mode and then we simply return ens_signal_array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ens_signal_array</strong> – 2D array (or nm.matrix) with the following
+dimensions (num_channels, sample_len)</li>
+<li><strong>exclude_bipolar_pairs</strong> – {bool} specifies whether bipolar time
+series should be based on full set of bipolar pairs (as speciofied
+in the self. montage_data) or whether
+we should exclude bipolar pairs (specified in
+self.excluded_montage_data)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">{ndarray} bipolar time series</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bptools.transform.SeriesTransformation.bipolar_possible">
+<code class="descname">bipolar_possible</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation.bipolar_possible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation.bipolar_possible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether SeriesTransformation can produce bipolar pairs time
+series from  ens_time_series</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bptools.transform.SeriesTransformation.configure_bipolar_2_monopolar_transformation">
+<code class="descname">configure_bipolar_2_monopolar_transformation</code><span class="sig-paren">(</span><em>electrode_config_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation.configure_bipolar_2_monopolar_transformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation.configure_bipolar_2_monopolar_transformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads bipolar-to-monopolar transformation matrix from the disk. In the future we may
+generate this matrix on the fly if the proposed referencing scheme works as desired</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>electrode_config_file</strong> – {str} path to electrode configuration file</li>
+<li><strong>subject</strong> – {str} subject code (e.g. R1232N)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bptools.transform.SeriesTransformation.create">
+<em class="property">classmethod </em><code class="descname">create</code><span class="sig-paren">(</span><em>electrode_config_file</em>, <em>montage_file=None</em>, <em>excluded_montage_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads electrode config .csv file and stores ElectrodeConfig instance as member variable
+It also initializes transformation matrices (if possible) and configures bp_pairs-related variables
+that will be used in the ens_data_array -&gt; monopolar or ens_data_array -&gt; bipolar</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>electrode_config_file</strong> – {str} path to electrode configuration file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bptools.transform.SeriesTransformation.get_monopolar_to_bipolar_matrix">
+<code class="descname">get_monopolar_to_bipolar_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation.get_monopolar_to_bipolar_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation.get_monopolar_to_bipolar_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs monopolar to bipolar transformation matrix
+The algorithm is as follows:</p>
+<ol class="arabic simple">
+<li>We declare 256x256 zero matrix (because we can expect at most 256 sense channels in the ENS</li>
+<li>We iterate over sense channels (sorted by jackbox number) and put 1 in the [jack_box_num, jack_box_num]
+position and -1 in the [jack_box, ref_jack_box_num]</li>
+</ol>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>elec_conf</strong> – {instance of ElectrodeConfig}</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">{ndarray} monopolar to bipolar matrix as ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bptools.transform.SeriesTransformation.monopolar_possible">
+<code class="descname">monopolar_possible</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation.monopolar_possible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation.monopolar_possible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether we can recover monopolar recordings or not
+:return: {bool} “false” means that we can only get bipolar time series
+“false” means we can recover bipolar recordings</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.transform.SeriesTransformation.monopolar_recarray">
+<code class="descname">monopolar_recarray</code><a class="headerlink" href="#bptools.transform.SeriesTransformation.monopolar_recarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns contacts recarray (as declared int he electrode configuration)
+:return: {ndarray} contacts recarray witht eh following columns
+(jack_box_num,contact_name, description)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bptools.transform.SeriesTransformation.monopolar_signal">
+<code class="descname">monopolar_signal</code><span class="sig-paren">(</span><em>ens_signal_array</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation.monopolar_signal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation.monopolar_signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses bipolar_2_monopolar_transformation to extract monopolar_recordings if monopolar recordings are possible
+Otherwise raises exception</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ens_signal_array</strong> – 2D array (or nm.matrix) with the following dimensions (num_sense_channels, sample_len)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">monopolar signal numpy array shape=(num_monopolar_channels, sample_len)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bptools.transform.SeriesTransformation.monopolar_trans_matrix_via_inverse">
+<code class="descname">monopolar_trans_matrix_via_inverse</code><span class="sig-paren">(</span><em>elec_conf=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation.monopolar_trans_matrix_via_inverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation.monopolar_trans_matrix_via_inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that computes transformation matrix that takes mixed mode (a.k. Medtronic bipolar) recording and
+transforms it into monopolar recordings.
+IMPORTANT: the algoritm implemented in this function works only for the mixed-mode referencing scheme
+proposed by Medtronic - i.e. banks of 16 electrodes where one electrode is connected to C/R  and
+other electrode in the bank reference it</p>
+<p>Here is what we are doing:
+Example</p>
+<p>E1 - connected to CR
+E2, E2 ,E3 are referenced to E1</p>
+<p>and in the experiment we measure E1, E2E1, E3E1, E4E1</p>
+<p>For this we get the following system of eqns:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">E1</span> <span class="o">=</span> <span class="n">E1</span>
+<span class="n">E2</span> <span class="o">-</span> <span class="n">E1</span> <span class="o">=</span> <span class="n">E2E1</span>
+<span class="n">E3</span> <span class="o">-</span> <span class="n">E1</span> <span class="o">=</span> <span class="n">E3E1</span>
+<span class="n">E4</span> <span class="o">-</span> <span class="n">E1</span> <span class="o">=</span> <span class="n">E4E1</span>
+</pre></div>
+</div>
+<p>or in matrix form:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span> <span class="o">|</span>  <span class="o">|</span><span class="n">E1</span><span class="o">|</span>   <span class="o">|</span> <span class="n">E1</span>   <span class="o">|</span>
+<span class="o">|</span> <span class="o">-</span><span class="mi">1</span> <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span> <span class="o">|</span>  <span class="o">|</span><span class="n">E2</span><span class="o">|</span>   <span class="o">|</span> <span class="n">E2E1</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">-</span><span class="mi">1</span> <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span> <span class="o">|*</span> <span class="o">|</span><span class="n">E3</span><span class="o">|</span> <span class="o">=</span> <span class="o">|</span> <span class="n">E3E1</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">-</span><span class="mi">1</span> <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span> <span class="o">|</span>  <span class="o">|</span><span class="n">E4</span><span class="o">|</span>   <span class="o">|</span> <span class="n">E3E1</span> <span class="o">|</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span><span class="o">*</span><span class="n">E_monopolar</span> <span class="o">=</span> <span class="n">E_bipolar</span>
+</pre></div>
+</div>
+<p>Therefore to find monopolar recordings ew invert matrix A</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">{numpy matrix} transformation matrix - mixed-mode -&gt; monopolar. This is the inverse of A</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.transform.SeriesTransformation.net_bipolar_pairs_recarray">
+<code class="descname">net_bipolar_pairs_recarray</code><a class="headerlink" href="#bptools.transform.SeriesTransformation.net_bipolar_pairs_recarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns montage recarray but does not include excluded pairs
+:return: {ndarray} montage recarray with the following columns:
+(contact_name, ch0_label, ch1_label, ch1_idx, ch1_idx)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.transform.SeriesTransformation.net_num_bp">
+<code class="descname">net_num_bp</code><a class="headerlink" href="#bptools.transform.SeriesTransformation.net_num_bp" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns number of bipolar pairs in the net montage data. Typically used in classifier computations
+Note this is not necessarily the number of total sensing bipolar pairs, because some of the bps
+could have been excluded in the net_montage_data
+:return: {int} number of bps</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.transform.SeriesTransformation.num_all_bp">
+<code class="descname">num_all_bp</code><a class="headerlink" href="#bptools.transform.SeriesTransformation.num_all_bp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of ALL bipolar_pairs (if montage is provided or if full bp config is inplace)
+:return: {int}</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.transform.SeriesTransformation.num_sense_channels">
+<code class="descname">num_sense_channels</code><a class="headerlink" href="#bptools.transform.SeriesTransformation.num_sense_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of sense channels as stored int he elec_conf
+:return: {int}</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.transform.SeriesTransformation.sense_channel_recarray">
+<code class="descname">sense_channel_recarray</code><a class="headerlink" href="#bptools.transform.SeriesTransformation.sense_channel_recarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns contacts recarray (as declared int he electrode configuration)
+:return: {ndarray} contacts recarray witht eh following columns
+(jack_box_num,contact_name, description)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bptools.transform.SeriesTransformation.transform_signal">
+<code class="descname">transform_signal</code><span class="sig-paren">(</span><em>ens_signal_array</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/transform.html#SeriesTransformation.transform_signal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.transform.SeriesTransformation.transform_signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies bipolar-to-monopolar transformation to recover monopolar readings (if possible)</p>
+<p>Here is an example:
+you get EEG signal - make sure that each row is a time series representing single channel recording
+i.e. your eeg array (EEG_ARRAY) should look like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>    <span class="n">time</span><span class="o">----------------&gt;</span>
+<span class="mi">0</span>  <span class="o">|</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span><span class="mi">56</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">78</span><span class="p">,</span> <span class="mi">78</span> <span class="mi">78</span>
+<span class="mi">1</span>  <span class="o">|</span> <span class="mi">34</span> <span class="mi">45</span> <span class="mi">56</span> <span class="mi">67</span> <span class="mi">78</span> <span class="mi">23</span> <span class="mi">45</span> <span class="mi">56</span> <span class="mi">56</span>
+<span class="mi">2</span>  <span class="o">|</span> <span class="mi">23</span> <span class="mi">45</span> <span class="mi">56</span> <span class="mi">23</span> <span class="mi">45</span> <span class="mi">667</span> <span class="mi">67</span> <span class="mi">34</span> <span class="mi">23</span>
+<span class="o">...</span>
+<span class="mi">100</span> <span class="o">|</span>
+<span class="o">^</span>
+<span class="o">|</span>
+<span class="n">channels</span>
+</pre></div>
+</div>
+<p>The transformation then is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">EEG_ARRAYTRANSFORMED</span> <span class="o">=</span> <span class="n">transformation_matrix</span> <span class="o">*</span> <span class="n">EEG_ARRAY</span>
+</pre></div>
+</div>
+<p>If such transformation is not possible it means we are in the fully bipolar mode and then we return signal_array
+because there is not transformation to be made</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ens_signal_array</strong> – 2D array (or nm.matrix) with the following dimensions (num_channels, sample_len)</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>:return:numpy array shape=(num_channels, sample_len) of monopolar readings</dt>
+<dd>or signal_array if bipolar_2_monopolar transformation is impossible</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 </div>
 
@@ -545,6 +851,7 @@ as type of electrode (depth, grid, strip) and surface areas.</p>
 <li><a class="reference internal" href="#module-bptools.jacksheet">Jacksheet utilities</a></li>
 <li><a class="reference internal" href="#module-bptools.pairs">Pair creation tools</a></li>
 <li><a class="reference internal" href="#module-bptools.odin.config">Odin ENS configuration</a></li>
+<li><a class="reference internal" href="#bipolar-transformation-utilities">Bipolar transformation utilities</a></li>
 </ul>
 </li>
 </ul>
