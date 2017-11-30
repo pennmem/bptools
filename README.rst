@@ -11,6 +11,10 @@ bptools
   :target: https://pennmem.github.io/bptools/html/index.html
   :alt: docs
 
+.. image:: https://img.shields.io/conda/v/pennmem/bptools.svg
+  :target: https://anaconda.org/pennmem/bptools
+  :alt: conda package
+
 EEG bipolar montage helpers.
 
 See the `documentation <https://pennmem.github.io/bptools/html/index.html>`_ for
