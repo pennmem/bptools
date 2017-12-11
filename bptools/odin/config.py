@@ -102,47 +102,49 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
 
     # Header
     config = [
-        "ODINConfigurationVersion:,#1.2#",
-        "ConfigurationName:," + name,
-        "SubjectID:," + subject,
-        "Contacts:",
+        b"ODINConfigurationVersion:,#1.2#",
+        b"ConfigurationName:," + name.encode(),
+        b"SubjectID:," + subject.encode(),
+        b"Contacts:",
     ]
 
     # Channel definitions
     for n, row in js.iterrows():
         jbox_num = n
         chan = _num_to_bank_label(jbox_num)
-        data = [row.label, str(jbox_num), str(jbox_num), "{:.03f}".format(default_surface_area),
-                "#Electrode {} jack box {}#".format(chan, jbox_num)]
-        config.append(','.join(data))
+        data = [row.label.encode(), str(jbox_num).encode(),
+                str(jbox_num).encode(),
+                "{:.03f}".format(default_surface_area).encode(),
+                "#Electrode {} jack box {}#".format(chan, jbox_num).encode()]
+        config.append(b','.join(data))
 
     # Sense definitions
-    config.append("SenseChannelSubclasses:")
-    config.append("SenseChannels:")
+    config.append(b"SenseChannelSubclasses:")
+    config.append(b"SenseChannels:")
     for _, row in pairs.iterrows():
         if good_leads is not None:
             if row.contact1 not in good_leads:
                 continue
             if row.contact2 not in good_leads and scheme != "monopolar":
                 continue
-        data = [row.label1, row.pair.replace('-', ''),
-                str(row.contact1), str(row.contact2), 'x',
-                "#{}#".format(row.pair)]
-        config.append(','.join(data))
+        data = [row.label1.encode(), row.pair.replace('-', '').encode(),
+                str(row.contact1).encode(), str(row.contact2).encode(), b'x',
+                "#{}#".format(row.pair).encode()]
+        config.append(b','.join(data))
 
     # Stim definitions
-    config.append("StimulationChannelSubclasses:")
-    config.append("StimulationChannels:")
-    config.append("REF:,0,Common")
-    config.append('EOF')
+    config.append(b"StimulationChannelSubclasses:")
+    config.append(b"StimulationChannels:")
+    config.append(b"REF:,0,Common")
+    config.append(b'EOF')
 
     if path is not None:
         outfile = osp.join(path, config_name + '.csv')
-        with open(outfile, 'w') as f:
-            f.write('\n'.join(config))
-            f.write('\n')
+        with open(outfile, 'wb') as f:
+            f.write(b'\n'.join(config))
+            f.write(b'\n')
     else:
-        return "\n".join(config)
+        return b"\n".join(config)
 
 
 class _SlotsMixin(object):
