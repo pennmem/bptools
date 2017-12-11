@@ -62,7 +62,8 @@ def make_config_name(subject, localization, montage, stim):
 
 
 def make_odin_config(jacksheet_filename, config_name, default_surface_area,
-                     path=None, good_leads=None, scheme='bipolar', format='csv'):
+                     path=None, stim_channels=None, good_leads=None,
+                     scheme='bipolar', format='csv'):
     """Create an Odin ENS electrode configuration file.
 
     .. todo:: Merge into ElectrodeConfig class as a method.
@@ -77,6 +78,8 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
         Default surface area for electrodes.
     path : str
         Directory to write file to. If None, return as a string.
+    stim_channels : List[StimChannel]
+        A list of stim channel specifications.
     good_leads : list or None
         Jackbox numbers to use when configuring sense channels. This is usually
         determined from the ``good_leads.txt`` file. When None, use all.
@@ -134,7 +137,7 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
         delimit("ODINConfigurationVersion:,#1.2#"),
         delimit("ConfigurationName:," + name),
         delimit("SubjectID:," + subject),
-        b"Contacts:\n",
+        b"Contacts:",
     ]
 
     # Channel definitions
@@ -163,6 +166,12 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
     # Stim definitions
     config.append(b"StimulationChannelSubclasses:")
     config.append(b"StimulationChannels:")
+    if stim_channels is not None:
+        for channel in stim_channels:
+            entry = channel.config_entry if format == 'csv' else channel.config_entry_bin
+            config.append(entry)
+
+    # Footer
     config.append(delimit("REF:,0,Common"))
     config.append(b'EOF')
 
@@ -234,6 +243,32 @@ class StimChannel(FromSeriesMixin, _SlotsMixin):
     @property
     def label(self):
         return self.name
+
+    @property
+    def config_entry(self):
+        """Returns the CSV config file representation of this stim channel.
+
+        Returns
+        -------
+        bytes
+
+        """
+        return '\n'.join([
+            'StimChannel:,{:s},x,# #'.format(self.name),
+            'Anodes:,{:d},#'.format(self.anode),
+            'Cathodes:,{:d},#'.format(self.cathode)
+        ]).encode()
+
+    @property
+    def config_entry_bin(self):
+        """Returns the binary config file representation of this stim channel.
+
+        Returns
+        -------
+        bytes
+
+        """
+        return self.config_entry.replace(b',', b'~').replace(b'\n', b'|')
 
 
 class ElectrodeConfig(object):
