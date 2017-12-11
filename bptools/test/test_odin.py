@@ -1,9 +1,10 @@
 import os.path as osp
 from datetime import datetime
 from io import StringIO
+from pkg_resources import resource_filename
 
 import pytest
-from numpy.testing import assert_equal
+
 import pandas as pd
 
 from bptools.odin.config import (
@@ -61,36 +62,60 @@ def test_make_config_name():
 
 
 @pytest.mark.parametrize('scheme', ['bipolar', 'monopolar'])
-def test_make_odin_config(scheme):
+@pytest.mark.parametrize('format', ['csv', 'bin', 'txt'])
+def test_make_odin_config(scheme, format):
     filename = 'R1308T_jacksheet.txt'
-    output_filename = 'R1308T_NAME.csv'
+    prefix = 'R1308T_14JUN2017L0M0STIM'
+    output_filename = prefix + '.csv'
     jfile = datafile(filename)
 
+    if format == 'txt':
+        with pytest.raises(AssertionError):
+            make_odin_config(jfile, prefix, 0.001, format=format)
+        return
+
     # Printing to stdout
-    make_odin_config(jfile, 'R1308T_NAME', 0.001)
+    make_odin_config(jfile, prefix, 0.001, scheme=scheme, format=format)
 
     # Saving to a directory
     with tempdir() as path:
-        make_odin_config(jfile, 'R1308T_NAME', 0.001, path, scheme=scheme)
+        make_odin_config(jfile, prefix, 0.001, path, scheme=scheme, format=format)
         outfile = osp.join(path, output_filename)
         assert osp.exists(outfile)
 
         # Verify that each primary sense channel is only listed once
-        config = read_sense_config(outfile)
-        assert len(config.c1) == len(config.c1.unique())
-        assert all(config.c1 == config.c1.unique())
+        if format == 'csv':
+            config = read_sense_config(outfile)
+            assert len(config.c1) == len(config.c1.unique())
+            assert all(config.c1 == config.c1.unique())
+        elif format == 'bin':
+            reffile = '{}_{}.bin'.format(prefix, scheme)
+            with open(resource_filename('bptools.test.data', reffile), 'rb') as ref:
+                with open(outfile, 'rb') as gen:
+                    rlines = ref.read()
+                    glines = gen.read()
+
+            rlines = rlines.split(b'|')
+            glines = glines.split(b'|')
+            for i, line in enumerate(rlines):
+                # We don't really care if the comment section differs
+                assert line.split(b'#')[0] == glines[i].split(b'#')[0]
 
     # Explicitly specifiying leads to include
     good_leads = [n for n in range(1, 4)]
     with tempdir() as path:
         outfile = osp.join(path, output_filename)
-        make_odin_config(jfile, 'R1308T_NAME', 0.001, path, good_leads=good_leads,
-                         scheme=scheme)
-        config = read_sense_config(outfile)
-        if scheme == 'bipolar':
-            assert len(config) == 2
-        else:
-            assert len(config) == 3
+        make_odin_config(jfile, prefix, 0.001, path, good_leads=good_leads,
+                         scheme=scheme, format=format)
+
+        if format == 'csv':
+            config = read_sense_config(outfile)
+            if scheme == 'bipolar':
+                assert len(config) == 2
+            else:
+                assert len(config) == 3
+        elif format == 'bin':
+            pass  # FIXME
 
 
 def test_cli():

@@ -1,7 +1,8 @@
-import os.path as osp
-from io import StringIO
-from datetime import datetime
 from contextlib import contextmanager
+from datetime import datetime
+from io import StringIO
+import os.path as osp
+import struct
 
 try:
     from typing import List
@@ -61,8 +62,8 @@ def make_config_name(subject, localization, montage, stim):
 
 
 def make_odin_config(jacksheet_filename, config_name, default_surface_area,
-                     path=None, good_leads=None, scheme='bipolar'):
-    """Create an Odin ENS electrode configuration CSV file.
+                     path=None, good_leads=None, scheme='bipolar', format='csv'):
+    """Create an Odin ENS electrode configuration file.
 
     .. todo:: Merge into ElectrodeConfig class as a method.
 
@@ -81,6 +82,12 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
         determined from the ``good_leads.txt`` file. When None, use all.
     scheme : str
         Referencing scheme to use (``bipolar`` or ``monopolar``).
+    format : str
+        Config format to output as (``csv`` or ``bin``).
+
+    Returns
+    -------
+    Configuration file as a bytes object.
 
     Notes
     -----
@@ -90,6 +97,28 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
     """
     assert isinstance(default_surface_area, float)
     assert scheme in ['bipolar', 'monopolar'], "invalid referencing scheme"
+    assert format in ['csv', 'bin'], "format must be csv or bin"
+
+    delimiter = b',' if format == 'csv' else b'~'
+    newline = b'\n' if format == 'csv' else b'|'
+
+    def iencode(number):
+        if format == 'csv':
+            return str(number).encode()
+        else:
+            return struct.pack('<h', number)
+
+    def fencode(number):
+        if format == 'csv':
+            return "{:.03f}".format(number).encode()
+        else:
+            return struct.pack('<f', number)
+
+    def delimit(string):
+        if format == 'bin':
+            return string.replace(',', '~').encode()
+        else:
+            return string.encode()
 
     js = read_jacksheet(jacksheet_filename)
 
@@ -102,21 +131,20 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
 
     # Header
     config = [
-        b"ODINConfigurationVersion:,#1.2#",
-        b"ConfigurationName:," + name.encode(),
-        b"SubjectID:," + subject.encode(),
-        b"Contacts:",
+        delimit("ODINConfigurationVersion:,#1.2#"),
+        delimit("ConfigurationName:," + name),
+        delimit("SubjectID:," + subject),
+        b"Contacts:\n",
     ]
 
     # Channel definitions
     for n, row in js.iterrows():
         jbox_num = n
         chan = _num_to_bank_label(jbox_num)
-        data = [row.label.encode(), str(jbox_num).encode(),
-                str(jbox_num).encode(),
-                "{:.03f}".format(default_surface_area).encode(),
+        data = [row.label.encode(), iencode(jbox_num), iencode(jbox_num),
+                fencode(default_surface_area),  # FIXME: allow input to set this
                 "#Electrode {} jack box {}#".format(chan, jbox_num).encode()]
-        config.append(b','.join(data))
+        config.append(delimiter.join(data))
 
     # Sense definitions
     config.append(b"SenseChannelSubclasses:")
@@ -128,23 +156,23 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
             if row.contact2 not in good_leads and scheme != "monopolar":
                 continue
         data = [row.label1.encode(), row.pair.replace('-', '').encode(),
-                str(row.contact1).encode(), str(row.contact2).encode(), b'x',
+                iencode(row.contact1), iencode(row.contact2), b'x',
                 "#{}#".format(row.pair).encode()]
-        config.append(b','.join(data))
+        config.append(delimiter.join(data))
 
     # Stim definitions
     config.append(b"StimulationChannelSubclasses:")
     config.append(b"StimulationChannels:")
-    config.append(b"REF:,0,Common")
+    config.append(delimit("REF:,0,Common"))
     config.append(b'EOF')
 
     if path is not None:
         outfile = osp.join(path, config_name + '.csv')
         with open(outfile, 'wb') as f:
-            f.write(b'\n'.join(config))
-            f.write(b'\n')
+            f.write(newline.join(config))
+            f.write(newline)
     else:
-        return b"\n".join(config)
+        return newline.join(config)
 
 
 class _SlotsMixin(object):
