@@ -46,23 +46,14 @@ using the CLI tool provided in :mod:`bptools.odin`::
 If no jacksheet is specified, the script will try to automatically find it based
 on the subject ID.
 
-The general workflow is as follows:
-
-1. Generate CSV config file with the script provided here.
-2. Edit the CSV config file to include the proper surface areas for each contact.
-3. Load the CSV config in the Odin configuration tool.
-4. Define stim channels if applicable.
-5. Save the CSV config file.
-6. Save the binary config file.
+Both CSV and binary config files will be generated. This command-line tool has
+no way of specifying surface areas (other than a common default surface area) or
+of defining stim channels. It exists primarily for historical reasons and for
+rapid testing.
 
 To run the script, either run from the root directory of ``bptools``, add said
 directory to your ``PYTHONPATH``, or run ``python setup.py install`` so that it
 is always reachable from your environment.
-
-.. note::
-
-    Stimulation channels must be defined manually via the Odin configuration
-    tool GUI.
 
 .. warning::
 

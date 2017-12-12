@@ -19,3 +19,5 @@ codecov = "*"
 
 pytest = "*"
 pytest-cov = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"

@@ -1,51 +1,171 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>bptools &#8212; bptools 1.1.2 documentation</title>
-    
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.1.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
-  </head>
-  <body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">bptools 1.1.2 documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bptools &mdash; bptools 1.2.0 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="bptools 1.2.0 documentation" href="#"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> bptools
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">bptools</a><ul>
+<li><a class="reference internal" href="#electrode-config-generation">Electrode config generation</a><ul>
+<li><a class="reference internal" href="#known-issues">Known issues</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#api-reference">API reference</a><ul>
+<li><a class="reference internal" href="#module-bptools.jacksheet">Jacksheet utilities</a></li>
+<li><a class="reference internal" href="#module-bptools.pairs">Pair creation tools</a></li>
+<li><a class="reference internal" href="#module-bptools.odin.config">Odin ENS configuration</a></li>
+<li><a class="reference internal" href="#bipolar-transformation-utilities">Bipolar transformation utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">bptools</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>bptools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="bptools">
 <h1>bptools<a class="headerlink" href="#bptools" title="Permalink to this headline">¶</a></h1>
@@ -90,23 +210,13 @@ using the CLI tool provided in <code class="xref py py-mod docutils literal"><sp
 </div>
 <p>If no jacksheet is specified, the script will try to automatically find it based
 on the subject ID.</p>
-<p>The general workflow is as follows:</p>
-<ol class="arabic simple">
-<li>Generate CSV config file with the script provided here.</li>
-<li>Edit the CSV config file to include the proper surface areas for each contact.</li>
-<li>Load the CSV config in the Odin configuration tool.</li>
-<li>Define stim channels if applicable.</li>
-<li>Save the CSV config file.</li>
-<li>Save the binary config file.</li>
-</ol>
+<p>Both CSV and binary config files will be generated. This command-line tool has
+no way of specifying surface areas (other than a common default surface area) or
+of defining stim channels. It exists primarily for historical reasons and for
+rapid testing.</p>
 <p>To run the script, either run from the root directory of <code class="docutils literal"><span class="pre">bptools</span></code>, add said
 directory to your <code class="docutils literal"><span class="pre">PYTHONPATH</span></code>, or run <code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> so that it
 is always reachable from your environment.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Stimulation channels must be defined manually via the Odin configuration
-tool GUI.</p>
-</div>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">In order to properly handle micro contacts on combined macro/micro
@@ -328,7 +438,7 @@ keyword argument is also required.</li>
 
 <dl class="class">
 <dt id="bptools.odin.config.ElectrodeConfig">
-<em class="property">class </em><code class="descclassname">bptools.odin.config.</code><code class="descname">ElectrodeConfig</code><span class="sig-paren">(</span><em>filename=None</em>, <em>version=‘1.2’</em>, <em>name=”</em>, <em>subject=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bptools.odin.config.</code><code class="descname">ElectrodeConfig</code><span class="sig-paren">(</span><em>filename=None</em>, <em>version='1.2'</em>, <em>name=''</em>, <em>subject=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Representation of OdinLib electrode configuration files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -379,7 +489,7 @@ the same directory.</li>
 
 <dl class="classmethod">
 <dt id="bptools.odin.config.ElectrodeConfig.from_jacksheet">
-<em class="property">classmethod </em><code class="descname">from_jacksheet</code><span class="sig-paren">(</span><em>filename</em>, <em>subject=”</em>, <em>scheme=’bipolar’</em>, <em>area=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig.from_jacksheet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.from_jacksheet" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">from_jacksheet</code><span class="sig-paren">(</span><em>filename</em>, <em>subject=''</em>, <em>scheme='bipolar'</em>, <em>area=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig.from_jacksheet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.from_jacksheet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new <a class="reference internal" href="#bptools.odin.config.ElectrodeConfig" title="bptools.odin.config.ElectrodeConfig"><code class="xref py py-class docutils literal"><span class="pre">ElectrodeConfig</span></code></a> instance from a jacksheet.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -476,6 +586,38 @@ primary contact and the reference contact.</p>
 <dt id="bptools.odin.config.StimChannel">
 <em class="property">class </em><code class="descclassname">bptools.odin.config.</code><code class="descname">StimChannel</code><span class="sig-paren">(</span><em>name</em>, <em>anode</em>, <em>cathode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#StimChannel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.StimChannel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Data for a configured stimulation channel.</p>
+<dl class="attribute">
+<dt id="bptools.odin.config.StimChannel.config_entry">
+<code class="descname">config_entry</code><a class="headerlink" href="#bptools.odin.config.StimChannel.config_entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the CSV config file representation of this stim channel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bptools.odin.config.StimChannel.config_entry_bin">
+<code class="descname">config_entry_bin</code><a class="headerlink" href="#bptools.odin.config.StimChannel.config_entry_bin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the binary config file representation of this stim channel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="function">
@@ -500,21 +642,29 @@ primary contact and the reference contact.</p>
 
 <dl class="function">
 <dt id="bptools.odin.config.make_odin_config">
-<code class="descclassname">bptools.odin.config.</code><code class="descname">make_odin_config</code><span class="sig-paren">(</span><em>jacksheet_filename</em>, <em>config_name</em>, <em>default_surface_area</em>, <em>path=None</em>, <em>good_leads=None</em>, <em>scheme=’bipolar’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#make_odin_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.make_odin_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create an Odin ENS electrode configuration CSV file.</p>
+<code class="descclassname">bptools.odin.config.</code><code class="descname">make_odin_config</code><span class="sig-paren">(</span><em>jacksheet_filename</em>, <em>config_name</em>, <em>default_surface_area</em>, <em>path=None</em>, <em>stim_channels=None</em>, <em>good_leads=None</em>, <em>scheme='bipolar'</em>, <em>format='csv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#make_odin_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.make_odin_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an Odin ENS electrode configuration file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>jacksheet_filename</strong> (<em>str</em>) – Input jacksheet filename.</li>
 <li><strong>config_name</strong> (<em>str</em>) – Configuration file name.</li>
 <li><strong>default_surface_area</strong> (<em>float</em>) – Default surface area for electrodes.</li>
 <li><strong>path</strong> (<em>str</em>) – Directory to write file to. If None, return as a string.</li>
+<li><strong>stim_channels</strong> (<em>List</em><em>[</em><a class="reference internal" href="#bptools.odin.config.StimChannel" title="bptools.odin.config.StimChannel"><em>StimChannel</em></a><em>]</em>) – A list of stim channel specifications.</li>
 <li><strong>good_leads</strong> (<em>list</em><em> or </em><em>None</em>) – Jackbox numbers to use when configuring sense channels. This is usually
 determined from the <code class="docutils literal"><span class="pre">good_leads.txt</span></code> file. When None, use all.</li>
 <li><strong>scheme</strong> (<em>str</em>) – Referencing scheme to use (<code class="docutils literal"><span class="pre">bipolar</span></code> or <code class="docutils literal"><span class="pre">monopolar</span></code>).</li>
+<li><strong>format</strong> (<em>str</em>) – Config format to output as (<code class="docutils literal"><span class="pre">csv</span></code> or <code class="docutils literal"><span class="pre">bin</span></code>).</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Configuration file as a bytes object.</p>
 </td>
 </tr>
 </tbody>
@@ -835,65 +985,67 @@ because there is not transformation to be made</p>
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">bptools</a><ul>
-<li><a class="reference internal" href="#electrode-config-generation">Electrode config generation</a><ul>
-<li><a class="reference internal" href="#known-issues">Known issues</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#api-reference">API reference</a><ul>
-<li><a class="reference internal" href="#module-bptools.jacksheet">Jacksheet utilities</a></li>
-<li><a class="reference internal" href="#module-bptools.pairs">Pair creation tools</a></li>
-<li><a class="reference internal" href="#module-bptools.odin.config">Odin ENS configuration</a></li>
-<li><a class="reference internal" href="#bipolar-transformation-utilities">Bipolar transformation utilities</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Penn Computational Memory Lab.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">bptools 1.1.2 documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Penn Computational Memory Lab.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

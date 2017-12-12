@@ -8,6 +8,9 @@ class VersionInfo(object):
         self.minor = minor
         self.patch = patch
 
+    def to_tuple(self):
+        return self.major, self.minor, self.patch
 
-__version__ = "1.2.dev0"
+
+__version__ = "1.2.0"
 version_info = VersionInfo(*__version__.split('.'))
