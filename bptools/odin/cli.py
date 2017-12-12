@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from argparse import ArgumentParser
+from functools import partial
 import os.path as osp
 
 from .config import make_config_name, make_odin_config
@@ -54,9 +55,14 @@ def main(args=None):
         good_leads = _read_good_leads(args.good_leads)
 
     name = make_config_name(args.subject, args.localization, args.montage, args.stim)
-    res = make_odin_config(jacksheet, name, args.surface_area, args.output_path,
-                           good_leads=good_leads, scheme=args.scheme)
-    if res is not None:
-        print(res)
-    else:
-        print("Wrote", osp.join(args.output_path, name + ".csv"))
+
+    make_config = partial(make_odin_config, jacksheet, name, args.surface_area,
+                          args.output_path, good_leads=good_leads,
+                          scheme=args.scheme)
+
+    for format in ['csv', 'bin']:
+        res = make_config(format=format)
+        if res is not None:
+            print(res)
+        else:
+            print("Wrote", osp.join(args.output_path, name + format))
