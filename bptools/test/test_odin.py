@@ -1,9 +1,11 @@
 import os.path as osp
 from datetime import datetime
+from functools import partial
 from io import StringIO
+from pkg_resources import resource_filename
 
 import pytest
-from numpy.testing import assert_equal
+
 import pandas as pd
 
 from bptools.odin.config import (
@@ -11,6 +13,7 @@ from bptools.odin.config import (
 )
 from bptools.odin import cli
 from bptools.odin.confgrep import get_odin_config_path
+from bptools.odin.config import StimChannel
 from bptools.test import datafile, tempdir, HERE
 
 
@@ -61,36 +64,80 @@ def test_make_config_name():
 
 
 @pytest.mark.parametrize('scheme', ['bipolar', 'monopolar'])
-def test_make_odin_config(scheme):
-    filename = 'R1308T_jacksheet.txt'
-    output_filename = 'R1308T_NAME.csv'
+@pytest.mark.parametrize('format', ['csv', 'bin', 'txt'])
+def test_make_odin_config(scheme, format):
+    subject = 'R1308T' if scheme == 'monopolar' else 'R1347D'
+    filename = '{:s}_jacksheet.txt'.format(subject)
+    prefix = 'R1308T_14JUN2017L0M0STIM' if subject == 'R1308T' else 'R1347D_8DEC2017L0M0STIM'
+    output_filename = prefix + '.csv'
     jfile = datafile(filename)
 
+    if scheme == 'monopolar':
+        stim_channels = [
+            StimChannel('LB6_LB7', 11, 12),
+            StimChannel('LC7_LC8', 45, 46),
+            StimChannel('LB5_LB6', 10, 11)
+        ]
+    else:
+        stim_channels = [
+            StimChannel('LAD8_LAD9', 38, 39),
+            StimChannel('LPHCD8_LPHCD9', 78, 79),
+            StimChannel('LAHCD9_LAHCD10', 59, 60),
+            StimChannel('RAD8_RAD9', 28, 29),
+            StimChannel('LOFD8_LOFD9', 18, 19),
+            StimChannel('RPHCD8_RPHCD9', 68, 69)
+        ]
+
+    makeconf = partial(make_odin_config, jfile, prefix, 0.001,
+                       stim_channels=stim_channels, scheme=scheme,
+                       format=format)
+
+    if format == 'txt':
+        with pytest.raises(AssertionError):
+            makeconf()
+        return
+
     # Printing to stdout
-    make_odin_config(jfile, 'R1308T_NAME', 0.001)
+    makeconf()
 
     # Saving to a directory
     with tempdir() as path:
-        make_odin_config(jfile, 'R1308T_NAME', 0.001, path, scheme=scheme)
+        makeconf(path=path)
         outfile = osp.join(path, output_filename)
         assert osp.exists(outfile)
 
         # Verify that each primary sense channel is only listed once
-        config = read_sense_config(outfile)
-        assert len(config.c1) == len(config.c1.unique())
-        assert all(config.c1 == config.c1.unique())
+        if format == 'csv':
+            config = read_sense_config(outfile)
+            assert len(config.c1) == len(config.c1.unique())
+            assert all(config.c1 == config.c1.unique())
+        elif format == 'bin':
+            reffile = '{}_{}.bin'.format(prefix, scheme)
+            with open(resource_filename('bptools.test.data', reffile), 'rb') as ref:
+                with open(outfile, 'rb') as gen:
+                    rlines = ref.read()
+                    glines = gen.read()
+
+            rlines = rlines.split(b'|')
+            glines = glines.split(b'|')
+            for i, line in enumerate(rlines):
+                # We don't really care if the comment section differs
+                assert line.split(b'#')[0] == glines[i].split(b'#')[0]
 
     # Explicitly specifiying leads to include
     good_leads = [n for n in range(1, 4)]
     with tempdir() as path:
         outfile = osp.join(path, output_filename)
-        make_odin_config(jfile, 'R1308T_NAME', 0.001, path, good_leads=good_leads,
-                         scheme=scheme)
-        config = read_sense_config(outfile)
-        if scheme == 'bipolar':
-            assert len(config) == 2
-        else:
-            assert len(config) == 3
+        makeconf(path=path, good_leads=good_leads)
+
+        if format == 'csv':
+            config = read_sense_config(outfile)
+            if scheme == 'bipolar':
+                assert len(config) == 2
+            else:
+                assert len(config) == 3
+        elif format == 'bin':
+            pass  # FIXME
 
 
 def test_cli():
