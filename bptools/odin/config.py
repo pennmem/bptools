@@ -268,7 +268,11 @@ class StimChannel(FromSeriesMixin, _SlotsMixin):
         bytes
 
         """
-        return self.config_entry.replace(b',', b'~').replace(b'\n', b'|')
+        return b'|'.join([
+            'StimChannel:~{:s}~x~# #'.format(self.name).encode(),
+            b'Anodes:~' + struct.pack('<h', self.anode) + b'~#',
+            b'Cathodes:~' + struct.pack('<h', self.cathode) + b'~#'
+        ])
 
 
 class ElectrodeConfig(object):
