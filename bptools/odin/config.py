@@ -172,7 +172,10 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
             config.append(entry)
 
     # Footer
-    config.append(delimit("REF:,0,Common"))
+    if format == 'csv':
+        config.append(b"REF:,0,Common")
+    else:
+        config.append(b"REF:~\x00\x00~Common")
     config.append(b'EOF')
 
     if path is not None:
