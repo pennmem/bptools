@@ -4,7 +4,7 @@ Changes
 Version 1.2.0
 -------------
 
-**Not yet released**
+**2017-12-12**
 
 * Added ability to generate Odin binary configuration files in addition to CSV
   files
