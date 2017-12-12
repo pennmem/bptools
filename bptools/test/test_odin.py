@@ -1,5 +1,6 @@
 import os.path as osp
 from datetime import datetime
+from functools import partial
 from io import StringIO
 from pkg_resources import resource_filename
 
@@ -12,6 +13,7 @@ from bptools.odin.config import (
 )
 from bptools.odin import cli
 from bptools.odin.confgrep import get_odin_config_path
+from bptools.odin.config import StimChannel
 from bptools.test import datafile, tempdir, HERE
 
 
@@ -68,18 +70,27 @@ def test_make_odin_config(scheme, format):
     prefix = 'R1308T_14JUN2017L0M0STIM'
     output_filename = prefix + '.csv'
     jfile = datafile(filename)
+    stim_channels = [
+        StimChannel('LB6_LB7', 11, 12),
+        StimChannel('LC7_LC8', 45, 46),
+        StimChannel('LB5_LB6', 10, 11)
+    ]
+
+    makeconf = partial(make_odin_config, jfile, prefix, 0.001,
+                       stim_channels=stim_channels, scheme=scheme,
+                       format=format)
 
     if format == 'txt':
         with pytest.raises(AssertionError):
-            make_odin_config(jfile, prefix, 0.001, format=format)
+            makeconf()
         return
 
     # Printing to stdout
-    make_odin_config(jfile, prefix, 0.001, scheme=scheme, format=format)
+    makeconf()
 
     # Saving to a directory
     with tempdir() as path:
-        make_odin_config(jfile, prefix, 0.001, path, scheme=scheme, format=format)
+        makeconf(path=path)
         outfile = osp.join(path, output_filename)
         assert osp.exists(outfile)
 
@@ -105,8 +116,7 @@ def test_make_odin_config(scheme, format):
     good_leads = [n for n in range(1, 4)]
     with tempdir() as path:
         outfile = osp.join(path, output_filename)
-        make_odin_config(jfile, prefix, 0.001, path, good_leads=good_leads,
-                         scheme=scheme, format=format)
+        makeconf(path=path, good_leads=good_leads)
 
         if format == 'csv':
             config = read_sense_config(outfile)
