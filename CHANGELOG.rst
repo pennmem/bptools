@@ -1,5 +1,46 @@
+Changes
+=======
+
+Version 1.2.0
+-------------
+
+**Not yet released**
+
+* Added ability to generate Odin binary configuration files in addition to CSV
+  files
+
+
+Version 1.1.2
+-------------
+
+**2017-10-23**
+
+* Stopped standardizing labels by default (this could sometimes cause issues
+  and was never strictly necessary)
+
+
+Version 1.1.1
+-------------
+
+**2017-10-11**
+
+* Added a method for standardizing labels and defaulted to using these
+* Aliased "name" with "label"
+* Added a utility to find existing Odin electrode configuration files
+
+
+Version 1.1.0
+-------------
+
+**2017-09-29**
+
+* Added support for "monopolar" (common reference) electrode configuration
+* Added auto-generated documentation
+* Numerous bug fixes and workflow improvements
+
+
 Version 1.0.0
-=============
+-------------
 
 **2017-09-12**
 
