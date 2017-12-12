@@ -65,4 +65,4 @@ def main(args=None):
         if res is not None:
             print(res)
         else:
-            print("Wrote", osp.join(args.output_path, name + format))
+            print("Wrote", osp.join(args.output_path, name + "." + format))

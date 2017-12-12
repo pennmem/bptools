@@ -179,7 +179,7 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
     config.append(b'EOF')
 
     if path is not None:
-        outfile = osp.join(path, config_name + '.csv')
+        outfile = osp.join(path, config_name + '.' + format)
         with open(outfile, 'wb') as f:
             f.write(newline.join(config))
             f.write(newline)
