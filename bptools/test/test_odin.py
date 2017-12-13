@@ -69,7 +69,7 @@ def test_make_odin_config(scheme, format):
     subject = 'R1308T' if scheme == 'monopolar' else 'R1347D'
     filename = '{:s}_jacksheet.txt'.format(subject)
     prefix = 'R1308T_14JUN2017L0M0STIM' if subject == 'R1308T' else 'R1347D_8DEC2017L0M0STIM'
-    output_filename = prefix + '.csv'
+    output_filename = prefix + '.' + format
     jfile = datafile(filename)
 
     if scheme == 'monopolar':
@@ -214,7 +214,6 @@ class TestElectrodeConfig:
             assert ec.sense_channels[i].contact == ec2.sense_channels[i].contact
             assert ec.sense_channels[i].ref == ec2.sense_channels[i].ref
 
-    @pytest.mark.only
     def test_read_area_file(self):
         filename = resource_filename('bptools.test.data', 'R1347D_area.txt')
         areas = ElectrodeConfig.read_area_file(filename)
