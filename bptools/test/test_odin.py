@@ -239,8 +239,8 @@ class TestElectrodeConfig:
         ec = ElectrodeConfig.from_jacksheet(jfile, subject, scheme)
         assert isinstance(ec.contacts[0].port, int)
         assert ec.subject == subject
-        assert ec.num_contacts == 35
-        assert ec.num_sense_channels == 35 if scheme == 'monopolar' else 34
+        assert ec.num_contacts == 37
+        assert ec.num_sense_channels == 37 if scheme == 'monopolar' else 35
         assert ec.num_stim_channels == 0
 
     def test_to_csv(self, tmpdir):
@@ -264,8 +264,8 @@ class TestElectrodeConfig:
         arr = ec.contacts_as_recarray()
         for i, num in enumerate(range(1, 36)):
             assert arr.jack_box_num[i] == num
-        assert len(arr.contact_name) == 35
-        assert len(arr.description) == 35
+        assert len(arr.contact_name) == 37
+        assert len(arr.description) == 37
 
 
 def test_get_odin_config_path():

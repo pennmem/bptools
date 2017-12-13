@@ -84,10 +84,11 @@ def create_pairs(jacksheet_filename):
                     break
                 c1, c2 = _mux_filter(el.index[i], el.index[j])
 
-            if c1 is not None and [c1, c2] not in contacts:
+            if c1 is not None and [c1, c2] not in contacts and [c2, c1] not in contacts:
                 contacts.append([c1, c2])
 
-    return _contacts_to_dataframe(jacksheet, contacts)
+    df = _contacts_to_dataframe(jacksheet, contacts)
+    return df
 
 
 def create_monopolar_pairs(jacksheet_filename, common_ref=0):
