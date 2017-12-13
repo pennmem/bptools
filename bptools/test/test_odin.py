@@ -3,6 +3,7 @@ from datetime import datetime
 from functools import partial
 from io import StringIO
 from pkg_resources import resource_filename
+import re
 
 import pytest
 
@@ -226,8 +227,10 @@ class TestElectrodeConfig:
         for n, area in enumerate(areas.area):
             assert area == n + 1
 
+    @pytest.mark.only
     @pytest.mark.parametrize('scheme', ['bipolar', 'monopolar', 'invalid'])
-    def test_from_jacksheet(self, scheme):
+    @pytest.mark.parametrize('area', [0.5, resource_filename('bptools.test.data', 'simple_area.txt')])
+    def test_from_jacksheet(self, scheme, area):
         jfile = datafile('simple_jacksheet.txt')
         subject = "subject"
 
@@ -236,12 +239,23 @@ class TestElectrodeConfig:
                 ElectrodeConfig.from_jacksheet(jfile, subject, scheme)
             return
 
-        ec = ElectrodeConfig.from_jacksheet(jfile, subject, scheme)
+        ec = ElectrodeConfig.from_jacksheet(jfile, subject, scheme, area=area)
         assert isinstance(ec.contacts[0].port, int)
         assert ec.subject == subject
         assert ec.num_contacts == 37
         assert ec.num_sense_channels == 37 if scheme == 'monopolar' else 35
         assert ec.num_stim_channels == 0
+
+        if area == 0.5:
+            for contact in ec.contacts:
+                assert contact.area == area
+        else:
+            areas = ElectrodeConfig.read_area_file(area)
+            regex = re.compile(r'(\d*[a-zA-Z]+)')
+            for contact in ec.contacts:
+                electrode = contact.label[:regex.match(contact.label).end()]
+                area_ = areas[areas.label == electrode].area
+                assert all(area_ == contact.area)
 
     def test_to_csv(self, tmpdir):
         basename = "R1308T_14JUN2017L0M0STIM.csv"

@@ -424,14 +424,18 @@ class ElectrodeConfig(object):
         config.subject = subject
 
         if isinstance(area, str):
-            areas = cls.read_area_file(area)
+            area_map = cls.read_area_file(area)
+            areas = [area_map[area_map.label == row.electrode].area
+                     for _, row in js.iterrows()]
+        else:
+            areas = [area] * len(js)
 
         config.contacts = [
             Contact.from_series(s)
             for _, s in pd.DataFrame({
                 'label': js.label,
                 'port': js.index,
-                'area': [area] * len(js),
+                'area': areas,
                 'description': ['Jackbox number {}'.format(n) for n in js.index]
             }).iterrows()
         ]
