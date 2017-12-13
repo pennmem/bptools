@@ -75,29 +75,15 @@ def test_make_odin_config(scheme, format):
     jfile = datafile(filename)
 
     if scheme == 'monopolar':
-        stim_channels = [
-            StimChannel('LB6_LB7', 11, 12),
-            StimChannel('LC7_LC8', 45, 46),
-            StimChannel('LB5_LB6', 10, 11)
-        ]
+        stim_channels = [('LB6', 'LB7'), ('LC7', 'LC8'), ('LB5', 'LB6')]
     else:
-        stim_channels = [
-            StimChannel('LAD8_LAD9', 38, 39),
-            StimChannel('LPHCD8_LPHCD9', 78, 79),
-            StimChannel('LAHCD9_LAHCD10', 59, 60),
-            StimChannel('RAD8_RAD9', 28, 29),
-            StimChannel('LOFD8_LOFD9', 18, 19),
-            StimChannel('RPHCD8_RPHCD9', 68, 69)
-        ]
+        stim_channels = [('LAD8', 'LAD9'), ('LPHCD8', 'LPHCD9'),
+                         ('LAHCD9', 'LAHCD10'), ('RAD8', 'RAD9'),
+                         ('LOFD8', 'LOFD9'), ('RPHCD8', 'RPHCD9')]
 
     makeconf = partial(make_odin_config, jfile, prefix, 0.001,
                        stim_channels=stim_channels, scheme=scheme,
                        format=format)
-
-    if format == 'txt':
-        with pytest.raises(AssertionError):
-            makeconf()
-        return
 
     # Printing to stdout
     makeconf()
@@ -123,6 +109,9 @@ def test_make_odin_config(scheme, format):
             rlines = rlines.split(b'|')
             glines = glines.split(b'|')
             for i, line in enumerate(rlines):
+                if not len(line):
+                    break
+
                 # We don't really care if the comment section differs
                 assert line.split(b'#')[0] == glines[i].split(b'#')[0]
 
