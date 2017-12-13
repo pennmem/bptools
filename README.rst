@@ -11,6 +11,10 @@ bptools
   :target: https://pennmem.github.io/bptools/html/index.html
   :alt: docs
 
+.. image:: https://img.shields.io/github/release/pennmem/bptools.svg
+    :target: https://github.com/pennmem/bptools
+    :alt: GitHub release
+
 .. image:: https://img.shields.io/conda/v/pennmem/bptools.svg
   :target: https://anaconda.org/pennmem/bptools
   :alt: conda package
