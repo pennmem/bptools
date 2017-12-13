@@ -355,8 +355,8 @@ class ElectrodeConfig(object):
         """Return the number of configured stim channels."""
         return len(self.stim_channels)
 
-    @classmethod
-    def read_area_file(cls, filename):
+    @staticmethod
+    def read_area_file(filename):
         """Read a file that maps electrode labels to surface areas (see notes
         below).
 
