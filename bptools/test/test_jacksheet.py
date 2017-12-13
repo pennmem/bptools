@@ -14,7 +14,7 @@ def test_read_jacksheet(filename, ignore_ecg, standardize_labels):
     js = read_jacksheet(jacksheet, ignore_ecg=ignore_ecg, standardize_labels=standardize_labels)
 
     if filename.startswith('simple'):
-        assert len(js) == 35
+        assert len(js) == 37
     elif filename.startswith('R1308T'):
         assert len(js) == 128 if not ignore_ecg else 126
     elif filename.startswith('R1306E'):

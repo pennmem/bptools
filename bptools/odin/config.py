@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from datetime import datetime
+import functools
 from io import StringIO
 import os.path as osp
 import struct
@@ -12,9 +13,10 @@ except ImportError:  # pragma: no cover
 import numpy as np
 import pandas as pd
 
-from bptools.util import FromSeriesMixin, standardize_label
+from bptools.exc import ContactNotFoundError
 from bptools.jacksheet import read_jacksheet
 from bptools.pairs import create_pairs, create_monopolar_pairs
+from bptools.util import FromSeriesMixin, standardize_label
 
 
 def _num_to_bank_label(num):
@@ -215,6 +217,9 @@ class Contact(FromSeriesMixin, _SlotsMixin):
         self.area = area  # type: float
         self.description = description  # type: str
 
+    def __str__(self):
+        return "Contact(label={}, port={})".format(self.label, self.port)
+
 
 class SenseChannel(FromSeriesMixin, _SlotsMixin):
     """Data for a configured sense channel. This consists of two contacts: the
@@ -229,6 +234,9 @@ class SenseChannel(FromSeriesMixin, _SlotsMixin):
         self.ref = ref  # type: int
         self.description = description  # type: str
 
+    def __str__(self):
+        return "SenseChannel(label={}, contact={}, ref={})".format(self.label, self.contact, self.ref)
+
     @property
     def label(self):
         return self.name
@@ -242,6 +250,9 @@ class StimChannel(FromSeriesMixin, _SlotsMixin):
         self.name = name  # type: str
         self.anode = anode  # type: int
         self.cathode = cathode  # type: int
+
+    def __str__(self):
+        return "StimChannel(label={}, anode={}, cathode={})".format(self.label, self.anode, self.cathode)
 
     @property
     def label(self):
@@ -272,7 +283,7 @@ class StimChannel(FromSeriesMixin, _SlotsMixin):
 
         """
         return b'|'.join([
-            'StimChannel:~{:s}~x~# #'.format(self.name).encode(),
+            'StimChannel:~{:s}~x~##'.format(self.name).encode(),
             b'Anodes:~' + struct.pack('<h', self.anode) + b'~#',
             b'Cathodes:~' + struct.pack('<h', self.cathode) + b'~#'
         ])
@@ -320,6 +331,10 @@ class ElectrodeConfig(object):
         self.sense_channels = []  # type: List[SenseChannel]
         self.stim_channels = []  # type: List[StimChannel]
 
+        # Jacksheet contents (populated when created with from_jacksheet)
+        # FIXME: create when reading from existing config, too
+        self._jacksheet = None  # type: pd.DataFrame
+
         # Paths to config files
         self._csv_file = None  # type: str
         self._bin_file = None  # type: str
@@ -355,6 +370,48 @@ class ElectrodeConfig(object):
         """Return the number of configured stim channels."""
         return len(self.stim_channels)
 
+    @staticmethod
+    def read_area_file(filename):
+        """Read a file that maps electrode labels to surface areas (see notes
+        below).
+
+        Parameters
+        ----------
+        filename : str
+            Path to file
+
+        Returns
+        -------
+        pd.DataFrame
+            A dataframe containing the columns ``label`` and ``area``.
+
+        Notes
+        -----
+        Contact surface areas will be read in from the file with the following
+        format::
+
+            <electrode label 1> <surface area in mm^2>
+            <electrode label 2> <surface area in mm^2>
+
+        Electrode labels are everything preceding the specific contact number,
+        so ``LA1``, ``LA2``, etc. would use ``LA`` as the electrode label. This
+        assumes that in electrodes that combine contacts of different sizes that
+        each uniquely sized contact has a different labeling prefix. In other
+        words, if the ``LA`` lead contains both micro and macro contacts, the
+        jacksheet should be updated to label the micros with something like
+        ``uLA`` so that the surface area file could contain lines like::
+
+            LA 1
+            uLA 0.01
+
+        """
+        with open(filename, 'r') as f:
+            lines = [line.split() for line in f.read().split('\n') if len(line)]
+            areas = []
+            for label, area in lines:
+                areas.append({'label': label.strip(), 'area': float(area)})
+            return pd.DataFrame(areas)
+
     @classmethod
     def from_jacksheet(cls, filename, subject="", scheme='bipolar', area=0.5):
         """Create a new :class:`ElectrodeConfig` instance from a jacksheet.
@@ -367,8 +424,10 @@ class ElectrodeConfig(object):
             Subject ID
         scheme : str
             Referencing scheme to use (``bipolar`` or ``monopolar``).
-        area : float
-            Default surface area to use in mm^2.
+        area : float or str
+            Default surface area to use in mm^2 when a float or a file that
+            maps electrode labels to surface areas (see :meth:`read_area_file`
+            for file format details).
 
         Returns
         -------
@@ -378,13 +437,21 @@ class ElectrodeConfig(object):
         js = read_jacksheet(filename)
         config = ElectrodeConfig()
         config.subject = subject
+        config._jacksheet = js
+
+        if isinstance(area, str):
+            area_map = cls.read_area_file(area)
+            areas = [area_map[area_map.label == row.electrode].area
+                     for _, row in js.iterrows()]
+        else:
+            areas = [area] * len(js)
 
         config.contacts = [
             Contact.from_series(s)
             for _, s in pd.DataFrame({
                 'label': js.label,
                 'port': js.index,
-                'area': [area] * len(js),
+                'area': areas,
                 'description': ['Jackbox number {}'.format(n) for n in js.index]
             }).iterrows()
         ]
@@ -500,6 +567,119 @@ class ElectrodeConfig(object):
                 for stim_channel in self.stim_channels:
                     stim_channel.name = standardize_label(stim_channel.name)
 
+    def add_stim_channel(self, anode_label, cathode_label):
+        """Append a new stim channel to the list of existing stim channels.
+
+        Parameters
+        ----------
+        anode_label : str
+        cathode_label : str
+
+        """
+        anode, cathode = None, None
+        for contact in self.contacts:
+            if contact.label == anode_label:
+                anode = contact.port
+            elif contact.label == cathode_label:
+                cathode = contact.port
+
+            if anode is not None and cathode is not None:
+                channel = StimChannel(name="{}_{}".format(anode_label, cathode_label),
+                                      anode=anode, cathode=cathode)
+                self.stim_channels.append(channel)
+                break
+        else:
+            if anode is None and cathode is not None:
+                raise ContactNotFoundError("invalid anode label: " + anode_label)
+            elif cathode is None and anode is not None:
+                raise ContactNotFoundError("invalid cathode label: " + cathode_label)
+            else:
+                raise ContactNotFoundError("invalid anode and cathode labels")
+
+    @staticmethod
+    def _iencode(number, format):
+        if format == 'csv':
+            return str(number).encode()
+        else:
+            return struct.pack('<h', number)
+
+    @staticmethod
+    def _fencode(number, format):
+        if format == 'csv':
+            return "{:.03f}".format(number).encode()
+        else:
+            return struct.pack('<f', number)
+
+    @staticmethod
+    def _delimit(string, format):
+        if format == 'bin':
+            return string.replace(',', '~').encode()
+        else:
+            return string.encode()
+
+    def _export(self, format):
+        """Creates configuration data to be used by Ramulator and the ENS.
+
+        Parameters
+        ----------
+        format : str
+            ``'csv'`` or ``'bin'`` to generate CSV or binary format respectively
+
+        Returns
+        -------
+        config : bytes
+            Configuration data as bytes.
+
+        """
+        iencode = functools.partial(self._iencode, format=format)
+        fencode = functools.partial(self._fencode, format=format)
+        delimit = functools.partial(self._delimit, format=format)
+        delimiter = b',' if format == 'csv' else b'~'
+        newline = b'\n' if format == 'csv' else b'|'
+
+        # Header
+        config = [
+            delimit("ODINConfigurationVersion:,#1.2#"),
+            delimit("ConfigurationName:," + self.name),
+            delimit("SubjectID:," + self.subject),
+            b"Contacts:",
+        ]
+
+        # Channel definitions
+        for n, contact in enumerate(self.contacts):
+            jbox_num = n + 1
+            chan = _num_to_bank_label(jbox_num)
+            data = [contact.label.encode(), iencode(jbox_num), iencode(jbox_num),
+                    fencode(contact.area),
+                    "#Electrode {} jack box {}#".format(chan, jbox_num).encode()]
+            config.append(delimiter.join(data))
+
+        # Sense definitions
+        config.append(b"SenseChannelSubclasses:")
+        config.append(b"SenseChannels:")
+        for chan in self.sense_channels:
+            # <contact 1 label>,<sense channel label>,<contact 1 #>,<contact 2 #>,x,#description#
+            data = [self.contacts[chan.contact - 1].label.encode(), chan.label.encode(),
+                    iencode(chan.contact), iencode(chan.ref), b'x',
+                    '#{}#'.format(chan.description).encode()]
+            config.append(delimiter.join(data))
+
+        # Stim definitions
+        config.append(b"StimulationChannelSubclasses:")
+        config.append(b"StimulationChannels:")
+        for channel in self.stim_channels:
+            entry = channel.config_entry if format == 'csv' else channel.config_entry_bin
+            config.append(entry)
+
+        # Footer
+        if format == 'csv':
+            config.append(b"REF:,0,Common")
+        else:
+            config.append(b"REF:~\x00\x00~Common")
+        config.append(b'EOF')
+
+        return newline.join(config)
+
     def to_csv(self, outfile=None):
         """Export as an Odin CSV electrode configuration file.
 
@@ -512,22 +692,35 @@ class ElectrodeConfig(object):
         -------
         ``str`` if outfile is ``None`` else ``None`` and writes to ``outfile``.
 
-        Notes
-        -----
-        For now, this only works if the configuration was generated from an
-        existing CSV file.
+        """
+        config = self._export('csv')
+        if outfile is None:
+            return config.decode()
+        else:
+            with open(outfile, 'wb') as f:
+                f.write(config)
+            return None
+
+    def to_bin(self, outfile=None):
+        """Export as an Odin binary electrode configuration file.
+
+        Parameters
+        ----------
+        outfile : str
+            Name of the output file.
+
+        Returns
+        -------
+        ``bytes`` if outfile is ``None`` else ``None`` and writes to ``outfile``.
 
         """
-        assert self._csv_file is not None, "TODO: implement more general to_csv"
-
-        with open(self._csv_file, 'r') as f:
-            config = f.read()
-
+        config = self._export('bin')
         if outfile is None:
             return config
         else:
-            with open(outfile, 'w') as f:
+            with open(outfile, 'wb') as f:
                 f.write(config)
+            return None
 
     def contacts_as_recarray(self):
         """Return the monopolar contacts as a recarry.

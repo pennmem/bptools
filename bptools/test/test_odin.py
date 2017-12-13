@@ -3,11 +3,13 @@ from datetime import datetime
 from functools import partial
 from io import StringIO
 from pkg_resources import resource_filename
+import re
 
 import pytest
 
 import pandas as pd
 
+from bptools.exc import *
 from bptools.odin.config import (
     ElectrodeConfig, make_odin_config, make_config_name, Contact
 )
@@ -69,7 +71,7 @@ def test_make_odin_config(scheme, format):
     subject = 'R1308T' if scheme == 'monopolar' else 'R1347D'
     filename = '{:s}_jacksheet.txt'.format(subject)
     prefix = 'R1308T_14JUN2017L0M0STIM' if subject == 'R1308T' else 'R1347D_8DEC2017L0M0STIM'
-    output_filename = prefix + '.csv'
+    output_filename = prefix + '.' + format
     jfile = datafile(filename)
 
     if scheme == 'monopolar':
@@ -152,7 +154,7 @@ def test_cli():
 class TestSlotsMixin:
     def test_str(self):
         contact = Contact("x", 0, 1, "description")
-        assert str(contact) == "<Contact label=x, port=0, area=1, description=description>"
+        assert str(contact) == "Contact(label=x, port=0)"
 
     def test_keys(self):
         contact = Contact("x", 0, 1, "description")
@@ -214,8 +216,21 @@ class TestElectrodeConfig:
             assert ec.sense_channels[i].contact == ec2.sense_channels[i].contact
             assert ec.sense_channels[i].ref == ec2.sense_channels[i].ref
 
+    def test_read_area_file(self):
+        filename = resource_filename('bptools.test.data', 'R1347D_area.txt')
+        areas = ElectrodeConfig.read_area_file(filename)
+        assert len(areas) == 16
+
+        for label in ['ROFD', 'LOFD', 'RAD', 'LAD', 'RAHCD', 'RPHCD', 'RID',
+                      'LID', 'RMCD', 'LMCD', 'RPTD', 'LPTD', 'RACD', 'LACD']:
+            assert label in areas.label.values
+
+        for n, area in enumerate(areas.area):
+            assert area == n + 1
+
     @pytest.mark.parametrize('scheme', ['bipolar', 'monopolar', 'invalid'])
-    def test_from_jacksheet(self, scheme):
+    @pytest.mark.parametrize('area', [0.5, resource_filename('bptools.test.data', 'simple_area.txt')])
+    def test_from_jacksheet(self, scheme, area):
         jfile = datafile('simple_jacksheet.txt')
         subject = "subject"
 
@@ -224,36 +239,79 @@ class TestElectrodeConfig:
                 ElectrodeConfig.from_jacksheet(jfile, subject, scheme)
             return
 
-        ec = ElectrodeConfig.from_jacksheet(jfile, subject, scheme)
+        ec = ElectrodeConfig.from_jacksheet(jfile, subject, scheme, area=area)
         assert isinstance(ec.contacts[0].port, int)
         assert ec.subject == subject
-        assert ec.num_contacts == 35
-        assert ec.num_sense_channels == 35 if scheme == 'monopolar' else 34
+        assert ec.num_contacts == 37
+        assert ec.num_sense_channels == 37 if scheme == 'monopolar' else 35
         assert ec.num_stim_channels == 0
 
-    def test_to_csv(self, tmpdir):
-        basename = "R1308T_14JUN2017L0M0STIM.csv"
-        filename = datafile(basename)
-        ec = ElectrodeConfig(filename)
-        stringy = ec.to_csv()
+        if area == 0.5:
+            for contact in ec.contacts:
+                assert contact.area == area
+        else:
+            areas = ElectrodeConfig.read_area_file(area)
+            regex = re.compile(r'(\d*[a-zA-Z]+)')
+            for contact in ec.contacts:
+                electrode = contact.label[:regex.match(contact.label).end()]
+                area_ = areas[areas.label == electrode].area
+                assert all(area_ == contact.area)
 
-        with open(filename, 'r') as original:
-            assert stringy == original.read()
+    @pytest.mark.parametrize('format', ['csv', 'bin'])
+    def test_export(self, format):
+        jfile = datafile('R1347D_jacksheet.txt')
+        scheme = 'bipolar'
+        area = 0.001
+        ec = ElectrodeConfig.from_jacksheet(jfile, 'R1347D', scheme, area)
+        ec.name = '8DEC2017L0M0STIM'
 
-        outfile = str(tmpdir.join(basename))
-        ec.to_csv(outfile=outfile)
+        anodes = ['LAD8', 'LPHCD8', 'LAHCD9', 'RAD8', 'LOFD8', 'RPHCD8']
+        cathodes = ['LAD9', 'LPHCD9', 'LAHCD10', 'RAD9', 'LOFD9', 'RPHCD9']
+        for args in zip(anodes, cathodes):
+            ec.add_stim_channel(*args)
 
-        with open(filename, 'r') as original:
-            with open(outfile, 'r') as new:
-                assert new.read() == original.read()
+        if format == 'csv':
+            with open(datafile("R1347D_8DEC2017L0M0STIM.csv"), 'r') as f:
+                ref = f.read().split()
+                new = ec.to_csv().split()
+                for n, line in enumerate(ref):
+                    assert line == new[n]
+        else:
+            with open(datafile('R1347D_8DEC2017L0M0STIM_bipolar.bin'), 'rb') as f:
+                ref = f.read().split(b'|')
+                new = ec.to_bin().split(b'|')
+                for n, line in enumerate(ref):
+                    if len(line) == 0:
+                        break
+                    assert line == new[n]
 
     def test_contacts_as_recarray(self):
         ec = ElectrodeConfig.from_jacksheet(datafile("simple_jacksheet.txt"))
         arr = ec.contacts_as_recarray()
         for i, num in enumerate(range(1, 36)):
             assert arr.jack_box_num[i] == num
-        assert len(arr.contact_name) == 35
-        assert len(arr.description) == 35
+        assert len(arr.contact_name) == 37
+        assert len(arr.description) == 37
+
+    def test_add_stim_channel(self):
+        ec = ElectrodeConfig.from_jacksheet(datafile('simple_jacksheet.txt'))
+        assert len(ec.stim_channels) == 0
+
+        ec.add_stim_channel('A1', 'A2')
+        assert len(ec.stim_channels) == 1
+        stim = ec.stim_channels[0]
+        assert stim.name == 'A1_A2'
+        assert stim.anode == 1
+        assert stim.cathode == 2
+
+        with pytest.raises(ContactNotFoundError):
+            ec.add_stim_channel('C1', 'A2')
+
+        with pytest.raises(ContactNotFoundError):
+            ec.add_stim_channel('A1', 'C2')
+
+        with pytest.raises(ContactNotFoundError):
+            ec.add_stim_channel('C1', 'C3')
 
 
 def test_get_odin_config_path():
