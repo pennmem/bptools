@@ -9,6 +9,7 @@ import pytest
 
 import pandas as pd
 
+from bptools.exc import *
 from bptools.odin.config import (
     ElectrodeConfig, make_odin_config, make_config_name, Contact
 )
@@ -276,6 +277,26 @@ class TestElectrodeConfig:
             assert arr.jack_box_num[i] == num
         assert len(arr.contact_name) == 37
         assert len(arr.description) == 37
+
+    def test_add_stim_channel(self):
+        ec = ElectrodeConfig.from_jacksheet(datafile('simple_jacksheet.txt'))
+        assert len(ec.stim_channels) == 0
+
+        ec.add_stim_channel('A1', 'A2')
+        assert len(ec.stim_channels) == 1
+        stim = ec.stim_channels[0]
+        assert stim.name == 'A1_A2'
+        assert stim.anode == 1
+        assert stim.cathode == 2
+
+        with pytest.raises(ContactNotFoundError):
+            ec.add_stim_channel('C1', 'A2')
+
+        with pytest.raises(ContactNotFoundError):
+            ec.add_stim_channel('A1', 'C2')
+
+        with pytest.raises(ContactNotFoundError):
+            ec.add_stim_channel('C1', 'C3')
 
 
 def test_get_odin_config_path():

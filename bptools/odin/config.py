@@ -13,9 +13,10 @@ except ImportError:  # pragma: no cover
 import numpy as np
 import pandas as pd
 
-from bptools.util import FromSeriesMixin, standardize_label
+from bptools.exc import ContactNotFoundError
 from bptools.jacksheet import read_jacksheet
 from bptools.pairs import create_pairs, create_monopolar_pairs
+from bptools.util import FromSeriesMixin, standardize_label
 
 
 def _num_to_bank_label(num):
@@ -565,6 +566,35 @@ class ElectrodeConfig(object):
                     sense_channel.name = standardize_label(sense_channel.name)
                 for stim_channel in self.stim_channels:
                     stim_channel.name = standardize_label(stim_channel.name)
+
+    def add_stim_channel(self, anode_label, cathode_label):
+        """Append a new stim channel to the list of existing stim channels.
+
+        Parameters
+        ----------
+        anode_label : str
+        cathode_label : str
+
+        """
+        anode, cathode = None, None
+        for contact in self.contacts:
+            if contact.label == anode_label:
+                anode = contact.port
+            elif contact.label == cathode_label:
+                cathode = contact.port
+
+            if anode is not None and cathode is not None:
+                channel = StimChannel(name="{}_{}".format(anode_label, cathode_label),
+                                      anode=anode, cathode=cathode)
+                self.stim_channels.append(channel)
+                break
+        else:
+            if anode is None and cathode is not None:
+                raise ContactNotFoundError("invalid anode label: " + anode_label)
+            elif cathode is None and anode is not None:
+                raise ContactNotFoundError("invalid cathode label: " + cathode_label)
+            else:
+                raise ContactNotFoundError("invalid anode and cathode labels")
 
     @staticmethod
     def _iencode(number, format):
