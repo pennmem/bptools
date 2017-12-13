@@ -356,6 +356,48 @@ class ElectrodeConfig(object):
         return len(self.stim_channels)
 
     @classmethod
+    def read_area_file(cls, filename):
+        """Read a file that maps electrode labels to surface areas (see notes
+        below).
+
+        Parameters
+        ----------
+        filename : str
+            Path to file
+
+        Returns
+        -------
+        pd.DataFrame
+            A dataframe containing the columns ``label`` and ``area``.
+
+        Notes
+        -----
+        Contact surface areas will be read in from the file with the following
+        format::
+
+            <electrode label 1> <surface area in mm^2>
+            <electrode label 2> <surface area in mm^2>
+
+        Electrode labels are everything preceding the specific contact number,
+        so ``LA1``, ``LA2``, etc. would use ``LA`` as the electrode label. This
+        assumes that in electrodes that combine contacts of different sizes that
+        each uniquely sized contact has a different labeling prefix. In other
+        words, if the ``LA`` lead contains both micro and macro contacts, the
+        jacksheet should be updated to label the micros with something like
+        ``uLA`` so that the surface area file could contain lines like::
+
+            LA 1
+            uLA 0.01
+
+        """
+        with open(filename, 'r') as f:
+            lines = [line.split() for line in f.read().split('\n') if len(line)]
+            areas = []
+            for label, area in lines:
+                areas.append({'label': label.strip(), 'area': float(area)})
+            return pd.DataFrame(areas)
+
+    @classmethod
     def from_jacksheet(cls, filename, subject="", scheme='bipolar', area=0.5):
         """Create a new :class:`ElectrodeConfig` instance from a jacksheet.
 
@@ -367,8 +409,10 @@ class ElectrodeConfig(object):
             Subject ID
         scheme : str
             Referencing scheme to use (``bipolar`` or ``monopolar``).
-        area : float
-            Default surface area to use in mm^2.
+        area : float or str
+            Default surface area to use in mm^2 when a float or a file that
+            maps electrode labels to surface areas (see :meth:`read_area_file`
+            for file format details).
 
         Returns
         -------
@@ -378,6 +422,9 @@ class ElectrodeConfig(object):
         js = read_jacksheet(filename)
         config = ElectrodeConfig()
         config.subject = subject
+
+        if isinstance(area, str):
+            areas = cls.read_area_file(area)
 
         config.contacts = [
             Contact.from_series(s)

@@ -37,6 +37,6 @@ def read_jacksheet(filename, ignore_ecg=True, standardize_labels=True):
         js['label'] = js['label'].apply(standardize_label)
 
     if ignore_ecg:
-        js =  js[~js.label.str.startswith('ECG') & ~js.label.str.startswith('EKG')]
-    
+        js = js[~js.label.str.startswith('ECG') & ~js.label.str.startswith('EKG')]
+
     return js

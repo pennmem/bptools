@@ -214,6 +214,19 @@ class TestElectrodeConfig:
             assert ec.sense_channels[i].contact == ec2.sense_channels[i].contact
             assert ec.sense_channels[i].ref == ec2.sense_channels[i].ref
 
+    @pytest.mark.only
+    def test_read_area_file(self):
+        filename = resource_filename('bptools.test.data', 'R1347D_area.txt')
+        areas = ElectrodeConfig.read_area_file(filename)
+        assert len(areas) == 16
+
+        for label in ['ROFD', 'LOFD', 'RAD', 'LAD', 'RAHCD', 'RPHCD', 'RID',
+                      'LID', 'RMCD', 'LMCD', 'RPTD', 'LPTD', 'RACD', 'LACD']:
+            assert label in areas.label.values
+
+        for n, area in enumerate(areas.area):
+            assert area == n + 1
+
     @pytest.mark.parametrize('scheme', ['bipolar', 'monopolar', 'invalid'])
     def test_from_jacksheet(self, scheme):
         jfile = datafile('simple_jacksheet.txt')
