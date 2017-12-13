@@ -1,6 +1,15 @@
 Changes
 =======
 
+Version 1.2.1
+-------------
+
+**2017-12-13**
+
+* Automated setting surface areas by reading from a file
+* Taught ``ElectrodeConfig`` objects how to output to CSV and binary files
+
+
 Version 1.2.0
 -------------
 
