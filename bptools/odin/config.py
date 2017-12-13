@@ -63,12 +63,10 @@ def make_config_name(subject, localization, montage, stim):
     return name.upper()
 
 
-def make_odin_config(jacksheet_filename, config_name, default_surface_area,
+def make_odin_config(jacksheet_filename, config_name, area,
                      path=None, stim_channels=None, good_leads=None,
                      scheme='bipolar', format='csv'):
     """Create an Odin ENS electrode configuration file.
-
-    .. todo:: Merge into ElectrodeConfig class as a method.
 
     Parameters
     ----------
@@ -76,12 +74,14 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
         Input jacksheet filename.
     config_name : str
         Configuration file name.
-    default_surface_area : float
-        Default surface area for electrodes.
+    area : float or str
+        Default surface area for electrodes if a float, or path to surface area
+        file if a str (see :meth:`ElectrodeConfig.read_area_file`).
     path : str
-        Directory to write file to. If None, return as a string.
-    stim_channels : List[StimChannel]
-        A list of stim channel specifications.
+        Directory to write file to. If None, return as a string. The filename
+        will be determined automatically.
+    stim_channels : List[Tuple[str, str]]
+        A list of stim channel (anode label, cathode label) tuples.
     good_leads : list or None
         Jackbox numbers to use when configuring sense channels. This is usually
         determined from the ``good_leads.txt`` file. When None, use all.
@@ -100,93 +100,28 @@ def make_odin_config(jacksheet_filename, config_name, default_surface_area,
     as type of electrode (depth, grid, strip) and surface areas.
 
     """
-    assert isinstance(default_surface_area, float)
-    assert scheme in ['bipolar', 'monopolar'], "invalid referencing scheme"
-    assert format in ['csv', 'bin'], "format must be csv or bin"
-
-    delimiter = b',' if format == 'csv' else b'~'
-    newline = b'\n' if format == 'csv' else b'|'
-
-    def iencode(number):
-        if format == 'csv':
-            return str(number).encode()
-        else:
-            return struct.pack('<h', number)
-
-    def fencode(number):
-        if format == 'csv':
-            return "{:.03f}".format(number).encode()
-        else:
-            return struct.pack('<f', number)
-
-    def delimit(string):
-        if format == 'bin':
-            return string.replace(',', '~').encode()
-        else:
-            return string.encode()
-
-    js = read_jacksheet(jacksheet_filename)
-
-    if scheme == 'bipolar':
-        pairs = create_pairs(jacksheet_filename)
-    elif scheme == 'monopolar':
-        pairs = create_monopolar_pairs(jacksheet_filename)
-
     subject, name = config_name.split('_')
+    ec = ElectrodeConfig.from_jacksheet(jacksheet_filename, subject, scheme, area)
+    ec.name = name
 
-    # Header
-    config = [
-        delimit("ODINConfigurationVersion:,#1.2#"),
-        delimit("ConfigurationName:," + name),
-        delimit("SubjectID:," + subject),
-        b"Contacts:",
-    ]
-
-    # Channel definitions
-    for n, row in js.iterrows():
-        jbox_num = n
-        chan = _num_to_bank_label(jbox_num)
-        data = [row.label.encode(), iencode(jbox_num), iencode(jbox_num),
-                fencode(default_surface_area),  # FIXME: allow input to set this
-                "#Electrode {} jack box {}#".format(chan, jbox_num).encode()]
-        config.append(delimiter.join(data))
-
-    # Sense definitions
-    config.append(b"SenseChannelSubclasses:")
-    config.append(b"SenseChannels:")
-    for _, row in pairs.iterrows():
-        if good_leads is not None:
-            if row.contact1 not in good_leads:
-                continue
-            if row.contact2 not in good_leads and scheme != "monopolar":
-                continue
-        data = [row.label1.encode(), row.pair.replace('-', '').encode(),
-                iencode(row.contact1), iencode(row.contact2), b'x',
-                "#{}#".format(row.pair).encode()]
-        config.append(delimiter.join(data))
-
-    # Stim definitions
-    config.append(b"StimulationChannelSubclasses:")
-    config.append(b"StimulationChannels:")
     if stim_channels is not None:
         for channel in stim_channels:
-            entry = channel.config_entry if format == 'csv' else channel.config_entry_bin
-            config.append(entry)
+            ec.add_stim_channel(*channel)
 
-    # Footer
+    if good_leads is not None:
+        new_sense_channels = []
+        for c in ec.sense_channels:
+            ref = c.ref if scheme == 'bipolar' else c.contact
+            if c.contact in good_leads and ref in good_leads:
+                new_sense_channels.append(c)
+        ec.sense_channels = new_sense_channels
+
+    outfile = None if path is None else osp.join(path, config_name) + '.' + format
+
     if format == 'csv':
-        config.append(b"REF:,0,Common")
+        return ec.to_csv(outfile)
     else:
-        config.append(b"REF:~\x00\x00~Common")
-    config.append(b'EOF')
-
-    if path is not None:
-        outfile = osp.join(path, config_name + '.' + format)
-        with open(outfile, 'wb') as f:
-            f.write(newline.join(config))
-            f.write(newline)
-    else:
-        return newline.join(config)
+        return ec.to_bin(outfile)
 
 
 class _SlotsMixin(object):
@@ -195,12 +130,6 @@ class _SlotsMixin(object):
             getattr(self, slot) == getattr(other, slot)
             for slot in self.__class__.__slots__
         ])
-
-    def __str__(self):
-        repr = []
-        for slot in self.__class__.__slots__:
-            repr.append("{}={}".format(slot, getattr(self, slot)))
-        return "<{} {}>".format(self.__class__.__name__, ', '.join(repr))
 
     def keys(self):
         """Return all the slot names."""
