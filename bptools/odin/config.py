@@ -260,10 +260,6 @@ class ElectrodeConfig(object):
         self.sense_channels = []  # type: List[SenseChannel]
         self.stim_channels = []  # type: List[StimChannel]
 
-        # Jacksheet contents (populated when created with from_jacksheet)
-        # FIXME: create when reading from existing config, too
-        self._jacksheet = None  # type: pd.DataFrame
-
         # Paths to config files
         self._csv_file = None  # type: str
         self._bin_file = None  # type: str
