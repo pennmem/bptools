@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from datetime import datetime
+import functools
 from io import StringIO
 import os.path as osp
 import struct
@@ -215,6 +216,9 @@ class Contact(FromSeriesMixin, _SlotsMixin):
         self.area = area  # type: float
         self.description = description  # type: str
 
+    def __str__(self):
+        return "Contact(label={}, port={})".format(self.label, self.port)
+
 
 class SenseChannel(FromSeriesMixin, _SlotsMixin):
     """Data for a configured sense channel. This consists of two contacts: the
@@ -229,6 +233,9 @@ class SenseChannel(FromSeriesMixin, _SlotsMixin):
         self.ref = ref  # type: int
         self.description = description  # type: str
 
+    def __str__(self):
+        return "SenseChannel(label={}, contact={}, ref={})".format(self.label, self.contact, self.ref)
+
     @property
     def label(self):
         return self.name
@@ -242,6 +249,9 @@ class StimChannel(FromSeriesMixin, _SlotsMixin):
         self.name = name  # type: str
         self.anode = anode  # type: int
         self.cathode = cathode  # type: int
+
+    def __str__(self):
+        return "StimChannel(label={}, anode={}, cathode={})".format(self.label, self.anode, self.cathode)
 
     @property
     def label(self):
@@ -319,6 +329,10 @@ class ElectrodeConfig(object):
         self.contacts = []  # type: List[Contact]
         self.sense_channels = []  # type: List[SenseChannel]
         self.stim_channels = []  # type: List[StimChannel]
+
+        # Jacksheet contents (populated when created with from_jacksheet)
+        # FIXME: create when reading from existing config, too
+        self._jacksheet = None  # type: pd.DataFrame
 
         # Paths to config files
         self._csv_file = None  # type: str
@@ -422,6 +436,7 @@ class ElectrodeConfig(object):
         js = read_jacksheet(filename)
         config = ElectrodeConfig()
         config.subject = subject
+        config._jacksheet = js
 
         if isinstance(area, str):
             area_map = cls.read_area_file(area)
@@ -551,6 +566,90 @@ class ElectrodeConfig(object):
                 for stim_channel in self.stim_channels:
                     stim_channel.name = standardize_label(stim_channel.name)
 
+    @staticmethod
+    def _iencode(number, format):
+        if format == 'csv':
+            return str(number).encode()
+        else:
+            return struct.pack('<h', number)
+
+    @staticmethod
+    def _fencode(number, format):
+        if format == 'csv':
+            return "{:.03f}".format(number).encode()
+        else:
+            return struct.pack('<f', number)
+
+    @staticmethod
+    def _delimit(string, format):
+        if format == 'bin':
+            return string.replace(',', '~').encode()
+        else:
+            return string.encode()
+
+    def _export(self, format):
+        """Creates configuration data to be used by Ramulator and the ENS.
+
+        Parameters
+        ----------
+        format : str
+            ``'csv'`` or ``'bin'`` to generate CSV or binary format respectively
+
+        Returns
+        -------
+        config : bytes
+            Configuration data as bytes.
+
+        """
+        iencode = functools.partial(self._iencode, format=format)
+        fencode = functools.partial(self._fencode, format=format)
+        delimit = functools.partial(self._delimit, format=format)
+        delimiter = b',' if format == 'csv' else b'~'
+        newline = b'\n' if format == 'csv' else b'|'
+
+        # Header
+        config = [
+            delimit("ODINConfigurationVersion:,#1.2#"),
+            delimit("ConfigurationName:," + self.name),
+            delimit("SubjectID:," + self.subject),
+            b"Contacts:",
+        ]
+
+        # Channel definitions
+        for n, contact in enumerate(self.contacts):
+            jbox_num = n + 1
+            chan = _num_to_bank_label(jbox_num)
+            data = [contact.label.encode(), iencode(jbox_num), iencode(jbox_num),
+                    fencode(contact.area),
+                    "#Electrode {} jack box {}#".format(chan, jbox_num).encode()]
+            config.append(delimiter.join(data))
+
+        # Sense definitions
+        config.append(b"SenseChannelSubclasses:")
+        config.append(b"SenseChannels:")
+        for chan in self.sense_channels:
+            # <contact 1 label>,<sense channel label>,<contact 1 #>,<contact 2 #>,x,#description#
+            data = [self.contacts[chan.contact].label.encode(), chan.label.encode(),
+                    iencode(chan.contact), iencode(chan.ref), b'x',
+                    chan.description.encode()]
+            config.append(delimiter.join(data))
+
+        # Stim definitions
+        config.append(b"StimulationChannelSubclasses:")
+        config.append(b"StimulationChannels:")
+        for channel in self.stim_channels:
+            entry = channel.config_entry if format == 'csv' else channel.config_entry_bin
+            config.append(entry)
+
+        # Footer
+        if format == 'csv':
+            config.append(b"REF:,0,Common")
+        else:
+            config.append(b"REF:~\x00\x00~Common")
+        config.append(b'EOF')
+
+        return newline.join(config)
+
     def to_csv(self, outfile=None):
         """Export as an Odin CSV electrode configuration file.
 
@@ -563,22 +662,35 @@ class ElectrodeConfig(object):
         -------
         ``str`` if outfile is ``None`` else ``None`` and writes to ``outfile``.
 
-        Notes
-        -----
-        For now, this only works if the configuration was generated from an
-        existing CSV file.
+        """
+        config = self._export('csv')
+        if outfile is None:
+            return config.decode()
+        else:
+            with open(outfile, 'wb') as f:
+                f.write(config)
+            return None
+
+    def to_bin(self, outfile=None):
+        """Export as an Odin binary electrode configuration file.
+
+        Parameters
+        ----------
+        outfile : str
+            Name of the output file.
+
+        Returns
+        -------
+        ``bytes`` if outfile is ``None`` else ``None`` and writes to ``outfile``.
 
         """
-        assert self._csv_file is not None, "TODO: implement more general to_csv"
-
-        with open(self._csv_file, 'r') as f:
-            config = f.read()
-
+        config = self._export('bin')
         if outfile is None:
             return config
         else:
-            with open(outfile, 'w') as f:
+            with open(outfile, 'wb') as f:
                 f.write(config)
+            return None
 
     def contacts_as_recarray(self):
         """Return the monopolar contacts as a recarry.

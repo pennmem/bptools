@@ -227,7 +227,6 @@ class TestElectrodeConfig:
         for n, area in enumerate(areas.area):
             assert area == n + 1
 
-    @pytest.mark.only
     @pytest.mark.parametrize('scheme', ['bipolar', 'monopolar', 'invalid'])
     @pytest.mark.parametrize('area', [0.5, resource_filename('bptools.test.data', 'simple_area.txt')])
     def test_from_jacksheet(self, scheme, area):
@@ -257,21 +256,18 @@ class TestElectrodeConfig:
                 area_ = areas[areas.label == electrode].area
                 assert all(area_ == contact.area)
 
-    def test_to_csv(self, tmpdir):
-        basename = "R1308T_14JUN2017L0M0STIM.csv"
-        filename = datafile(basename)
-        ec = ElectrodeConfig(filename)
-        stringy = ec.to_csv()
+    @pytest.mark.parametrize('format', ['csv', 'bin'])
+    def test_export(self, format):
+        jfile = datafile('simple_jacksheet.txt')
+        scheme = 'bipolar'
+        area = 0.5
+        ec = ElectrodeConfig.from_jacksheet(jfile, 'R0000X', scheme, area)
 
-        with open(filename, 'r') as original:
-            assert stringy == original.read()
-
-        outfile = str(tmpdir.join(basename))
-        ec.to_csv(outfile=outfile)
-
-        with open(filename, 'r') as original:
-            with open(outfile, 'r') as new:
-                assert new.read() == original.read()
+        # FIXME: add stim channels, compare with existing
+        if format == 'csv':
+            print(ec.to_csv())
+        else:
+            print(ec.to_bin())
 
     def test_contacts_as_recarray(self):
         ec = ElectrodeConfig.from_jacksheet(datafile("simple_jacksheet.txt"))
