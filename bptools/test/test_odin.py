@@ -154,7 +154,7 @@ def test_cli():
 class TestSlotsMixin:
     def test_str(self):
         contact = Contact("x", 0, 1, "description")
-        assert str(contact) == "<Contact label=x, port=0, area=1, description=description>"
+        assert str(contact) == "Contact(label=x, port=0)"
 
     def test_keys(self):
         contact = Contact("x", 0, 1, "description")
@@ -259,16 +259,31 @@ class TestElectrodeConfig:
 
     @pytest.mark.parametrize('format', ['csv', 'bin'])
     def test_export(self, format):
-        jfile = datafile('simple_jacksheet.txt')
+        jfile = datafile('R1347D_jacksheet.txt')
         scheme = 'bipolar'
-        area = 0.5
-        ec = ElectrodeConfig.from_jacksheet(jfile, 'R0000X', scheme, area)
+        area = 0.001
+        ec = ElectrodeConfig.from_jacksheet(jfile, 'R1347D', scheme, area)
+        ec.name = '8DEC2017L0M0STIM'
 
-        # FIXME: add stim channels, compare with existing
+        anodes = ['LAD8', 'LPHCD8', 'LAHCD9', 'RAD8', 'LOFD8', 'RPHCD8']
+        cathodes = ['LAD9', 'LPHCD9', 'LAHCD10', 'RAD9', 'LOFD9', 'RPHCD9']
+        for args in zip(anodes, cathodes):
+            ec.add_stim_channel(*args)
+
         if format == 'csv':
-            print(ec.to_csv())
+            with open(datafile("R1347D_8DEC2017L0M0STIM.csv"), 'r') as f:
+                ref = f.read().split()
+                new = ec.to_csv().split()
+                for n, line in enumerate(ref):
+                    assert line == new[n]
         else:
-            print(ec.to_bin())
+            with open(datafile('R1347D_8DEC2017L0M0STIM_bipolar.bin'), 'rb') as f:
+                ref = f.read().split(b'|')
+                new = ec.to_bin().split(b'|')
+                for n, line in enumerate(ref):
+                    if len(line) == 0:
+                        break
+                    assert line == new[n]
 
     def test_contacts_as_recarray(self):
         ec = ElectrodeConfig.from_jacksheet(datafile("simple_jacksheet.txt"))

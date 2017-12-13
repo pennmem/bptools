@@ -283,7 +283,7 @@ class StimChannel(FromSeriesMixin, _SlotsMixin):
 
         """
         return b'|'.join([
-            'StimChannel:~{:s}~x~# #'.format(self.name).encode(),
+            'StimChannel:~{:s}~x~##'.format(self.name).encode(),
             b'Anodes:~' + struct.pack('<h', self.anode) + b'~#',
             b'Cathodes:~' + struct.pack('<h', self.cathode) + b'~#'
         ])
@@ -659,9 +659,9 @@ class ElectrodeConfig(object):
         config.append(b"SenseChannels:")
         for chan in self.sense_channels:
             # <contact 1 label>,<sense channel label>,<contact 1 #>,<contact 2 #>,x,#description#
-            data = [self.contacts[chan.contact].label.encode(), chan.label.encode(),
+            data = [self.contacts[chan.contact - 1].label.encode(), chan.label.encode(),
                     iencode(chan.contact), iencode(chan.ref), b'x',
-                    chan.description.encode()]
+                    '#{}#'.format(chan.description).encode()]
             config.append(delimiter.join(data))
 
         # Stim definitions
