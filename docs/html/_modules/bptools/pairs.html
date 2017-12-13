@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bptools.pairs &mdash; bptools 1.2.0 documentation</title>
+  <title>bptools.pairs &mdash; bptools 1.2.1 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="bptools 1.2.0 documentation" href="../../index.html"/>
+    <link rel="top" title="bptools 1.2.1 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -239,10 +239,11 @@
                     <span class="k">break</span>
                 <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span> <span class="o">=</span> <span class="n">_mux_filter</span><span class="p">(</span><span class="n">el</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">el</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
 
-            <span class="k">if</span> <span class="n">c1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">[</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contacts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">[</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contacts</span> <span class="ow">and</span> <span class="p">[</span><span class="n">c2</span><span class="p">,</span> <span class="n">c1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contacts</span><span class="p">:</span>
                 <span class="n">contacts</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">])</span>
 
-    <span class="k">return</span> <span class="n">_contacts_to_dataframe</span><span class="p">(</span><span class="n">jacksheet</span><span class="p">,</span> <span class="n">contacts</span><span class="p">)</span></div>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">_contacts_to_dataframe</span><span class="p">(</span><span class="n">jacksheet</span><span class="p">,</span> <span class="n">contacts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
 
 
 <div class="viewcode-block" id="create_monopolar_pairs"><a class="viewcode-back" href="../../index.html#bptools.pairs.create_monopolar_pairs">[docs]</a><span class="k">def</span> <span class="nf">create_monopolar_pairs</span><span class="p">(</span><span class="n">jacksheet_filename</span><span class="p">,</span> <span class="n">common_ref</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -470,7 +471,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.2.0',
+            VERSION:'1.2.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

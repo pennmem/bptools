@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bptools &mdash; bptools 1.2.0 documentation</title>
+  <title>bptools &mdash; bptools 1.2.1 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="bptools 1.2.0 documentation" href="#"/> 
+    <link rel="top" title="bptools 1.2.1 documentation" href="#"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -98,7 +98,7 @@
 <li><a class="reference internal" href="#api-reference">API reference</a><ul>
 <li><a class="reference internal" href="#module-bptools.jacksheet">Jacksheet utilities</a></li>
 <li><a class="reference internal" href="#module-bptools.pairs">Pair creation tools</a></li>
-<li><a class="reference internal" href="#module-bptools.odin.config">Odin ENS configuration</a></li>
+<li><a class="reference internal" href="#odin-ens-configuration">Odin ENS configuration</a></li>
 <li><a class="reference internal" href="#bipolar-transformation-utilities">Bipolar transformation utilities</a></li>
 </ul>
 </li>
@@ -172,6 +172,13 @@
 <p>EEG bipolar montage helpers.</p>
 <div class="section" id="electrode-config-generation">
 <h2>Electrode config generation<a class="headerlink" href="#electrode-config-generation" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The CLI described below is considered deprecated as of 2017-12-13. The recommended
+way of generating electrode configuration files is via the <code class="docutils literal"><span class="pre">ramutils</span></code>
+package which uses the <code class="xref py py-mod docutils literal"><span class="pre">bptools</span></code> API internally. This user interface
+may be removed entirely in future releases in favor of using the API only.</p>
+</div>
 <p>Electrode configuration CSV files can be generated for the Medtronic Odin ENS
 using the CLI tool provided in <code class="xref py py-mod docutils literal"><span class="pre">bptools.odin</span></code>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">bptools</span><span class="o">.</span><span class="n">odin</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">scheme</span> <span class="p">{</span><span class="n">bipolar</span><span class="p">,</span><span class="n">monopolar</span><span class="p">}]</span>
@@ -428,9 +435,17 @@ keyword argument is also required.</li>
 </dd></dl>
 
 </div>
-<div class="section" id="module-bptools.odin.config">
-<span id="odin-ens-configuration"></span><h3>Odin ENS configuration<a class="headerlink" href="#module-bptools.odin.config" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<div class="section" id="odin-ens-configuration">
+<h3>Odin ENS configuration<a class="headerlink" href="#odin-ens-configuration" title="Permalink to this headline">¶</a></h3>
+<p>The general workflow for creating electrode configuration files:</p>
+<ul class="simple">
+<li>Create a <code class="xref py py-class docutils literal"><span class="pre">bptools.odin.ElectrodeConfig</span></code> object using its
+<code class="xref py py-func docutils literal"><span class="pre">from_jacksheet()</span></code> method: <code class="docutils literal"><span class="pre">ec</span> <span class="pre">=</span> <span class="pre">ElectrodeConfig.from_jacksheet(path_to_jacksheet_file)</span></code></li>
+<li>Populate stim channels: <code class="docutils literal"><span class="pre">ec.add_stim_channel('LA1',</span> <span class="pre">'LA2')</span></code></li>
+<li>Save as CSV: <code class="docutils literal"><span class="pre">ec.to_csv(path_to_csv_file)</span></code></li>
+<li>Save as binary: <code class="docutils literal"><span class="pre">ec.to_bin(path_to_csv_file</span></code></li>
+</ul>
+<span class="target" id="module-bptools.odin.config"></span><dl class="class">
 <dt id="bptools.odin.config.Contact">
 <em class="property">class </em><code class="descclassname">bptools.odin.config.</code><code class="descname">Contact</code><span class="sig-paren">(</span><em>label</em>, <em>port</em>, <em>area</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#Contact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.Contact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Data about a configured contact.</p>
@@ -481,6 +496,24 @@ the same directory.</li>
 <li>description - str</li>
 </ul>
 <dl class="method">
+<dt id="bptools.odin.config.ElectrodeConfig.add_stim_channel">
+<code class="descname">add_stim_channel</code><span class="sig-paren">(</span><em>anode_label</em>, <em>cathode_label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig.add_stim_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.add_stim_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append a new stim channel to the list of existing stim channels.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>anode_label</strong> (<em>str</em>) – </li>
+<li><strong>cathode_label</strong> (<em>str</em>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="bptools.odin.config.ElectrodeConfig.contacts_as_recarray">
 <code class="descname">contacts_as_recarray</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig.contacts_as_recarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.contacts_as_recarray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the monopolar contacts as a recarry.</p>
@@ -499,7 +532,9 @@ the same directory.</li>
 <li><strong>filename</strong> (<em>str</em>) – Path to jacksheet file.</li>
 <li><strong>subject</strong> (<em>str</em>) – Subject ID</li>
 <li><strong>scheme</strong> (<em>str</em>) – Referencing scheme to use (<code class="docutils literal"><span class="pre">bipolar</span></code> or <code class="docutils literal"><span class="pre">monopolar</span></code>).</li>
-<li><strong>area</strong> (<em>float</em>) – Default surface area to use in mm^2.</li>
+<li><strong>area</strong> (<em>float</em><em> or </em><em>str</em>) – Default surface area to use in mm^2 when a float or a file that
+maps electrode labels to surface areas (see <a class="reference internal" href="#bptools.odin.config.ElectrodeConfig.read_area_file" title="bptools.odin.config.ElectrodeConfig.read_area_file"><code class="xref py py-meth docutils literal"><span class="pre">read_area_file()</span></code></a>
+for file format details).</li>
 </ul>
 </td>
 </tr>
@@ -531,6 +566,43 @@ the same directory.</li>
 <dd><p>Return the number of configured stim channels.</p>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="bptools.odin.config.ElectrodeConfig.read_area_file">
+<em class="property">static </em><code class="descname">read_area_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig.read_area_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.read_area_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a file that maps electrode labels to surface areas (see notes
+below).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – Path to file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A dataframe containing the columns <code class="docutils literal"><span class="pre">label</span></code> and <code class="docutils literal"><span class="pre">area</span></code>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Contact surface areas will be read in from the file with the following
+format:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">electrode</span> <span class="n">label</span> <span class="mi">1</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">surface</span> <span class="n">area</span> <span class="ow">in</span> <span class="n">mm</span><span class="o">^</span><span class="mi">2</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">electrode</span> <span class="n">label</span> <span class="mi">2</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">surface</span> <span class="n">area</span> <span class="ow">in</span> <span class="n">mm</span><span class="o">^</span><span class="mi">2</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Electrode labels are everything preceding the specific contact number,
+so <code class="docutils literal"><span class="pre">LA1</span></code>, <code class="docutils literal"><span class="pre">LA2</span></code>, etc. would use <code class="docutils literal"><span class="pre">LA</span></code> as the electrode label. This
+assumes that in electrodes that combine contacts of different sizes that
+each uniquely sized contact has a different labeling prefix. In other
+words, if the <code class="docutils literal"><span class="pre">LA</span></code> lead contains both micro and macro contacts, the
+jacksheet should be updated to label the micros with something like
+<code class="docutils literal"><span class="pre">uLA</span></code> so that the surface area file could contain lines like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">LA</span> <span class="mi">1</span>
+<span class="n">uLA</span> <span class="mf">0.01</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <dl class="method">
 <dt id="bptools.odin.config.ElectrodeConfig.read_config_file">
 <code class="descname">read_config_file</code><span class="sig-paren">(</span><em>filename</em>, <em>standardize_labels=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig.read_config_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.read_config_file" title="Permalink to this definition">¶</a></dt>
@@ -553,6 +625,24 @@ the same directory.</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="bptools.odin.config.ElectrodeConfig.to_bin">
+<code class="descname">to_bin</code><span class="sig-paren">(</span><em>outfile=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig.to_bin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.to_bin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export as an Odin binary electrode configuration file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>outfile</strong> (<em>str</em>) – Name of the output file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">bytes</span></code> if outfile is <code class="docutils literal"><span class="pre">None</span></code> else <code class="docutils literal"><span class="pre">None</span></code> and writes to <code class="docutils literal"><span class="pre">outfile</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="bptools.odin.config.ElectrodeConfig.to_csv">
 <code class="descname">to_csv</code><span class="sig-paren">(</span><em>outfile=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#ElectrodeConfig.to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.ElectrodeConfig.to_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Export as an Odin CSV electrode configuration file.</p>
@@ -568,9 +658,6 @@ the same directory.</li>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>For now, this only works if the configuration was generated from an
-existing CSV file.</p>
 </dd></dl>
 
 </dd></dl>
@@ -642,7 +729,7 @@ primary contact and the reference contact.</p>
 
 <dl class="function">
 <dt id="bptools.odin.config.make_odin_config">
-<code class="descclassname">bptools.odin.config.</code><code class="descname">make_odin_config</code><span class="sig-paren">(</span><em>jacksheet_filename</em>, <em>config_name</em>, <em>default_surface_area</em>, <em>path=None</em>, <em>stim_channels=None</em>, <em>good_leads=None</em>, <em>scheme='bipolar'</em>, <em>format='csv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#make_odin_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.make_odin_config" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">bptools.odin.config.</code><code class="descname">make_odin_config</code><span class="sig-paren">(</span><em>jacksheet_filename</em>, <em>config_name</em>, <em>area</em>, <em>path=None</em>, <em>stim_channels=None</em>, <em>good_leads=None</em>, <em>scheme='bipolar'</em>, <em>format='csv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bptools/odin/config.html#make_odin_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bptools.odin.config.make_odin_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an Odin ENS electrode configuration file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -651,9 +738,11 @@ primary contact and the reference contact.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>jacksheet_filename</strong> (<em>str</em>) – Input jacksheet filename.</li>
 <li><strong>config_name</strong> (<em>str</em>) – Configuration file name.</li>
-<li><strong>default_surface_area</strong> (<em>float</em>) – Default surface area for electrodes.</li>
-<li><strong>path</strong> (<em>str</em>) – Directory to write file to. If None, return as a string.</li>
-<li><strong>stim_channels</strong> (<em>List</em><em>[</em><a class="reference internal" href="#bptools.odin.config.StimChannel" title="bptools.odin.config.StimChannel"><em>StimChannel</em></a><em>]</em>) – A list of stim channel specifications.</li>
+<li><strong>area</strong> (<em>float</em><em> or </em><em>str</em>) – Default surface area for electrodes if a float, or path to surface area
+file if a str (see <a class="reference internal" href="#bptools.odin.config.ElectrodeConfig.read_area_file" title="bptools.odin.config.ElectrodeConfig.read_area_file"><code class="xref py py-meth docutils literal"><span class="pre">ElectrodeConfig.read_area_file()</span></code></a>).</li>
+<li><strong>path</strong> (<em>str</em>) – Directory to write file to. If None, return as a string. The filename
+will be determined automatically.</li>
+<li><strong>stim_channels</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em>) – A list of stim channel (anode label, cathode label) tuples.</li>
 <li><strong>good_leads</strong> (<em>list</em><em> or </em><em>None</em>) – Jackbox numbers to use when configuring sense channels. This is usually
 determined from the <code class="docutils literal"><span class="pre">good_leads.txt</span></code> file. When None, use all.</li>
 <li><strong>scheme</strong> (<em>str</em>) – Referencing scheme to use (<code class="docutils literal"><span class="pre">bipolar</span></code> or <code class="docutils literal"><span class="pre">monopolar</span></code>).</li>
@@ -1019,7 +1108,7 @@ because there is not transformation to be made</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.2.0',
+            VERSION:'1.2.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

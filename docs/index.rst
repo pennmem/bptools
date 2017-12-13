@@ -7,6 +7,13 @@ EEG bipolar montage helpers.
 Electrode config generation
 ---------------------------
 
+.. warning::
+
+    The CLI described below is considered deprecated as of 2017-12-13. The recommended
+    way of generating electrode configuration files is via the ``ramutils``
+    package which uses the :mod:`bptools` API internally. This user interface
+    may be removed entirely in future releases in favor of using the API only.
+
 Electrode configuration CSV files can be generated for the Medtronic Odin ENS
 using the CLI tool provided in :mod:`bptools.odin`::
 
@@ -89,6 +96,14 @@ Pair creation tools
 
 Odin ENS configuration
 ^^^^^^^^^^^^^^^^^^^^^^
+
+The general workflow for creating electrode configuration files:
+
+* Create a :class:`bptools.odin.ElectrodeConfig` object using its
+  :func:`from_jacksheet` method: ``ec = ElectrodeConfig.from_jacksheet(path_to_jacksheet_file)``
+* Populate stim channels: ``ec.add_stim_channel('LA1', 'LA2')``
+* Save as CSV: ``ec.to_csv(path_to_csv_file)``
+* Save as binary: ``ec.to_bin(path_to_csv_file``
 
 .. automodule:: bptools.odin.config
     :members:
