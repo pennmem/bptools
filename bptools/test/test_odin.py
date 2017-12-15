@@ -15,7 +15,6 @@ from bptools.odin.config import (
 )
 from bptools.odin import cli
 from bptools.odin.confgrep import get_odin_config_path
-from bptools.odin.config import StimChannel
 from bptools.test import datafile, tempdir, HERE
 
 
@@ -210,9 +209,12 @@ class TestElectrodeConfig:
         areas = ElectrodeConfig.read_area_file(filename)
         assert len(areas) == 16
 
-        for label in ['ROFD', 'LOFD', 'RAD', 'LAD', 'RAHCD', 'RPHCD', 'RID',
-                      'LID', 'RMCD', 'LMCD', 'RPTD', 'LPTD', 'RACD', 'LACD']:
+        labels = ['ROFD', 'LOFD', 'RAD', 'LAD', 'RAHCD', 'RPHCD', 'RID', 'LID',
+                  'RMCD', 'LMCD', 'RPTD', 'LPTD', 'RACD', 'LACD']
+
+        for label in labels:
             assert label in areas.label.values
+            assert len(areas[areas.label == label].area) == 1
 
         for n, area in enumerate(areas.area):
             assert area == n + 1

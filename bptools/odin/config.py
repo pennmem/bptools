@@ -366,7 +366,7 @@ class ElectrodeConfig(object):
 
         if isinstance(area, str):
             area_map = cls.read_area_file(area)
-            areas = [area_map[area_map.label == row.electrode].area
+            areas = [area_map[area_map.label == row.electrode].area.values[0]
                      for _, row in js.iterrows()]
         else:
             areas = [area] * len(js)
