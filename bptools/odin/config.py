@@ -13,7 +13,7 @@ except ImportError:  # pragma: no cover
 import numpy as np
 import pandas as pd
 
-from bptools.exc import ContactNotFoundError
+from bptools.exc import ContactNotFoundError, InvalidAreaFileError
 from bptools.jacksheet import read_jacksheet
 from bptools.pairs import create_pairs, create_monopolar_pairs
 from bptools.util import FromSeriesMixin, standardize_label
@@ -307,7 +307,7 @@ class ElectrodeConfig(object):
 
         Returns
         -------
-        pd.DataFrame
+        area_map : pd.DataFrame
             A dataframe containing the columns ``label`` and ``area``.
 
         Notes
@@ -335,7 +335,14 @@ class ElectrodeConfig(object):
             areas = []
             for label, area in lines:
                 areas.append({'label': label.strip(), 'area': float(area)})
-            return pd.DataFrame(areas)
+            area_map = pd.DataFrame(areas)
+
+            # Validate that a label is only found once
+            for label in area_map.label.unique():
+                if len(area_map[area_map.label == label]) != 1:
+                    raise InvalidAreaFileError("Repeated labels found in surface area file")
+
+            return area_map
 
     @classmethod
     def from_jacksheet(cls, filename, subject="", scheme='bipolar', area=0.5):
@@ -366,8 +373,10 @@ class ElectrodeConfig(object):
 
         if isinstance(area, str):
             area_map = cls.read_area_file(area)
-            areas = [area_map[area_map.label == row.electrode].area.values[0]
-                     for _, row in js.iterrows()]
+            areas = [
+                area_map[area_map.label == row.electrode].area.values[0]
+                for _, row in js.iterrows()
+            ]
         else:
             areas = [area] * len(js)
 

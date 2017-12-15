@@ -214,10 +214,13 @@ class TestElectrodeConfig:
 
         for label in labels:
             assert label in areas.label.values
-            assert len(areas[areas.label == label].area) == 1
 
         for n, area in enumerate(areas.area):
             assert area == n + 1
+
+        with pytest.raises(InvalidAreaFileError):
+            filename = resource_filename('bptools.test.data', 'bad_area.txt')
+            ElectrodeConfig.read_area_file(filename)
 
     @pytest.mark.parametrize('scheme', ['bipolar', 'monopolar', 'invalid'])
     @pytest.mark.parametrize('area', [0.5, resource_filename('bptools.test.data', 'simple_area.txt')])
