@@ -1,6 +1,16 @@
 Changes
 =======
 
+Version 1.2.2
+-------------
+
+**2017-12-15**
+
+* Added simple validation for surface area files.
+* Fixed bug where surface areas could be pandas ``Series`` objects rather than
+  floats.
+
+
 Version 1.2.1
 -------------
 
