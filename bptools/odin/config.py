@@ -611,6 +611,7 @@ class ElectrodeConfig(object):
         else:
             config.append(b"REF:~\x00\x00~Common")
         config.append(b'EOF')
+        config.append(b'')
 
         return newline.join(config)
 
