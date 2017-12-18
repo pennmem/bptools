@@ -1,6 +1,14 @@
 Changes
 =======
 
+Version 1.2.3
+-------------
+
+**2017-12-18**
+
+* Bugfix release to add a newline character after ``EOF`` in the binary config
+  file.
+
 Version 1.2.2
 -------------
 
