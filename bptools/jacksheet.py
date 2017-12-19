@@ -2,7 +2,7 @@ import pandas as pd
 from bptools.util import standardize_label
 
 
-def read_jacksheet(filename, ignore_ecg=True, standardize_labels=True):
+def read_jacksheet(filename, ignore_ecg=True, standardize_labels=False):
     """Utility function to read a jacksheet.
 
     Parameters
