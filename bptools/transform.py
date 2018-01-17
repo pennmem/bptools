@@ -388,7 +388,7 @@ class SeriesTransformation(object):
             except IndexError:
                 pass
 
-        contacts = self.elec_conf.contacts
+        contacts = sorted(list(self.elec_conf.contacts.values()), key=lambda c: c.port)
         contact_labels = [contact.label for contact in contacts]
 
         contacts_recarray = self.elec_conf.contacts_as_recarray()
