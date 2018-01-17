@@ -38,21 +38,18 @@ class SeriesTransformation(object):
         It also initializes transformation matrices (if possible) and configures bp_pairs-related variables
         that will be used in the ens_data_array -> monopolar or ens_data_array -> bipolar
 
+        FIXME: why aren't we just initializing in __init__???
+
         :param electrode_config_file: {str} path to electrode configuration file
         :return: None
         """
-
         st_obj = cls()
         electrode_config_file = abspath(electrode_config_file)
-        electrode_config_file_core, ext = splitext(electrode_config_file)
-        electrode_config_file_csv = electrode_config_file_core + '.csv'
 
         elec_conf = ElectrodeConfig(electrode_config_file)
-        # TODO check if we always have to include C/R in the electrode list
         st_obj.elec_conf = elec_conf
 
         # first we determine whether bipolar to monopolar transformation is possible
-
         # initializing  bipolar_2_monopolar_matrix - if possible
         st_obj.bipolar_to_monopolar_matrix = st_obj.monopolar_trans_matrix_via_inverse()
 

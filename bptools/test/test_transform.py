@@ -4,7 +4,6 @@ import unittest
 import h5py
 import numpy as np
 from numpy.testing import assert_array_almost_equal
-from pkg_resources import resource_filename
 import pytest
 
 from bptools.pairs import read_montage_json
@@ -130,7 +129,7 @@ class TestSeriesTransformation(unittest.TestCase):
         assert st.bipolar_possible(), 'Expected that bipolar model will be possible'
 
         # monopolar but without montage
-        elec_csv_abspath = osp.join(local_data_dir, 'R1308T_R1308T08JUNE2017NOSTIM.csv')
+        elec_csv_abspath = osp.join(self.data_dir, 'R1308T_14JUN2017L0M0STIM.csv')
 
         st = SeriesTransformation.create(elec_csv_abspath)
         assert st.monopolar_possible(), 'Expected that monopolar model will be impossible'
