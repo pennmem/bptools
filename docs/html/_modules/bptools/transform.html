@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bptools.transform &mdash; bptools 1.2.1 documentation</title>
+  <title>bptools.transform &mdash; bptools 1.3.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="bptools 1.2.1 documentation" href="../../index.html"/>
+    <link rel="top" title="bptools 1.3.0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                1.2
+                1.3
               </div>
             
           
@@ -193,21 +193,18 @@
 <span class="sd">        It also initializes transformation matrices (if possible) and configures bp_pairs-related variables</span>
 <span class="sd">        that will be used in the ens_data_array -&gt; monopolar or ens_data_array -&gt; bipolar</span>
 
+<span class="sd">        FIXME: why aren&#39;t we just initializing in __init__???</span>
+
 <span class="sd">        :param electrode_config_file: {str} path to electrode configuration file</span>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">st_obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="n">electrode_config_file</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">electrode_config_file</span><span class="p">)</span>
-        <span class="n">electrode_config_file_core</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">electrode_config_file</span><span class="p">)</span>
-        <span class="n">electrode_config_file_csv</span> <span class="o">=</span> <span class="n">electrode_config_file_core</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span>
 
         <span class="n">elec_conf</span> <span class="o">=</span> <span class="n">ElectrodeConfig</span><span class="p">(</span><span class="n">electrode_config_file</span><span class="p">)</span>
-        <span class="c1"># TODO check if we always have to include C/R in the electrode list</span>
         <span class="n">st_obj</span><span class="o">.</span><span class="n">elec_conf</span> <span class="o">=</span> <span class="n">elec_conf</span>
 
         <span class="c1"># first we determine whether bipolar to monopolar transformation is possible</span>
-
         <span class="c1"># initializing  bipolar_2_monopolar_matrix - if possible</span>
         <span class="n">st_obj</span><span class="o">.</span><span class="n">bipolar_to_monopolar_matrix</span> <span class="o">=</span> <span class="n">st_obj</span><span class="o">.</span><span class="n">monopolar_trans_matrix_via_inverse</span><span class="p">()</span>
 
@@ -522,49 +519,28 @@
         <span class="n">tr_mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_monopolar_to_bipolar_matrix</span><span class="p">()</span>
 
         <span class="c1"># storing matrix before removing zero columns</span>
-        <span class="c1"># the enstries from this matrix are meaningful if we process elec_cont.contacts</span>
+        <span class="c1"># the entries from this matrix are meaningful if we process elec_cont.contacts</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">monopolar_to_bipolar_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">tr_mat</span><span class="p">)</span>
 
-        <span class="c1"># implied_bp_dtype = np.dtype([(&#39;e0&#39;, &#39;&lt;i8&#39;), (&#39;e1&#39;, &#39;&lt;i8&#39;), (&#39;bp_name&#39;, &#39;|S256&#39;)])</span>
-        <span class="n">implied_bp_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span>
-            <span class="p">[(</span><span class="s1">&#39;ch0_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;i8&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;ch1_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;i8&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;ch0_label&#39;</span><span class="p">,</span> <span class="s1">&#39;|S256&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;ch1_label&#39;</span><span class="p">,</span> <span class="s1">&#39;|S256&#39;</span><span class="p">),</span>
-             <span class="p">(</span><span class="s1">&#39;contact_name&#39;</span><span class="p">,</span> <span class="s1">&#39;|S256&#39;</span><span class="p">)])</span>
+        <span class="n">implied_bp_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([</span>
+            <span class="p">(</span><span class="s1">&#39;ch0_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;i8&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;ch1_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;i8&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;ch0_label&#39;</span><span class="p">,</span> <span class="s1">&#39;|S256&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;ch1_label&#39;</span><span class="p">,</span> <span class="s1">&#39;|S256&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;contact_name&#39;</span><span class="p">,</span> <span class="s1">&#39;|S256&#39;</span><span class="p">),</span>
+        <span class="p">])</span>
 
-        <span class="c1"># self.configure_bipolar_2_monopolar_transformation(electrode_config_file)</span>
-        <span class="n">m2b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">monopolar_to_bipolar_matrix</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elec_conf</span><span class="o">.</span><span class="n">sense_channels</span><span class="p">:</span>
+            <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">contact</span><span class="p">,</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">ref</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">elec_conf</span><span class="o">.</span><span class="n">contacts</span><span class="p">[</span><span class="n">chan</span><span class="o">.</span><span class="n">contact</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">elec_conf</span><span class="o">.</span><span class="n">contacts</span><span class="p">[</span><span class="n">chan</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">))</span>
 
-        <span class="n">bp_idx_list</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m2b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">e_sense_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">m2b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">e_ref_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">m2b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">bp_idx_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">e_sense_idx</span><span class="p">,</span> <span class="n">e_ref_idx</span><span class="p">))</span>
-            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                <span class="k">pass</span>
-
-        <span class="n">contacts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elec_conf</span><span class="o">.</span><span class="n">contacts</span>
-        <span class="n">contact_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">contact</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">contact</span> <span class="ow">in</span> <span class="n">contacts</span><span class="p">]</span>
-
-        <span class="n">contacts_recarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elec_conf</span><span class="o">.</span><span class="n">contacts_as_recarray</span><span class="p">()</span>
-
-        <span class="n">e_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">recarray</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">bp_idx_list</span><span class="p">),),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">implied_bp_dtype</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">e_sense_idx</span><span class="p">,</span> <span class="n">e_ref_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bp_idx_list</span><span class="p">):</span>
-            <span class="c1"># NOTE: in the fully bp mode ch0_idx and ch1_idx are meaningless</span>
-            <span class="n">e_ref_name_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">contacts_recarray</span><span class="o">.</span><span class="n">jack_box_num</span> <span class="o">==</span> <span class="n">e_ref_idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">e_sense_name_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">contacts_recarray</span><span class="o">.</span><span class="n">jack_box_num</span> <span class="o">==</span> <span class="n">e_sense_idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-
-            <span class="n">e_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ch1_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e_ref_name_idx</span>
-            <span class="n">e_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ch0_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e_sense_name_idx</span>
-
-            <span class="n">e_ref_name</span> <span class="o">=</span> <span class="n">contact_labels</span><span class="p">[</span><span class="n">e_ref_name_idx</span><span class="p">]</span>
-            <span class="n">e_sense_name</span> <span class="o">=</span> <span class="n">contact_labels</span><span class="p">[</span><span class="n">e_sense_name_idx</span><span class="p">]</span>
-
-            <span class="n">e_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ch1_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">contacts_recarray</span><span class="p">[</span><span class="n">e_ref_name_idx</span><span class="p">][</span><span class="s1">&#39;jack_box_num&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-            <span class="n">e_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ch0_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">contacts_recarray</span><span class="p">[</span><span class="n">e_sense_name_idx</span><span class="p">][</span><span class="s1">&#39;jack_box_num&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-            <span class="n">e_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;contact_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e_sense_name</span><span class="p">,</span> <span class="n">e_ref_name</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">e_array</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">rec</span><span class="o">.</span><span class="n">fromrecords</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">implied_bp_dtype</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SeriesTransformation.configure_bipolar_2_monopolar_transformation"><a class="viewcode-back" href="../../index.html#bptools.transform.SeriesTransformation.configure_bipolar_2_monopolar_transformation">[docs]</a>    <span class="k">def</span> <span class="nf">configure_bipolar_2_monopolar_transformation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">electrode_config_file</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;reads bipolar-to-monopolar transformation matrix from the disk. In the future we may</span>
@@ -721,7 +697,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.2.1',
+            VERSION:'1.3.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

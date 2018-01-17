@@ -1,6 +1,19 @@
 Changes
 =======
 
+Version 1.3.0
+-------------
+
+**2018-01-17**
+
+* Updated ``ElectrodeConfig.contacts`` to be an ``OrderedDict`` instead of a
+  list (#17). This fixes an issue with broken config file generation when a
+  jacksheet contains ignored contacts (e.g., ``EKG``) in between non-ignored
+  contacts.
+* Disabled label standardization by default
+* Enabled some testing of the ``bptools.transform`` module
+
+
 Version 1.2.3
 -------------
 
