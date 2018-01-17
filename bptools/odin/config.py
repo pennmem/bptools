@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime
 import functools
@@ -6,7 +7,7 @@ import os.path as osp
 import struct
 
 try:
-    from typing import List
+    from typing import List, Dict
 except ImportError:  # pragma: no cover
     pass
 
@@ -256,7 +257,7 @@ class ElectrodeConfig(object):
         self.name = name  # type: str
         self.subject = subject  # type: str
 
-        self.contacts = []  # type: List[Contact]
+        self.contacts = OrderedDict()  # type: Dict[int, Contact]
         self.sense_channels = []  # type: List[SenseChannel]
         self.stim_channels = []  # type: List[StimChannel]
 
@@ -271,8 +272,9 @@ class ElectrodeConfig(object):
         # Naming conventions here differ for backwards compatibility with
         # Ramulator.
         self._recarray_dtype = np.dtype([
-            ('jack_box_num', '<i8'), ('contact_name', '|S256'),
-            ('description', '|S256')
+            ('jack_box_num', '<i8'),
+            ('contact_name', '|S256'),
+            ('description', '|S256'),
         ])
 
     def __str__(self):
@@ -383,15 +385,19 @@ class ElectrodeConfig(object):
         else:
             areas = [area] * len(js)
 
-        config.contacts = [
+        jsdf = pd.DataFrame({
+            'label': js.label,
+            'port': js.index,
+            'area': areas,
+            'description': ['Jackbox number {}'.format(n) for n in js.index]
+        })
+
+        contacts = [
             Contact.from_series(s)
-            for _, s in pd.DataFrame({
-                'label': js.label,
-                'port': js.index,
-                'area': areas,
-                'description': ['Jackbox number {}'.format(n) for n in js.index]
-            }).iterrows()
+            for _, s in jsdf.iterrows()
         ]
+        for c in contacts:
+            config.contacts[c.port] = c
 
         if scheme == 'bipolar':
             pairs = create_pairs(filename)
@@ -462,12 +468,13 @@ class ElectrodeConfig(object):
             with buffer() as buf:
                 for line in iterlines():
                     buf.write(','.join(line) + u'\n')
-            self.contacts = [
+            contacts = [
                 Contact.from_series(s)
                 for _, s in pd.read_csv(buf, names=[
                     'label', 'port', 'port2', 'area', 'description'
                 ], index_col=False).drop('port2', axis=1).iterrows()
             ]
+            self.contacts = {c.port: c for c in contacts}
 
             # Read sense channels
             with buffer() as buf:
@@ -497,7 +504,7 @@ class ElectrodeConfig(object):
 
             # Optionally standardize labels for contacts, sense channels, and stim channels
             if standardize_labels:
-                for contact in self.contacts:
+                for contact in self.contacts.values():
                     contact.label = standardize_label(contact.label)
                 for sense_channel in self.sense_channels:
                     sense_channel.name = standardize_label(sense_channel.name)
@@ -514,7 +521,7 @@ class ElectrodeConfig(object):
 
         """
         anode, cathode = None, None
-        for contact in self.contacts:
+        for contact in self.contacts.values():
             if contact.label == anode_label:
                 anode = contact.port
             elif contact.label == cathode_label:
@@ -583,8 +590,8 @@ class ElectrodeConfig(object):
         ]
 
         # Channel definitions
-        for n, contact in enumerate(self.contacts):
-            jbox_num = n + 1
+        for contact in self.contacts.values():
+            jbox_num = contact.port
             chan = _num_to_bank_label(jbox_num)
             data = [contact.label.encode(), iencode(jbox_num), iencode(jbox_num),
                     fencode(contact.area),
@@ -596,7 +603,7 @@ class ElectrodeConfig(object):
         config.append(b"SenseChannels:")
         for chan in self.sense_channels:
             # <contact 1 label>,<sense channel label>,<contact 1 #>,<contact 2 #>,x,#description#
-            data = [self.contacts[chan.contact - 1].label.encode(), chan.label.encode(),
+            data = [self.contacts[chan.contact].label.encode(), chan.label.encode(),
                     iencode(chan.contact), iencode(chan.ref), b'x',
                     '#{}#'.format(chan.description).encode()]
             config.append(delimiter.join(data))
@@ -668,7 +675,7 @@ class ElectrodeConfig(object):
         """
         arr = np.recarray((len(self.contacts),), dtype=self._recarray_dtype)
 
-        for i, contact in enumerate(self.contacts):
+        for i, contact in enumerate(self.contacts.values()):
             arr[i]['jack_box_num'] = int(contact.port)
             arr[i]['contact_name'] = str(contact.label)
             # Not using surface area anymore because not used by Ramulator
@@ -694,6 +701,7 @@ class ElectrodeConfig(object):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    c1 = Contact('a', 1, 1, '')
-    c2 = Contact('a', 1, 1, '')
-    print(c1 == c2)
+    jspath = osp.expanduser('~/mnt/rhino/data/eeg/R1383J/docs/jacksheet.txt')
+
+    ec = ElectrodeConfig.from_jacksheet(jspath, subject="R1383J")
+    print(ec.to_csv())

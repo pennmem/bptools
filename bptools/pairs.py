@@ -210,7 +210,7 @@ def read_montage_json(montage_path, assume_monopolar=True):
     with open(montage_path, 'r') as f:
         montage_jn = json.loads(f.read())
 
-    pairs_jn = montage_jn[montage_jn.keys()[0]]['pairs']
+    pairs_jn = montage_jn[list(montage_jn.keys())[0]]['pairs']
 
     ch0_label = []
     ch1_label = []
@@ -233,7 +233,7 @@ def read_montage_json(montage_path, assume_monopolar=True):
         )
 
     channel_array = np.sort(np.array(list(channel_set), dtype=np.int))
-    channel_idx_dict = dict(zip(channel_array,np.arange(channel_array.shape[0])))
+    channel_idx_dict = dict(zip(channel_array, np.arange(channel_array.shape[0])))
 
     if assume_monopolar:
         # we assume that all contacts are present in the electrode configuration

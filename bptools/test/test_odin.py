@@ -177,7 +177,7 @@ class TestElectrodeConfig:
         assert ec.subject == ec2.subject
         assert ec.version == ec2.version
         assert ec.name == ec2.name
-        assert all([ec.contacts[i] == ec2.contacts[i] for i in range(len(ec.contacts))])
+        assert all([ec.contacts[i] == ec2.contacts[i] for i in ec.contacts.keys()])
         assert all([ec.sense_channels[i] == ec2.sense_channels[i] for i in range(len(ec.sense_channels))])
         assert all([ec.stim_channels[i] == ec2.stim_channels[i] for i in range(len(ec.stim_channels))])
 
@@ -234,19 +234,19 @@ class TestElectrodeConfig:
             return
 
         ec = ElectrodeConfig.from_jacksheet(jfile, subject, scheme, area=area)
-        assert isinstance(ec.contacts[0].port, int)
+        assert isinstance(ec.contacts[1].port, int)
         assert ec.subject == subject
         assert ec.num_contacts == 37
         assert ec.num_sense_channels == 37 if scheme == 'monopolar' else 35
         assert ec.num_stim_channels == 0
 
         if area == 0.5:
-            for contact in ec.contacts:
+            for contact in ec.contacts.values():
                 assert contact.area == area
         else:
             areas = ElectrodeConfig.read_area_file(area)
             regex = re.compile(r'(\d*[a-zA-Z]+)')
-            for contact in ec.contacts:
+            for contact in ec.contacts.values():
                 electrode = contact.label[:regex.match(contact.label).end()]
                 area_ = areas[areas.label == electrode].area
                 assert all(area_ == contact.area)

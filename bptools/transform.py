@@ -38,21 +38,18 @@ class SeriesTransformation(object):
         It also initializes transformation matrices (if possible) and configures bp_pairs-related variables
         that will be used in the ens_data_array -> monopolar or ens_data_array -> bipolar
 
+        FIXME: why aren't we just initializing in __init__???
+
         :param electrode_config_file: {str} path to electrode configuration file
         :return: None
         """
-
         st_obj = cls()
         electrode_config_file = abspath(electrode_config_file)
-        electrode_config_file_core, ext = splitext(electrode_config_file)
-        electrode_config_file_csv = electrode_config_file_core + '.csv'
 
         elec_conf = ElectrodeConfig(electrode_config_file)
-        # TODO check if we always have to include C/R in the electrode list
         st_obj.elec_conf = elec_conf
 
         # first we determine whether bipolar to monopolar transformation is possible
-
         # initializing  bipolar_2_monopolar_matrix - if possible
         st_obj.bipolar_to_monopolar_matrix = st_obj.monopolar_trans_matrix_via_inverse()
 
@@ -367,49 +364,28 @@ class SeriesTransformation(object):
         tr_mat = self.get_monopolar_to_bipolar_matrix()
 
         # storing matrix before removing zero columns
-        # the enstries from this matrix are meaningful if we process elec_cont.contacts
+        # the entries from this matrix are meaningful if we process elec_cont.contacts
         self.monopolar_to_bipolar_matrix = np.matrix(tr_mat)
 
-        # implied_bp_dtype = np.dtype([('e0', '<i8'), ('e1', '<i8'), ('bp_name', '|S256')])
-        implied_bp_dtype = np.dtype(
-            [('ch0_idx', '<i8'), ('ch1_idx', '<i8'), ('ch0_label', '|S256'), ('ch1_label', '|S256'),
-             ('contact_name', '|S256')])
+        implied_bp_dtype = np.dtype([
+            ('ch0_idx', '<i8'),
+            ('ch1_idx', '<i8'),
+            ('ch0_label', '|S256'),
+            ('ch1_label', '|S256'),
+            ('contact_name', '|S256'),
+        ])
 
-        # self.configure_bipolar_2_monopolar_transformation(electrode_config_file)
-        m2b = self.monopolar_to_bipolar_matrix
+        records = []
+        for chan in self.elec_conf.sense_channels:
+            records.append((
+                chan.contact,
+                chan.ref,
+                self.elec_conf.contacts[chan.contact].label,
+                self.elec_conf.contacts[chan.ref].label,
+                chan.name
+            ))
 
-        bp_idx_list = []
-
-        for i in range(m2b.shape[0]):
-            try:
-                e_sense_idx = np.where(m2b[i, :] == 1)[1][0]
-                e_ref_idx = np.where(m2b[i, :] == -1)[1][0]
-                bp_idx_list.append((e_sense_idx, e_ref_idx))
-            except IndexError:
-                pass
-
-        contacts = self.elec_conf.contacts
-        contact_labels = [contact.label for contact in contacts]
-
-        contacts_recarray = self.elec_conf.contacts_as_recarray()
-
-        e_array = np.recarray((len(bp_idx_list),), dtype=implied_bp_dtype)
-        for i, (e_sense_idx, e_ref_idx) in enumerate(bp_idx_list):
-            # NOTE: in the fully bp mode ch0_idx and ch1_idx are meaningless
-            e_ref_name_idx = np.where(contacts_recarray.jack_box_num == e_ref_idx+1)[0][0]
-            e_sense_name_idx = np.where(contacts_recarray.jack_box_num == e_sense_idx+1)[0][0]
-
-            e_array[i]['ch1_idx'] = e_ref_name_idx
-            e_array[i]['ch0_idx'] = e_sense_name_idx
-
-            e_ref_name = contact_labels[e_ref_name_idx]
-            e_sense_name = contact_labels[e_sense_name_idx]
-
-            e_array[i]['ch1_label'] = str(contacts_recarray[e_ref_name_idx]['jack_box_num']).zfill(3)
-            e_array[i]['ch0_label'] = str(contacts_recarray[e_sense_name_idx]['jack_box_num']).zfill(3)
-            e_array[i]['contact_name'] = '{}-{}'.format(e_sense_name, e_ref_name)
-
-        return e_array
+        return np.rec.fromrecords(records, dtype=implied_bp_dtype)
 
     def configure_bipolar_2_monopolar_transformation(self, electrode_config_file):
         """reads bipolar-to-monopolar transformation matrix from the disk. In the future we may
