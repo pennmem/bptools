@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime
 import functools
@@ -256,7 +257,7 @@ class ElectrodeConfig(object):
         self.name = name  # type: str
         self.subject = subject  # type: str
 
-        self.contacts = {}  # type: Dict[int, Contact]
+        self.contacts = OrderedDict()  # type: Dict[int, Contact]
         self.sense_channels = []  # type: List[SenseChannel]
         self.stim_channels = []  # type: List[StimChannel]
 
@@ -271,8 +272,9 @@ class ElectrodeConfig(object):
         # Naming conventions here differ for backwards compatibility with
         # Ramulator.
         self._recarray_dtype = np.dtype([
-            ('jack_box_num', '<i8'), ('contact_name', '|S256'),
-            ('description', '|S256')
+            ('jack_box_num', '<i8'),
+            ('contact_name', '|S256'),
+            ('description', '|S256'),
         ])
 
     def __str__(self):
@@ -383,16 +385,19 @@ class ElectrodeConfig(object):
         else:
             areas = [area] * len(js)
 
+        jsdf = pd.DataFrame({
+            'label': js.label,
+            'port': js.index,
+            'area': areas,
+            'description': ['Jackbox number {}'.format(n) for n in js.index]
+        })
+
         contacts = [
             Contact.from_series(s)
-            for _, s in pd.DataFrame({
-                'label': js.label,
-                'port': js.index,
-                'area': areas,
-                'description': ['Jackbox number {}'.format(n) for n in js.index]
-            }).iterrows()
+            for _, s in jsdf.iterrows()
         ]
-        config.contacts = {c.port: c for c in contacts}
+        for c in contacts:
+            config.contacts[c.port] = c
 
         if scheme == 'bipolar':
             pairs = create_pairs(filename)
@@ -585,8 +590,8 @@ class ElectrodeConfig(object):
         ]
 
         # Channel definitions
-        for n, contact in enumerate(self.contacts.values()):
-            jbox_num = n + 1
+        for contact in self.contacts.values():
+            jbox_num = contact.port
             chan = _num_to_bank_label(jbox_num)
             data = [contact.label.encode(), iencode(jbox_num), iencode(jbox_num),
                     fencode(contact.area),
@@ -696,6 +701,7 @@ class ElectrodeConfig(object):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    c1 = Contact('a', 1, 1, '')
-    c2 = Contact('a', 1, 1, '')
-    print(c1 == c2)
+    jspath = osp.expanduser('~/mnt/rhino/data/eeg/R1383J/docs/jacksheet.txt')
+
+    ec = ElectrodeConfig.from_jacksheet(jspath, subject="R1383J")
+    print(ec.to_csv())
