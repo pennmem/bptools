@@ -7,7 +7,10 @@ with open('README.rst') as f:
 setup(
     name='bptools',
     version=__version__,
-    packages=find_packages(),
+    packages=find_packages(exclude=[
+        'bptools.test',
+        'bptools.test.*',
+    ]),
     package_data={
         '': ['*.txt', '*.csv'],
     },

@@ -367,13 +367,13 @@ class SeriesTransformation(object):
         tr_mat = self.get_monopolar_to_bipolar_matrix()
 
         # storing matrix before removing zero columns
-        # the enstries from this matrix are meaningful if we process elec_cont.contacts
+        # the entries from this matrix are meaningful if we process elec_cont.contacts
         self.monopolar_to_bipolar_matrix = np.matrix(tr_mat)
 
-        # implied_bp_dtype = np.dtype([('e0', '<i8'), ('e1', '<i8'), ('bp_name', '|S256')])
-        implied_bp_dtype = np.dtype(
-            [('ch0_idx', '<i8'), ('ch1_idx', '<i8'), ('ch0_label', '|S256'), ('ch1_label', '|S256'),
-             ('contact_name', '|S256')])
+        implied_bp_dtype = np.dtype([
+            ('ch0_idx', '<i8'), ('ch1_idx', '<i8'), ('ch0_label', '|S256'),
+            ('ch1_label', '|S256'), ('contact_name', '|S256')
+        ])
 
         # self.configure_bipolar_2_monopolar_transformation(electrode_config_file)
         m2b = self.monopolar_to_bipolar_matrix
