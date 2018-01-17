@@ -373,10 +373,13 @@ class ElectrodeConfig(object):
 
         if isinstance(area, str):
             area_map = cls.read_area_file(area)
-            areas = [
-                area_map[area_map.label == row.electrode].area.values[0]
-                for _, row in js.iterrows()
-            ]
+            try:
+                areas = [
+                    area_map[area_map.label == row.electrode].area.values[0]
+                    for _, row in js.iterrows()
+                ]
+            except IndexError as e:
+                raise IndexError(str(e) + " HINT: check for typos in area file")
         else:
             areas = [area] * len(js)
 
