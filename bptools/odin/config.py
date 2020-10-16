@@ -66,7 +66,7 @@ def make_config_name(subject, localization, montage, stim):
 
 def make_odin_config(jacksheet_filename, config_name, area,
                      path=None, stim_channels=None, good_leads=None,
-                     scheme='bipolar', format='csv'):
+                     scheme='bipolar', format='csv', ignore_labels=['ECG', 'EKG']):
     """Create an Odin ENS electrode configuration file.
 
     Parameters
@@ -102,7 +102,7 @@ def make_odin_config(jacksheet_filename, config_name, area,
 
     """
     subject, name = config_name.split('_')
-    ec = ElectrodeConfig.from_jacksheet(jacksheet_filename, subject, scheme, area)
+    ec = ElectrodeConfig.from_jacksheet(jacksheet_filename, subject, scheme, area, ignore_labels=ignore_labels)
     ec.name = name
 
     if stim_channels is not None:
@@ -347,7 +347,7 @@ class ElectrodeConfig(object):
             return area_map
 
     @classmethod
-    def from_jacksheet(cls, filename, subject="", scheme='bipolar', area=0.5):
+    def from_jacksheet(cls, filename, subject="", scheme='bipolar', area=0.5, ignore_labels=['ECG', 'EKG']):
         """Create a new :class:`ElectrodeConfig` instance from a jacksheet.
 
         Parameters
@@ -362,13 +362,15 @@ class ElectrodeConfig(object):
             Default surface area to use in mm^2 when a float or a file that
             maps electrode labels to surface areas (see :meth:`read_area_file`
             for file format details).
+        ignore_labels: list or tuple
+            Labels to ignore within the jacksheet
 
         Returns
         -------
         config : ElectrodeConfig
 
         """
-        js = read_jacksheet(filename)
+        js = read_jacksheet(filename, ignore_labels=ignore_labels)
         config = ElectrodeConfig()
         config.subject = subject
         config._jacksheet = js
@@ -400,9 +402,9 @@ class ElectrodeConfig(object):
             config.contacts[c.port] = c
 
         if scheme == 'bipolar':
-            pairs = create_pairs(filename)
+            pairs = create_pairs(filename, ignore_labels=ignore_labels)
         elif scheme == 'monopolar':
-            pairs = create_monopolar_pairs(filename)
+            pairs = create_monopolar_pairs(filename, ignore_labels=ignore_labels)
         else:
             raise AssertionError("Unrecognized referencing scheme")
 

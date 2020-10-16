@@ -22,6 +22,7 @@ def main(args=None):
                         default="bipolar",
                         help="configuration scheme to use (default: bipolar)")
     parser.add_argument("--jacksheet", "-j", type=str, help='path to jacksheet file')
+    parser.add_argument("--ignore-labels", nargs='*', default=['ECG', 'EKG'], help='Jacksheet labels to exclude')
     parser.add_argument("--good-leads", "-g", type=str, help="path to good_leads.txt")
     parser.add_argument("--localization", "-l", default=0, type=int,
                         help='localization number (default: 0)')
@@ -58,7 +59,7 @@ def main(args=None):
 
     make_config = partial(make_odin_config, jacksheet, name, args.surface_area,
                           args.output_path, good_leads=good_leads,
-                          scheme=args.scheme)
+                          scheme=args.scheme, ignore_labels=args.ignore_labels)
 
     for format in ['csv', 'bin']:
         res = make_config(format=format)

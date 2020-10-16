@@ -45,7 +45,7 @@ def _mux_filter(c1, c2):
         return None, None
 
 
-def create_pairs(jacksheet_filename):
+def create_pairs(jacksheet_filename, ignore_labels=['ECG', 'EKG']):
     """Defines bipolar pairs for the Odin ENS given a jacksheet.
 
     This uses a scheme to live within the constraints of ENS configuration,
@@ -63,7 +63,7 @@ def create_pairs(jacksheet_filename):
         Columns: pair, label1, label2, contact1, contact2, mux
 
     """
-    jacksheet = read_jacksheet(jacksheet_filename)
+    jacksheet = read_jacksheet(jacksheet_filename, ignore_labels=ignore_labels)
     groups = jacksheet.electrode.unique()
 
     contacts = []
@@ -91,7 +91,7 @@ def create_pairs(jacksheet_filename):
     return df
 
 
-def create_monopolar_pairs(jacksheet_filename, common_ref=0):
+def create_monopolar_pairs(jacksheet_filename, common_ref=0, ignore_labels=['ECG', 'EKG']):
     """Create 'pairs' that are referenced to a common reference.
 
     Parameters
@@ -109,7 +109,7 @@ def create_monopolar_pairs(jacksheet_filename, common_ref=0):
     """
     assert common_ref >= 0
     assert isinstance(common_ref, int)
-    jacksheet = read_jacksheet(jacksheet_filename)
+    jacksheet = read_jacksheet(jacksheet_filename, ignore_labels=ignore_labels)
     contacts = [[jacksheet.index[i], common_ref] for i in range(len(jacksheet))]
     return _contacts_to_dataframe(jacksheet, contacts)
 

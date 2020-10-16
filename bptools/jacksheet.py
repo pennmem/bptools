@@ -1,17 +1,18 @@
 import pandas as pd
 from bptools.util import standardize_label
+from functools import reduce
 
 
-def read_jacksheet(filename, ignore_ecg=True, standardize_labels=False):
+def read_jacksheet(filename, ignore_labels=['EKG', 'ECG'], standardize_labels=False):
     """Utility function to read a jacksheet.
 
     Parameters
     ----------
     filename : str
-    ignore_ecg : bool
-        Omit heart rate channels labeled as ECG/EKG.
     standarize_labels: bool
         Standarize contact labels when reading in the jacksheet
+    ignore_labels: list or tuple
+        Labels to ignore from jacksheet
 
     Returns
     -------
@@ -28,7 +29,9 @@ def read_jacksheet(filename, ignore_ecg=True, standardize_labels=False):
     The index is the jackbox number.
 
     """
+
     df = pd.read_csv(filename, index_col=0, names=['label'], sep='\s+')
+
     electrodes = df.label.str.extract(r'(\d*[a-zA-Z]+)', expand=True) \
         .rename(columns={0: 'electrode'})
     js = pd.concat([df, electrodes], axis=1)
@@ -36,11 +39,7 @@ def read_jacksheet(filename, ignore_ecg=True, standardize_labels=False):
     if standardize_labels:
         js['label'] = js['label'].apply(standardize_label)
 
-    if ignore_ecg:
-        js = js[~js.label.str.startswith('ECG')     \
-                & ~js.label.str.startswith('EKG')   \
-                & ~js.label.str.startswith('RSRCH') \
-                & ~js.label.str.startswith('DC')
-               ]
+    if ignore_labels:
+        js = js[reduce(lambda a, b: a & b,[~js.label.str.startswith(label) for label in ignore_labels])]
 
     return js
