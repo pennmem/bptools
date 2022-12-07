@@ -1,6 +1,14 @@
 Changes
 =======
 
+Version 1.3.1
+-------------
+
+**2022-12-07**
+
+* Added python 3.7 support
+
+
 Version 1.3.0
 -------------
 

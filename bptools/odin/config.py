@@ -449,7 +449,7 @@ class ElectrodeConfig(object):
                     row = getline()
                     if "Subclasses:" in ','.join(row):
                         getline()
-                        raise StopIteration
+                        return
                     yield row
 
             @contextmanager
