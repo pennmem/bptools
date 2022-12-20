@@ -18,13 +18,11 @@ requirements:
     - python {{ python }}
     - numpy
     - pandas
-    - pytz
 
   run:
     - python {{ python }}
     - numpy
     - pandas
-    - pytz
     # - vs2015_runtime  [win]
 
 test:

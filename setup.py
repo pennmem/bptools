@@ -17,7 +17,6 @@ setup(
     install_requires=[
         'numpy',
         'pandas',
-        'pytz',
     ],
     author='Penn Computational Memory Lab',
     description='EEG bipolar montage helpers',
