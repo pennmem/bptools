@@ -12,5 +12,5 @@ class VersionInfo(object):
         return self.major, self.minor, self.patch
 
 
-__version__ = "1.3.1"
+__version__ = "1.4.0"
 version_info = VersionInfo(*__version__.split('.'))

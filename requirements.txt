@@ -3,3 +3,4 @@ pandas
 pytest
 pytest-cov
 codecov
+pytz
