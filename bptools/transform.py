@@ -365,7 +365,7 @@ class SeriesTransformation(object):
 
         # storing matrix before removing zero columns
         # the entries from this matrix are meaningful if we process elec_cont.contacts
-        self.monopolar_to_bipolar_matrix = np.matrix(tr_mat)
+        self.monopolar_to_bipolar_matrix = np.array(tr_mat)
 
         implied_bp_dtype = np.dtype([
             ('ch0_idx', '<i8'),
@@ -485,7 +485,7 @@ class SeriesTransformation(object):
 
         # storing matrix before removing zero columns
         # the enstries from this matrix are meaningful if we process elec_cont.contacts
-        self.monopolar_to_bipolar_matrix = np.matrix(tr_mat)
+        self.monopolar_to_bipolar_matrix = np.array(tr_mat)
 
         # non_zero_mask = np.any(tr_mat != 0, axis=1)
         # self.monopolar_to_bipolar_matrix = self.monopolar_to_bipolar_matrix[non_zero_mask, :]
@@ -496,7 +496,7 @@ class SeriesTransformation(object):
         tr_mat = tr_mat[non_zero_mask_row, :]
         tr_mat = tr_mat[:, non_zero_mask_column]
 
-        tr_mat = np.matrix(tr_mat)
+        tr_mat = np.array(tr_mat)
 
         # self.monopolar_to_bipolar_matrix = tr_mat
 
