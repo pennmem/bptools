@@ -1,6 +1,15 @@
 Changes
 =======
 
+Version 1.5.0
+-------------
+
+**2023-03-23**
+
+* Added python 3.11 support
+* Removed support for all other python versions
+
+
 Version 1.4.0
 -------------
 
