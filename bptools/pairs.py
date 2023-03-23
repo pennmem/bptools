@@ -232,7 +232,7 @@ def read_montage_json(montage_path, assume_monopolar=True):
             )
         )
 
-    channel_array = np.sort(np.array(list(channel_set), dtype=np.int))
+    channel_array = np.sort(np.array(list(channel_set), dtype=int))
     channel_idx_dict = dict(zip(channel_array, np.arange(channel_array.shape[0])))
 
     if assume_monopolar:

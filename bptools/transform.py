@@ -423,7 +423,7 @@ class SeriesTransformation(object):
             raise RuntimeError("elec_conf not specified. Make sure you create SeriesTransformatin using"
                                " Seriestransformation.create(elec_conf_file_path) syntax ")
 
-        tr_mat = np.zeros((256, 256), dtype=np.int)
+        tr_mat = np.zeros((256, 256), dtype=int)
         for i, sense_channel in enumerate(elec_conf.sense_channels):
             port_num = sense_channel.contact
             tr_mat[port_num - 1, port_num - 1] = 1
