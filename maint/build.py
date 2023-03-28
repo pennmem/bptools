@@ -22,6 +22,7 @@ parser.add_argument('--no-convert', action='store_true', default=False,
 
 def clean():
     """Clean the build directory."""
+    print("rm -rf build/")
     try:
         shutil.rmtree('build')
         os.mkdir('build')
@@ -36,6 +37,8 @@ def build():
     check_call(shlex.split(build_cmd))
 
 
+platforms = ['linux-64', 'linux-aarch64', 'osx-64', 'osx-arm64', 'win-64']
+
 def convert():
     """Convert conda packages to other platforms."""
     os_name = {
@@ -46,8 +49,9 @@ def convert():
     dirname = '{}-{}'.format(os_name, platform.architecture()[0][:2])
     files = glob.glob('build/{}/*.tar.bz2'.format(dirname))
 
+    platform_args = "-p " + " -p ".join(platforms)
     for filename in files:
-        convert_cmd = "conda convert {} -p all -o build/".format(filename)
+        convert_cmd = f"conda convert {filename} {platform_args} -o build/"
         print(convert_cmd)
         check_call(shlex.split(convert_cmd))
 
