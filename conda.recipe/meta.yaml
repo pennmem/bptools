@@ -22,6 +22,7 @@ requirements:
     - python {{ python }}
     - numpy
     - pandas
+    - h5py
     # - vs2015_runtime  [win]
 
 test:

@@ -1,6 +1,7 @@
 numpy
 pandas
+h5py
+pytz
 pytest
 pytest-cov
 codecov
-pytz
