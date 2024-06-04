@@ -56,8 +56,9 @@ def standardize_label(label):
     final_label = label
 
     # Some contacts have a leading 0 (LAD01), so remove it
-    if label[-2] == "0":
-        final_label = label[:-2] + label[-1]
+    if len(label)>1:
+	if label[-2] == "0":
+		final_label = label[:-2] + label[-1]
 
     # All characters should be uppercase 
     final_label = final_label.upper()
